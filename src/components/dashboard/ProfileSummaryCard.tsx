@@ -83,9 +83,14 @@ export function ProfileSummaryCard() {
                 <Anchor size={11} /> Pacer
               </Badge>
             )}
-            {currentUser.is_steer && (
+            {currentUser.is_oc_steer && (
               <Badge className="bg-white/15 text-white">
-                <Compass size={11} /> Steer
+                <Compass size={11} /> OC Steer
+              </Badge>
+            )}
+            {currentUser.is_db_steer && (
+              <Badge className="bg-white/15 text-white">
+                <Compass size={11} /> DB Steer
               </Badge>
             )}
             {currentUser.is_drummer && (

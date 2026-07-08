@@ -31,6 +31,8 @@ export interface Database {
       paddle_side: "Left" | "Right" | "Ambi";
       boat_type: "DB12" | "DB22" | "V6";
       attendance_status: "Unconfirmed" | "Attending" | "Absent" | "Waitlist";
+      eligibility_status: "Citizen" | "PR" | "Other";
+      age_range: "Under 40" | "40-50" | "50-60" | "60+";
     };
   };
 }

@@ -10,7 +10,10 @@ import { cn } from "@/lib/utils";
 function CountdownUnit({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center rounded-lg bg-slate-900/5 px-2 py-1.5 dark:bg-white/10">
-      <span className="font-display text-lg font-bold tabular-nums text-slate-900 dark:text-white">
+      <span
+        className="font-display text-lg font-bold tabular-nums text-slate-900 dark:text-white"
+        suppressHydrationWarning
+      >
         {String(value).padStart(2, "0")}
       </span>
       <span className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">

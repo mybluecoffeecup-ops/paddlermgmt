@@ -6,6 +6,12 @@ export type PaddleSide = "Left" | "Right" | "Ambi";
 export type BoatType = "DB12" | "DB22" | "V6";
 export type AttendanceStatus = "Unconfirmed" | "Attending" | "Absent" | "Waitlist";
 
+export type EligibilityStatus = "Citizen" | "PR" | "Other";
+export const ALL_ELIGIBILITY_STATUSES: EligibilityStatus[] = ["Citizen", "PR", "Other"];
+
+export type AgeRange = "Under 40" | "40-50" | "50-60" | "60+";
+export const ALL_AGE_RANGES: AgeRange[] = ["Under 40", "40-50", "50-60", "60+"];
+
 export type CrewTag =
   | "Premier Mixed"
   | "Women"
@@ -13,6 +19,15 @@ export type CrewTag =
   | "Masters"
   | "Youth"
   | "Novice";
+
+export const ALL_CREW_TAGS: CrewTag[] = [
+  "Premier Mixed",
+  "Women",
+  "Men",
+  "Masters",
+  "Youth",
+  "Novice",
+];
 
 export interface Benchmarks {
   erg_2k_seconds?: number;
@@ -25,12 +40,14 @@ export interface Profile {
   id: string;
   full_name: string;
   weight_kg: number | null;
-  is_pr_or_citizen: boolean;
+  eligibility: EligibilityStatus;
+  age_range: AgeRange | null;
   primary_discipline: Discipline;
   preferred_side: PaddleSide;
   is_coach: boolean;
   is_pacer: boolean;
-  is_steer: boolean;
+  is_oc_steer: boolean;
+  is_db_steer: boolean;
   is_drummer: boolean;
   benchmarks: Benchmarks;
   coaching_feedback: string | null;

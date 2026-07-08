@@ -3,10 +3,10 @@
 import { SlidersHorizontal } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import type { Discipline } from "@/types";
+import { ALL_CREW_TAGS, type Discipline } from "@/types";
 
 export const DISCIPLINE_OPTIONS: Discipline[] = ["DB", "OC", "Both"];
-export const CREW_TAG_OPTIONS = ["Premier Mixed", "Women", "Men", "Masters"];
+export const CREW_TAG_OPTIONS = ALL_CREW_TAGS;
 
 interface FilterSidebarProps {
   disciplines: Set<Discipline>;

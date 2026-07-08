@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutGrid, LogOut, Users, Waves, Anchor } from "lucide-react";
+import { LayoutGrid, LogOut, User, Users, Waves, Anchor } from "lucide-react";
 
 import { useAppData } from "@/hooks/app-data";
 import { getSupabaseClient } from "@/lib/supabase/client";
@@ -17,7 +17,12 @@ const NAV_ITEMS = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { role, setRole, usingLiveBackend } = useAppData();
+  const { role, setRole, usingLiveBackend, loading, currentUser } = useAppData();
+
+  const resolved = !loading && currentUser !== undefined;
+  const visibleNavItems = NAV_ITEMS.filter(
+    (item) => item.href === "/" || !resolved || role === "coach"
+  );
 
   const handleSignOut = async () => {
     await getSupabaseClient()?.auth.signOut();
@@ -42,7 +47,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <nav className="hidden items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-white/5 md:flex">
-            {NAV_ITEMS.map((item) => {
+            {visibleNavItems.map((item) => {
               const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
               return (
                 <Link
@@ -107,6 +112,23 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </button>
               </div>
             )}
+            <Link
+              href="/profile"
+              aria-label="My profile"
+              className={cn(
+                "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[11px] font-bold uppercase text-slate-600 transition-colors hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/20",
+                pathname === "/profile" && "ring-2 ring-teal-500"
+              )}
+            >
+              {currentUser ? (
+                currentUser.full_name
+                  .split(" ")
+                  .map((p) => p[0])
+                  .join("")
+              ) : (
+                <User size={15} />
+              )}
+            </Link>
           </div>
         </div>
       </header>
@@ -117,7 +139,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur md:hidden dark:border-white/10 dark:bg-[#0b1f2e]/95">
         <div className="mx-auto flex max-w-[1400px] items-stretch justify-around px-2 py-1.5">
-          {NAV_ITEMS.map((item) => {
+          {visibleNavItems.map((item) => {
             const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
             return (
               <Link

@@ -21,16 +21,20 @@ function makeProfile(i: number): Profile {
   const sides = ["Left", "Right", "Ambi"] as const;
   const disciplines = ["DB", "OC", "Both"] as const;
   const crewTagPool = ["Premier Mixed", "Women", "Men", "Masters"];
+  const eligibilities = ["Citizen", "PR", "Other"] as const;
+  const ageRanges = ["Under 40", "40-50", "50-60", "60+"] as const;
   return {
     id: `paddler-${i}`,
     full_name: name,
     weight_kg: 58 + ((i * 7) % 40),
-    is_pr_or_citizen: i % 4 !== 0,
+    eligibility: eligibilities[i % eligibilities.length],
+    age_range: ageRanges[i % ageRanges.length],
     primary_discipline: disciplines[i % disciplines.length],
     preferred_side: sides[i % sides.length],
     is_coach: i === 0,
     is_pacer: i % 9 === 0,
-    is_steer: i % 11 === 0,
+    is_oc_steer: i % 11 === 0,
+    is_db_steer: i % 12 === 0,
     is_drummer: i % 13 === 0,
     benchmarks: {
       erg_2k_seconds: 420 + (i % 60),
