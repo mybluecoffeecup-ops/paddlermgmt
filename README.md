@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Paddler Management App
 
-## Getting Started
+A team management app for dragon boat crews — RSVPs, attendance, race commitments, and drag-and-drop boat lineups — built with Next.js App Router, TypeScript, Tailwind v4, and Supabase/Postgres.
 
-First, run the development server:
+**Live prototype:** https://mybluecoffeecup-ops.github.io/paddlermgmt/
+
+The live link above serves [`prototype.html`](prototype.html), a standalone, single-file interactive mockup of the lineup builder (mock data, drag-and-drop seating, live weight-balance telemetry) that runs entirely in the browser with no backend. The full Next.js application described below is the real app and currently runs locally.
+
+## Features
+
+- **Paddler dashboard** (`/`) — RSVP to sessions, view race countdowns
+- **Coach command center** (`/command-center`) — roster, attendance, and session management
+- **Lineup builder** (`/lineups/[lineupId]`) — drag-and-drop seat assignment across boat layouts (DB12, DB22, V6) with a live left/right (or bow/stern) weight-balance telemetry bar
+- Role switching (Paddler / Coach) as a UI toggle — no auth wired up yet
+
+## Running locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # start dev server (Turbopack) at http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Other useful commands:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build    # production build (also runs the TypeScript check)
+npm run lint     # ESLint
+npx tsc --noEmit # type-check only
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+By default the app runs entirely on mock data from `src/lib/mock-data.ts` — no environment setup required. To connect a real Supabase project, copy `.env.local.example` to `.env.local`, fill in your project's URL and anon key, and apply `supabase/migrations/0001_init.sql` to your database.
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+  app/                    # routes: /, /command-center, /lineups, /lineups/[lineupId]
+  components/
+    dashboard/            # paddler home dashboard widgets
+    command-center/        # coach roster, filters, session manager
+    lineup/               # drag-and-drop boat editor, telemetry, seat/bench UI
+    nav/                  # AppShell (role toggle, navigation)
+    ui/                   # shared primitives
+  hooks/app-data.tsx      # single data-fetching context consumed by all routes
+  lib/
+    api/                  # Supabase CRUD calls per table
+    boat-config.ts        # seat layouts + balance-group logic for DB12/DB22/V6
+    mock-data.ts          # seed data used when Supabase isn't configured
+    supabase/             # client + hand-written database types
+  types/index.ts          # domain types mirroring the SQL schema
+supabase/migrations/      # SQL schema, RLS policies, triggers
+prototype.html            # standalone static mockup (see Deployment below)
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+See [CLAUDE.md](CLAUDE.md) for a deeper architecture walkthrough.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deployment
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Pushes to `main` automatically deploy `prototype.html` to GitHub Pages via the workflow at [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml). The Next.js app itself isn't statically exported (it has a dynamic Supabase-backed route) and isn't deployed by this workflow.
