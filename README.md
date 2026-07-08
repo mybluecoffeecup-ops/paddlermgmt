@@ -2,6 +2,8 @@
 
 A team management app for dragon boat crews — RSVPs, attendance, race commitments, and drag-and-drop boat lineups — built with Next.js App Router, TypeScript, Tailwind v4, and Supabase/Postgres.
 
+The visual identity — a deep "regatta teal" + vermilion "ember" accent palette, Barlow Condensed display type, and condensed numerals throughout — is grounded in dragon boat racing itself rather than generic UI defaults, and is shared identically between the Next.js app and `prototype.html`.
+
 **Live prototype:** https://mybluecoffeecup-ops.github.io/paddlermgmt/
 
 The live link above serves [`prototype.html`](prototype.html), a standalone, single-file interactive mockup (mock data, no backend) with three tabs — Paddler Home, Coach/Captain Command Center, and a Lineup Tool — that runs entirely in the browser. The full Next.js application described below is the real app and currently runs locally.
