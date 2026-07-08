@@ -14,12 +14,23 @@ const SIDE_DOT: Record<string, string> = {
   Ambi: "bg-violet-500",
 };
 
+const SIDE_CYCLE = ["Left", "Right", "Ambi"] as const;
+
 export function ProfileSummaryCard() {
   const { currentUser, updateProfile, attendance, currentUserId } = useAppData();
   const [editingWeight, setEditingWeight] = useState(false);
   const [weightInput, setWeightInput] = useState("");
 
   if (!currentUser) return null;
+
+  const showPreferredSide =
+    currentUser.primary_discipline === "DB" || currentUser.primary_discipline === "Both";
+
+  function cyclePreferredSide() {
+    const idx = SIDE_CYCLE.indexOf(currentUser!.preferred_side);
+    const next = SIDE_CYCLE[(idx + 1) % SIDE_CYCLE.length];
+    updateProfile(currentUserId, { preferred_side: next });
+  }
 
   const upcomingAttending = attendance.filter(
     (a) => a.paddler_id === currentUserId && a.status === "Attending"
@@ -54,10 +65,19 @@ export function ProfileSummaryCard() {
           <p className="truncate text-base font-bold">{currentUser.full_name}</p>
           <div className="mt-1 flex flex-wrap items-center gap-1.5">
             <Badge className="bg-white/15 text-white">{currentUser.primary_discipline}</Badge>
-            <Badge className="bg-white/15 text-white">
-              <span className={`h-1.5 w-1.5 rounded-full ${SIDE_DOT[currentUser.preferred_side]}`} />
-              {currentUser.preferred_side}
-            </Badge>
+            {showPreferredSide && (
+              <button
+                onClick={cyclePreferredSide}
+                aria-label="Cycle preferred side"
+                className="inline-flex"
+              >
+                <Badge className="bg-white/15 text-white">
+                  <span className={`h-1.5 w-1.5 rounded-full ${SIDE_DOT[currentUser.preferred_side]}`} />
+                  {currentUser.preferred_side}
+                  <Pencil size={9} className="text-white/60" />
+                </Badge>
+              </button>
+            )}
             {currentUser.is_stroke && (
               <Badge className="bg-white/15 text-white">
                 <Anchor size={11} /> Stroke

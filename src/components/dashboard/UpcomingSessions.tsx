@@ -21,7 +21,7 @@ export function UpcomingSessions() {
         subtitle={`${upcoming.length} scheduled`}
         icon={<Calendar size={16} />}
       />
-      <ul className="divide-y divide-slate-100 dark:divide-white/10">
+      <ul className="max-h-64 divide-y divide-slate-100 overflow-y-auto dark:divide-white/10">
         {upcoming.map((session) => {
           const status = attendanceStatusFor(session.id, currentUserId);
           return (
