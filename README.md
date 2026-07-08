@@ -11,7 +11,7 @@ The live link above serves [`prototype.html`](prototype.html), a standalone, sin
 - **Paddler dashboard** (`/`; mirrored in the "Paddler Home" tab in `prototype.html`) — an editable profile card (weight, preferred side for DB/Both paddlers, Pacer/Steer/Drummer role badges), quick Attending/Absent RSVP to a scrollable list of upcoming sessions, live per-race countdown tickers with RSVP and payment status, and a private "Coaching Feedback Corner" for cues from coaching staff
 - **Coach/Captain command center** (`/command-center`) — a dense filter sidebar to segment the roster by discipline (DB/OC/Both) and crew category (Premier Mixed, Women, Men, Masters), a metrics summary (headcount vs. boat capacity, total attending weight, response rate, discipline), and a session manager for browsing sessions and broadcasting markdown workout/training logs
 - **Lineup builder** (`/lineups/[lineupId]`; standalone "Lineup Tool" tab in `prototype.html`) — drag-and-drop seat assignment across boat layouts (DB12, DB22, V6), including dedicated Drummer/Steer seats on dragon boats, with a live left/right (or bow/stern) weight-balance telemetry bar
-- Role switching (Paddler / Coach) as a UI toggle — no auth wired up yet
+- **Auth** — real Supabase Auth (email/password) once a Supabase project is configured: `/login` and `/signup`, route protection via `src/proxy.ts`, and a `profiles` row auto-created per signup. Paddler vs. Coach view is derived from `profiles.is_coach`. Without Supabase configured, the app falls back to a Paddler/Coach UI toggle over mock data (no login required) for local development
 
 ## Running locally
 
@@ -28,25 +28,30 @@ npm run lint     # ESLint
 npx tsc --noEmit # type-check only
 ```
 
-By default the app runs entirely on mock data from `src/lib/mock-data.ts` — no environment setup required. To connect a real Supabase project, copy `.env.local.example` to `.env.local`, fill in your project's URL and anon key, and apply `supabase/migrations/0001_init.sql` to your database.
+By default the app runs entirely on mock data from `src/lib/mock-data.ts` — no environment setup required, and `/login`/`/signup` are bypassed. To connect a real Supabase project, copy `.env.local.example` to `.env.local`, fill in your project's URL and anon key (plus `NEXT_PUBLIC_SITE_URL` for email-confirmation redirects), and apply both `supabase/migrations/0001_init.sql` and `0002_handle_new_user.sql` to your database.
 
 ## Project structure
 
 ```
 src/
-  app/                    # routes: /, /command-center, /lineups, /lineups/[lineupId]
+  app/
+    (app)/                # routes wrapped in AppDataProvider + AppShell: /, /command-center, /lineups, /lineups/[lineupId]
+    login/, signup/       # auth pages (server actions, no AppShell chrome)
+    auth/callback/        # exchanges Supabase email-confirmation code for a session
   components/
     dashboard/            # paddler home dashboard widgets
     command-center/        # coach roster, filters, session manager
     lineup/               # drag-and-drop boat editor, telemetry, seat/bench UI
-    nav/                  # AppShell (role toggle, navigation)
+    nav/                  # AppShell (role badge/sign-out or demo toggle, navigation)
     ui/                   # shared primitives
   hooks/app-data.tsx      # single data-fetching context consumed by all routes
   lib/
     api/                  # Supabase CRUD calls per table
+    auth-actions.ts       # login/signup/logout server actions
     boat-config.ts        # seat layouts + balance-group logic for DB12/DB22/V6
     mock-data.ts          # seed data used when Supabase isn't configured
-    supabase/             # client + hand-written database types
+    supabase/             # browser + server clients, hand-written database types
+  proxy.ts                # route guard: redirects unauthenticated requests to /login
   types/index.ts          # domain types mirroring the SQL schema
 supabase/migrations/      # SQL schema, RLS policies, triggers
 prototype.html            # standalone static mockup (see Deployment below)
@@ -56,4 +61,4 @@ See [CLAUDE.md](CLAUDE.md) for a deeper architecture walkthrough.
 
 ## Deployment
 
-Pushes to `main` automatically deploy `prototype.html` to GitHub Pages via the workflow at [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml). The Next.js app itself isn't statically exported (it has a dynamic Supabase-backed route) and isn't deployed by this workflow.
+Pushes to `main` automatically deploy `prototype.html` to GitHub Pages via the workflow at [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml). The Next.js app itself isn't statically exported — it has Server Actions and a `proxy.ts` route guard, both of which require a live Node server — so GitHub Pages can't host it. The intended host for the real app is Vercel; it isn't deployed there yet.
