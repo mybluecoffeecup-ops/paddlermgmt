@@ -29,7 +29,7 @@ function makeProfile(i: number): Profile {
     primary_discipline: disciplines[i % disciplines.length],
     preferred_side: sides[i % sides.length],
     is_coach: i === 0,
-    is_stroke: i % 9 === 0,
+    is_pacer: i % 9 === 0,
     is_steer: i % 11 === 0,
     is_drummer: i % 13 === 0,
     benchmarks: {

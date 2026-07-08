@@ -25,7 +25,7 @@ create table profiles (
   primary_discipline discipline_type not null default 'DB',
   preferred_side paddle_side not null default 'Ambi',
   is_coach boolean not null default false,
-  is_stroke boolean not null default false,
+  is_pacer boolean not null default false,
   is_steer boolean not null default false,
   is_drummer boolean not null default false,
   benchmarks jsonb not null default '{}'::jsonb,

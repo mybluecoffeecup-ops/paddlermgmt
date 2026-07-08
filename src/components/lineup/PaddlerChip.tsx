@@ -60,7 +60,7 @@ export function PaddlerChip({
       <div className="mt-0.5 flex items-center justify-between gap-1">
         <p className="text-[11px] font-semibold text-slate-400">{formatWeight(paddler.weight_kg)}</p>
         <div className="flex items-center gap-0.5 text-slate-400">
-          {paddler.is_stroke && <Anchor size={10} />}
+          {paddler.is_pacer && <Anchor size={10} />}
           {paddler.is_steer && <Compass size={10} />}
           {paddler.is_drummer && <Mic2 size={10} />}
         </div>

@@ -42,7 +42,7 @@ function dragonBoatLayout(boat: "DB12" | "DB22", rows: number): BoatLayout {
 }
 
 function outriggerLayout(): BoatLayout {
-  const labels = ["Stroke", "2", "3", "4", "5", "Steer"];
+  const labels = ["Pacer", "2", "3", "4", "5", "Steer"];
   const seats: SeatDefinition[] = labels.map((label, i) => ({
     id: `${i + 1}`,
     label: `${i + 1} · ${label}`,

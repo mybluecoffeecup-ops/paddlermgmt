@@ -78,9 +78,9 @@ export function ProfileSummaryCard() {
                 </Badge>
               </button>
             )}
-            {currentUser.is_stroke && (
+            {currentUser.is_pacer && (
               <Badge className="bg-white/15 text-white">
-                <Anchor size={11} /> Stroke
+                <Anchor size={11} /> Pacer
               </Badge>
             )}
             {currentUser.is_steer && (

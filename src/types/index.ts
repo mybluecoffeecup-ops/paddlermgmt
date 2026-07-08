@@ -29,7 +29,7 @@ export interface Profile {
   primary_discipline: Discipline;
   preferred_side: PaddleSide;
   is_coach: boolean;
-  is_stroke: boolean;
+  is_pacer: boolean;
   is_steer: boolean;
   is_drummer: boolean;
   benchmarks: Benchmarks;
