@@ -4,6 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 <title>Paddler Management — Interactive Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
@@ -11,42 +14,54 @@
     theme: {
       extend: {
         colors: {
+          /* Deep harbor navy — matches the Next.js app's dark surface tokens. */
           ink: {
-            950: '#05070a',
-            900: '#0a0e14',
-            800: '#11161f',
-            700: '#181f2b',
-            600: '#232c3b',
-            500: '#334055',
+            950: '#071620',
+            900: '#0b1f2e',
+            800: '#11283a',
+            700: '#17324a',
+            600: '#1f405c',
+            500: '#3a5a75',
           },
+          /* Regatta teal — the water. Primary brand accent, shared with the app. */
           accent: {
-            DEFAULT: '#38bdf8',
-            soft: '#7dd3fc',
+            DEFAULT: '#2f8074',
+            soft: '#78b8ac',
+          },
+          /* Ember — the dragon head's carved vermilion. Secondary accent. */
+          ember: {
+            DEFAULT: '#d9532c',
+            soft: '#ef8d6c',
           },
         },
         fontFamily: {
           sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Inter', 'sans-serif'],
+          display: ['"Barlow Condensed"', '-apple-system', 'sans-serif'],
         },
       },
     },
   };
 </script>
 <style>
-  html, body { background:#05070a; }
+  html, body { background:#071620; }
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #232c3b; border-radius: 999px; }
+  ::-webkit-scrollbar-thumb { background: #1f405c; border-radius: 999px; }
   .paddler-card { touch-action: none; }
   .paddler-card.dragging { opacity: 0.35; }
-  .seat-drop.drag-over { outline: 2px dashed #38bdf8; outline-offset: -2px; background-color: rgba(56,189,248,0.12); }
-  .bench-drop.drag-over { outline: 2px dashed #38bdf8; outline-offset: -4px; background-color: rgba(56,189,248,0.06); }
+  .seat-drop.drag-over { outline: 2px dashed #2f8074; outline-offset: -2px; background-color: rgba(47,128,116,0.16); }
+  .bench-drop.drag-over { outline: 2px dashed #2f8074; outline-offset: -4px; background-color: rgba(47,128,116,0.08); }
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
-  .side-left { border-left: 3px solid #38bdf8; }
-  .side-right { border-left: 3px solid #fb923c; }
-  .side-ambi { border-left: 3px solid #a78bfa; }
+  .side-left { border-left: 3px solid #f43f5e; }
+  .side-right { border-left: 3px solid #3b82f6; }
+  .side-ambi { border-left: 3px solid #8b5cf6; }
   @keyframes pulse-warn { 0%,100%{opacity:1;} 50%{opacity:.55;} }
   .pulse-warn { animation: pulse-warn 1.4s ease-in-out infinite; }
+  svg.icon { display: inline-block; vertical-align: middle; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
 </style>
 </head>
 <body class="min-h-screen bg-ink-950 text-slate-200 font-sans antialiased">
@@ -56,21 +71,23 @@
   <!-- Top App Bar -->
   <header class="sticky top-0 z-30 border-b border-ink-700 bg-ink-950/90 backdrop-blur px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
     <div class="flex items-center gap-2.5">
-      <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-accent to-sky-600 flex items-center justify-center text-ink-950 font-bold text-sm shadow-lg shadow-accent/20">🐉</div>
+      <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-accent to-ember flex items-center justify-center text-white shadow-lg shadow-accent/20">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/><circle cx="12" cy="5" r="3"/></svg>
+      </div>
       <div>
-        <h1 class="text-sm font-semibold tracking-tight text-white leading-none">Paddler Management</h1>
-        <p class="text-[11px] text-slate-500 leading-none mt-0.5">Interactive Prototype</p>
+        <h1 class="font-display text-base font-bold uppercase tracking-wide text-white leading-none">Paddler Management</h1>
+        <p class="text-[11px] text-slate-500 leading-none mt-1">Interactive Prototype</p>
       </div>
     </div>
 
     <nav class="flex items-center gap-1 rounded-xl bg-ink-800 p-1 border border-ink-600">
-      <button id="tab-btn-home" class="tab-btn active px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors">
+      <button id="tab-btn-home" class="tab-btn active px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
         Paddler Home
       </button>
-      <button id="tab-btn-coach" class="tab-btn px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors">
+      <button id="tab-btn-coach" class="tab-btn px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
         Command Center
       </button>
-      <button id="tab-btn-lineup" class="tab-btn px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors">
+      <button id="tab-btn-lineup" class="tab-btn px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
         Lineup Tool
       </button>
     </nav>
@@ -87,7 +104,7 @@
 
       <!-- Profile card -->
       <div class="rounded-2xl border border-ink-600 bg-ink-800/60 overflow-hidden mb-5">
-        <div class="flex items-center gap-3 bg-gradient-to-br from-sky-500 to-indigo-600 px-4 py-4">
+        <div class="flex items-center gap-3 bg-gradient-to-br from-accent to-ember px-4 py-4">
           <div id="profile-avatar" class="h-12 w-12 rounded-2xl bg-white/15 flex items-center justify-center font-bold text-white text-lg shrink-0 backdrop-blur"></div>
           <div class="min-w-0 flex-1">
             <p id="profile-name" class="text-white font-bold truncate"></p>
@@ -114,9 +131,9 @@
       <div class="mb-5">
         <div class="flex items-center justify-between mb-2 px-1">
           <h2 class="text-xs uppercase tracking-wider text-slate-500 font-semibold">Coaching Feedback Corner</h2>
-          <span class="flex items-center gap-1 text-[10px] font-semibold text-accent-soft">&#128274; Private</span>
+          <span class="flex items-center gap-1 text-[10px] font-semibold text-accent-soft"><svg class="icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Private</span>
         </div>
-        <div class="rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/5 to-sky-500/5 p-4">
+        <div class="rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/5 to-ember/5 p-4">
           <blockquote id="coaching-feedback" class="border-l-4 border-accent/50 pl-3 text-sm italic leading-relaxed text-slate-300"></blockquote>
         </div>
       </div>
@@ -134,7 +151,7 @@
   <section id="panel-coach" class="tab-panel flex-1 px-4 sm:px-6 py-6">
 
     <div class="mb-4">
-      <h1 class="text-lg font-bold text-white leading-tight">Coach / Captain Command Center</h1>
+      <h1 class="font-display text-2xl font-bold uppercase tracking-wide text-white leading-tight">Coach / Captain Command Center</h1>
       <p class="text-xs text-slate-500 mt-0.5">Roster segmentation, session broadcasts, and readiness at a glance.</p>
     </div>
 
@@ -146,7 +163,7 @@
       <!-- Filter sidebar -->
       <aside class="rounded-2xl border border-ink-600 bg-ink-800/60 p-4 space-y-4 xl:sticky xl:top-20">
         <div class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wide text-slate-500">
-          <span>&#9881;</span> Segment Roster
+          <svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="4" x2="14" y2="4"/><line x1="10" y1="4" x2="3" y2="4"/><line x1="21" y1="12" x2="12" y2="12"/><line x1="8" y1="12" x2="3" y2="12"/><line x1="21" y1="20" x2="16" y2="20"/><line x1="12" y1="20" x2="3" y2="20"/><line x1="14" y1="2" x2="14" y2="6"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="22"/></svg> Segment Roster
         </div>
         <div>
           <p class="mb-2 text-[10px] font-bold uppercase tracking-wide text-slate-500">Discipline</p>
@@ -162,7 +179,7 @@
       <div class="rounded-2xl border border-ink-600 bg-ink-800/60 overflow-hidden flex flex-col xl:h-[34rem]">
         <div class="flex items-center justify-between px-4 py-3 border-b border-ink-600 shrink-0">
           <div class="flex items-center gap-2">
-            <span class="text-sm">&#128197;</span>
+            <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             <p class="text-sm font-semibold text-white">Session Manager</p>
           </div>
           <span id="session-count" class="text-[11px] text-slate-500">0 sessions</span>
@@ -177,7 +194,7 @@
   <section id="panel-lineup" class="tab-panel flex-1 px-4 sm:px-6 py-6">
 
     <div class="mb-4">
-      <h1 class="text-lg font-bold text-white leading-tight">Lineup Tool</h1>
+      <h1 class="font-display text-2xl font-bold uppercase tracking-wide text-white leading-tight">Lineup Tool</h1>
       <p class="text-xs text-slate-500 mt-0.5">DB12 — Dragon Boat Lineup. Drag paddlers into seats.</p>
     </div>
 
@@ -186,18 +203,18 @@
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-6 sm:gap-10">
           <div>
-            <p class="text-[11px] uppercase tracking-wider text-sky-300 font-semibold">Left Side</p>
-            <p id="tele-left" class="text-2xl font-bold text-white tabular-nums">0.0 <span class="text-sm font-normal text-slate-400">kg</span></p>
+            <p class="text-[11px] uppercase tracking-wider text-accent-soft font-semibold">Left Side</p>
+            <p id="tele-left" class="font-display text-3xl font-bold text-white tabular-nums">0.0 <span class="text-sm font-normal text-slate-400">kg</span></p>
           </div>
           <div class="h-10 w-px bg-ink-600"></div>
           <div>
-            <p class="text-[11px] uppercase tracking-wider text-orange-300 font-semibold">Right Side</p>
-            <p id="tele-right" class="text-2xl font-bold text-white tabular-nums">0.0 <span class="text-sm font-normal text-slate-400">kg</span></p>
+            <p class="text-[11px] uppercase tracking-wider text-ember-soft font-semibold">Right Side</p>
+            <p id="tele-right" class="font-display text-3xl font-bold text-white tabular-nums">0.0 <span class="text-sm font-normal text-slate-400">kg</span></p>
           </div>
           <div class="h-10 w-px bg-ink-600"></div>
           <div>
             <p class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Variance</p>
-            <p id="tele-delta" class="text-2xl font-bold text-white tabular-nums">0.0 <span class="text-sm font-normal text-slate-400">kg</span></p>
+            <p id="tele-delta" class="font-display text-3xl font-bold text-white tabular-nums">0.0 <span class="text-sm font-normal text-slate-400">kg</span></p>
           </div>
         </div>
         <div id="tele-status" class="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
@@ -206,8 +223,8 @@
         </div>
       </div>
       <div class="mt-3 h-2 rounded-full bg-ink-950 overflow-hidden flex">
-        <div id="tele-bar-left" class="bg-sky-400 transition-all duration-300" style="width:50%"></div>
-        <div id="tele-bar-right" class="bg-orange-400 transition-all duration-300" style="width:50%"></div>
+        <div id="tele-bar-left" class="bg-accent transition-all duration-300" style="width:50%"></div>
+        <div id="tele-bar-right" class="bg-ember transition-all duration-300" style="width:50%"></div>
       </div>
     </div>
 
@@ -216,21 +233,21 @@
       <!-- Bench -->
       <div class="lg:w-80 shrink-0">
         <div class="flex items-center justify-between mb-2 px-1">
-          <h2 class="text-xs uppercase tracking-wider text-slate-500 font-semibold">The Bench</h2>
+          <h2 class="font-display text-sm uppercase tracking-wide text-slate-400 font-bold">The Bench</h2>
           <span id="bench-count" class="text-[11px] text-slate-500">20 available</span>
         </div>
         <div id="bench" class="bench-drop rounded-2xl border border-ink-600 bg-ink-800/60 p-3 min-h-[420px] max-h-[70vh] overflow-y-auto space-y-2">
         </div>
         <div class="flex gap-2 mt-3">
-          <button id="btn-reset" class="flex-1 text-xs font-medium px-3 py-2 rounded-lg bg-ink-700 border border-ink-600 hover:bg-ink-600 transition-colors">Reset Lineup</button>
-          <button id="btn-autobalance" class="flex-1 text-xs font-medium px-3 py-2 rounded-lg bg-accent/10 border border-accent/40 text-accent-soft hover:bg-accent/20 transition-colors">Auto-Balance</button>
+          <button id="btn-reset" class="flex-1 text-xs font-medium px-3 py-2 rounded-lg bg-ink-700 border border-ink-600 hover:bg-ink-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">Reset Lineup</button>
+          <button id="btn-autobalance" class="flex-1 text-xs font-medium px-3 py-2 rounded-lg bg-accent/10 border border-accent/40 text-accent-soft hover:bg-accent/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">Auto-Balance</button>
         </div>
       </div>
 
       <!-- Boat -->
       <div class="flex-1">
         <div class="flex items-center justify-between mb-2 px-1">
-          <h2 class="text-xs uppercase tracking-wider text-slate-500 font-semibold">DB12 — Dragon Boat Lineup</h2>
+          <h2 class="font-display text-sm uppercase tracking-wide text-slate-400 font-bold">DB12 — Dragon Boat Lineup</h2>
           <span class="text-[11px] text-slate-500">Drag paddlers into seats</span>
         </div>
         <div class="rounded-2xl border border-ink-600 bg-gradient-to-b from-ink-800/80 to-ink-900/80 p-4 sm:p-6">
@@ -241,8 +258,8 @@
           </div>
 
           <div class="flex justify-center gap-3 sm:gap-6 mb-2">
-            <span class="text-[11px] uppercase tracking-wider text-sky-300 font-semibold w-24 sm:w-36 text-center">Left</span>
-            <span class="text-[11px] uppercase tracking-wider text-orange-300 font-semibold w-24 sm:w-36 text-center">Right</span>
+            <span class="text-[11px] uppercase tracking-wider text-accent-soft font-semibold w-24 sm:w-36 text-center">Left</span>
+            <span class="text-[11px] uppercase tracking-wider text-ember-soft font-semibold w-24 sm:w-36 text-center">Right</span>
           </div>
 
           <div id="boat-grid" class="flex flex-col items-center gap-2 sm:gap-3">
@@ -266,6 +283,32 @@
 <script>
 (function () {
   "use strict";
+
+  // ---------------------------------------------------------------------
+  // Icons — inline SVG (lucide-style line icons), never emoji.
+  // ---------------------------------------------------------------------
+  function icon(paths, size) {
+    size = size || 14;
+    return `<svg class="icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+  }
+  const ICONS = {
+    lock: icon('<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'),
+    sliders: icon('<line x1="21" y1="4" x2="14" y2="4"/><line x1="10" y1="4" x2="3" y2="4"/><line x1="21" y1="12" x2="12" y2="12"/><line x1="8" y1="12" x2="3" y2="12"/><line x1="21" y1="20" x2="16" y2="20"/><line x1="12" y1="20" x2="3" y2="20"/><line x1="14" y1="2" x2="14" y2="6"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="22"/>'),
+    calendar: icon('<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'),
+    pencil: icon('<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/>', 11),
+    anchor: icon('<path d="M12 22V8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/><circle cx="12" cy="5" r="3"/>', 11),
+    compass: icon('<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>', 11),
+    mic: icon('<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>', 11),
+    check: icon('<polyline points="20 6 9 17 4 12"/>', 16),
+    x: icon('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>', 16),
+    flag: icon('<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>', 56),
+    mapPin: icon('<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>', 11),
+    boat: icon('<path d="M3 18h18l-2 3H5l-2-3Z"/><path d="M5 18V9l7-5 7 5v9"/><path d="M12 4v14"/>', 16),
+    users: icon('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>', 18),
+    scale: icon('<path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>', 18),
+    trendingUp: icon('<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>', 18),
+    radio: icon('<circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-8.49a6 6 0 0 0 0 8.49"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/>', 14),
+  };
 
   // ---------------------------------------------------------------------
   // Mock data — 20 paddlers
@@ -334,7 +377,7 @@
   const style = document.createElement('style');
   style.textContent = `
     .tab-btn { color: #94a3b8; }
-    .tab-btn.active { background: #38bdf8; color: #05070a; }
+    .tab-btn.active { background: #2f8074; color: #ffffff; }
   `;
   document.head.appendChild(style);
 
@@ -376,11 +419,11 @@
       ${showSide ? `
         <button id="btn-cycle-side" class="inline-flex items-center gap-1 rounded-full bg-white/15 text-white text-[11px] font-semibold px-2.5 py-0.5" aria-label="Cycle preferred side">
           <span class="h-1.5 w-1.5 rounded-full ${SIDE_DOT[CURRENT_PADDLER.side]}"></span>${CURRENT_PADDLER.side}
-          <span class="text-white/60">&#9998;</span>
+          <span class="text-white/60">${ICONS.pencil}</span>
         </button>` : ''}
-      ${CURRENT_PADDLER.isPacer ? `<span class="inline-flex items-center gap-1 rounded-full bg-white/15 text-white text-[11px] font-semibold px-2.5 py-0.5">&#9875; Pacer</span>` : ''}
-      ${CURRENT_PADDLER.isSteer ? `<span class="inline-flex items-center gap-1 rounded-full bg-white/15 text-white text-[11px] font-semibold px-2.5 py-0.5">&#129517; Steer</span>` : ''}
-      ${CURRENT_PADDLER.isDrummer ? `<span class="inline-flex items-center gap-1 rounded-full bg-white/15 text-white text-[11px] font-semibold px-2.5 py-0.5">&#127908; Drummer</span>` : ''}
+      ${CURRENT_PADDLER.isPacer ? `<span class="inline-flex items-center gap-1 rounded-full bg-white/15 text-white text-[11px] font-semibold px-2.5 py-0.5">${ICONS.anchor} Pacer</span>` : ''}
+      ${CURRENT_PADDLER.isSteer ? `<span class="inline-flex items-center gap-1 rounded-full bg-white/15 text-white text-[11px] font-semibold px-2.5 py-0.5">${ICONS.compass} Steer</span>` : ''}
+      ${CURRENT_PADDLER.isDrummer ? `<span class="inline-flex items-center gap-1 rounded-full bg-white/15 text-white text-[11px] font-semibold px-2.5 py-0.5">${ICONS.mic} Drummer</span>` : ''}
     `;
     const sideBtn = document.getElementById('btn-cycle-side');
     if (sideBtn) sideBtn.addEventListener('click', cyclePreferredSide);
@@ -412,7 +455,7 @@
       el.innerHTML = `
         <div class="flex items-center gap-1">
           <input id="weight-input" type="number" inputmode="decimal" value="${CURRENT_PADDLER.weight}" class="w-16 rounded-md border border-accent/40 bg-ink-950 px-1.5 py-1 text-center text-lg font-bold text-white focus:outline-none focus:ring-2 focus:ring-accent" />
-          <button id="btn-save-weight" class="rounded-md bg-accent p-1.5 text-ink-950" aria-label="Save weight">&#10003;</button>
+          <button id="btn-save-weight" class="rounded-md bg-accent p-1.5 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-soft" aria-label="Save weight">${ICONS.check}</button>
         </div>
       `;
       const input = document.getElementById('weight-input');
@@ -422,8 +465,8 @@
       document.getElementById('btn-save-weight').addEventListener('click', saveWeight);
     } else {
       el.innerHTML = `
-        <button id="btn-edit-weight" class="flex items-center gap-1 text-lg font-extrabold text-white">
-          ${CURRENT_PADDLER.weight}kg <span class="text-xs text-slate-500">&#9998;</span>
+        <button id="btn-edit-weight" class="flex items-center gap-1 font-display text-xl font-bold tabular-nums text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+          ${CURRENT_PADDLER.weight}kg <span class="text-slate-500">${ICONS.pencil}</span>
         </button>
       `;
       document.getElementById('btn-edit-weight').addEventListener('click', () => {
@@ -468,7 +511,7 @@
   }
 
   function countdownUnit(value, label) {
-    return `<div class="rounded-xl bg-ink-950/60 border border-ink-600 py-2 text-center"><p class="text-lg font-bold text-white tabular-nums">${String(value).padStart(2, '0')}</p><p class="text-[9px] text-slate-500 uppercase">${label}</p></div>`;
+    return `<div class="rounded-xl bg-ink-950/60 border border-ink-600 py-2 text-center"><p class="font-display text-xl font-bold text-white tabular-nums">${String(value).padStart(2, '0')}</p><p class="text-[9px] text-slate-500 uppercase">${label}</p></div>`;
   }
 
   function raceStatusClasses(status) {
@@ -481,18 +524,18 @@
     const container = document.getElementById('race-list');
     container.innerHTML = RACES.map(race => `
       <div class="rounded-2xl bg-gradient-to-br from-ink-800 to-ink-900 border border-ink-600 p-4 relative overflow-hidden">
-        <div class="absolute -right-6 -top-6 text-7xl opacity-[0.06] select-none">🏁</div>
+        <div class="absolute -right-6 -top-6 text-ember opacity-[0.08] select-none">${ICONS.flag}</div>
         <div class="flex items-start justify-between gap-2">
           <div class="min-w-0">
             <p class="text-white font-bold text-sm leading-tight truncate">${race.name}</p>
-            ${race.location ? `<p class="text-[11px] text-slate-500 mt-0.5">&#128205; ${race.location}</p>` : ''}
+            ${race.location ? `<p class="flex items-center gap-1 text-[11px] text-slate-500 mt-0.5">${ICONS.mapPin} ${race.location}</p>` : ''}
           </div>
           ${race.commitment.status === 'Attending' ? `<span class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${race.commitment.hasPaid ? 'bg-emerald-500/15 text-emerald-300' : 'bg-amber-500/15 text-amber-300'}">${race.commitment.hasPaid ? 'Paid' : 'Payment due'}</span>` : ''}
         </div>
         <div class="grid grid-cols-4 gap-1.5 mt-3" data-countdown="${race.id}"></div>
         <div class="flex gap-1.5 mt-3">
           ${['Attending', 'Unconfirmed', 'Absent'].map(status => `
-            <button data-race-id="${race.id}" data-status="${status}" class="flex-1 rounded-lg border py-1.5 text-[11px] font-semibold transition-colors ${race.commitment.status === status ? raceStatusClasses(status) : 'border-ink-600 text-slate-400'}">${status}</button>
+            <button data-race-id="${race.id}" data-status="${status}" class="flex-1 rounded-lg border py-1.5 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${race.commitment.status === status ? raceStatusClasses(status) : 'border-ink-600 text-slate-400'}">${status}</button>
           `).join('')}
         </div>
       </div>
@@ -536,8 +579,8 @@
   ];
 
   const SESSION_DISCIPLINE_CLASSES = {
-    DB: 'bg-sky-500/10 text-sky-300 border-sky-500/30',
-    OC: 'bg-orange-500/10 text-orange-300 border-orange-500/30',
+    DB: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30',
+    OC: 'bg-violet-500/10 text-violet-300 border-violet-500/30',
     Both: 'bg-accent/10 text-accent-soft border-accent/30',
   };
 
@@ -556,8 +599,8 @@
           <p class="text-[11px] text-slate-500">${session.time}</p>
         </div>
         <div class="flex gap-1.5 shrink-0" data-session="${session.id}">
-          <button data-status="attending" aria-label="RSVP Attending" class="flex h-8 w-8 items-center justify-center rounded-full border transition-colors ${session.status === 'attending' ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-ink-600 text-slate-400 hover:border-emerald-400 hover:text-emerald-400'}">&#10003;</button>
-          <button data-status="absent" aria-label="RSVP Absent" class="flex h-8 w-8 items-center justify-center rounded-full border transition-colors ${session.status === 'absent' ? 'border-rose-500 bg-rose-500 text-white' : 'border-ink-600 text-slate-400 hover:border-rose-400 hover:text-rose-400'}">&#10005;</button>
+          <button data-status="attending" aria-label="RSVP Attending" class="flex h-8 w-8 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${session.status === 'attending' ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-ink-600 text-slate-400 hover:border-emerald-400 hover:text-emerald-400'}">${ICONS.check}</button>
+          <button data-status="absent" aria-label="RSVP Absent" class="flex h-8 w-8 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${session.status === 'absent' ? 'border-rose-500 bg-rose-500 text-white' : 'border-ink-600 text-slate-400 hover:border-rose-400 hover:text-rose-400'}">${ICONS.x}</button>
         </div>
       `;
       container.appendChild(row);
@@ -592,7 +635,7 @@
     const container = document.getElementById('workout-log');
     container.innerHTML = WORKOUTS.map(w => `
       <div class="rounded-xl bg-ink-800 border border-ink-600 p-3 flex items-center gap-3">
-        <div class="h-9 w-9 rounded-lg bg-ink-700 flex items-center justify-center text-sm shrink-0">🛶</div>
+        <div class="h-9 w-9 rounded-lg bg-ink-700 flex items-center justify-center text-accent-soft shrink-0">${ICONS.boat}</div>
         <div class="min-w-0 flex-1">
           <p class="text-sm font-medium text-white truncate">${w.type}</p>
           <p class="text-[11px] text-slate-500">${w.date} · ${w.duration} · ${w.distance}</p>
@@ -690,7 +733,7 @@
   function renderFilters() {
     const disciplineEl = document.getElementById('filter-discipline');
     disciplineEl.innerHTML = DISCIPLINE_OPTIONS.map(d => `
-      <button data-discipline="${d}" class="w-full rounded-lg border px-3 py-2 text-left text-xs font-semibold transition-colors ${chipClasses(ccDisciplines.has(d))}">${d}</button>
+      <button data-discipline="${d}" class="w-full rounded-lg border px-3 py-2 text-left text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${chipClasses(ccDisciplines.has(d))}">${d}</button>
     `).join('');
     disciplineEl.querySelectorAll('button[data-discipline]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -703,7 +746,7 @@
 
     const crewEl = document.getElementById('filter-crew');
     crewEl.innerHTML = CREW_TAG_OPTIONS.map(tag => `
-      <button data-crew-tag="${tag}" class="w-full rounded-lg border px-3 py-2 text-left text-xs font-semibold transition-colors ${chipClasses(ccCrewTags.has(tag))}">${tag}</button>
+      <button data-crew-tag="${tag}" class="w-full rounded-lg border px-3 py-2 text-left text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${chipClasses(ccCrewTags.has(tag))}">${tag}</button>
     `).join('');
     crewEl.querySelectorAll('button[data-crew-tag]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -720,7 +763,7 @@
       <div class="flex items-center gap-3 rounded-2xl border border-ink-600 bg-ink-800/60 px-4 py-3">
         <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg ${warn ? 'bg-amber-400/10 text-amber-300' : 'bg-accent/10 text-accent-soft'}">${icon}</div>
         <div class="min-w-0">
-          <p class="text-lg font-extrabold leading-tight text-white">${value}</p>
+          <p class="font-display text-2xl font-bold leading-tight tabular-nums text-white">${value}</p>
           <p class="truncate text-[11px] font-semibold uppercase tracking-wide text-slate-500">${label}</p>
           ${hint ? `<p class="text-[11px] text-slate-500">${hint}</p>` : ''}
         </div>
@@ -746,10 +789,10 @@
     const attendancePct = roster.length ? Math.round((responded.length / roster.length) * 100) : 0;
 
     container.innerHTML = [
-      metricCard('&#128101;', 'Headcount', `${attending.length} / ${session.capacity}`, overCapacity ? 'Over boat capacity' : 'vs. boat capacity', overCapacity),
-      metricCard('&#9878;&#65039;', 'Total Weight', `${totalWeight.toFixed(0)} kg`, 'attending paddlers'),
-      metricCard('&#128200;', 'Response Rate', `${attendancePct}%`, `${responded.length} of ${roster.length} replied`),
-      metricCard('&#128674;', 'Discipline', session.discipline, session.type),
+      metricCard(ICONS.users, 'Headcount', `${attending.length} / ${session.capacity}`, overCapacity ? 'Over boat capacity' : 'vs. boat capacity', overCapacity),
+      metricCard(ICONS.scale, 'Total Weight', `${totalWeight.toFixed(0)} kg`, 'attending paddlers'),
+      metricCard(ICONS.trendingUp, 'Response Rate', `${attendancePct}%`, `${responded.length} of ${roster.length} replied`),
+      metricCard(ICONS.boat, 'Discipline', session.discipline, session.type),
     ].join('');
   }
 
@@ -757,12 +800,12 @@
     const container = document.getElementById('session-list');
     document.getElementById('session-count').textContent = `${CC_SESSIONS.length} sessions`;
     container.innerHTML = CC_SESSIONS.map(session => `
-      <button data-session-id="${session.id}" class="flex w-full items-center justify-between gap-2 border-b border-ink-700 px-4 py-2.5 text-left last:border-0 transition-colors ${session.id === ccSelectedSessionId ? 'bg-accent/10' : 'hover:bg-ink-700/40'}">
+      <button data-session-id="${session.id}" class="flex w-full items-center justify-between gap-2 border-b border-ink-700 px-4 py-2.5 text-left last:border-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent ${session.id === ccSelectedSessionId ? 'bg-accent/10' : 'hover:bg-ink-700/40'}">
         <div class="min-w-0">
           <p class="truncate text-sm font-semibold text-white">${session.title}</p>
           <p class="text-[11px] text-slate-500">${session.date}</p>
         </div>
-        <span class="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded border shrink-0 ${session.discipline === 'DB' ? 'bg-sky-500/10 text-sky-300 border-sky-500/30' : 'bg-orange-500/10 text-orange-300 border-orange-500/30'}">${session.discipline}</span>
+        <span class="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded border shrink-0 ${SESSION_DISCIPLINE_CLASSES[session.discipline]}">${session.discipline}</span>
       </button>
     `).join('');
     container.querySelectorAll('button[data-session-id]').forEach(btn => {
@@ -785,8 +828,8 @@
     container.innerHTML = `
       <label class="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-slate-500">Workout Program (markdown)</label>
       <textarea id="workout-draft" rows="7" class="w-full rounded-lg border border-ink-600 bg-ink-950/60 p-2.5 font-mono text-xs leading-relaxed text-slate-200 focus:outline-none focus:ring-2 focus:ring-accent" placeholder="## Warm-up&#10;- 15 min easy paddle"></textarea>
-      <button id="btn-broadcast" class="mt-3 w-full flex items-center justify-center gap-1.5 rounded-lg bg-accent py-2 text-sm font-bold text-ink-950 transition-colors hover:bg-accent-soft">
-        &#128225; Broadcast to Crew
+      <button id="btn-broadcast" class="mt-3 w-full flex items-center justify-center gap-1.5 rounded-lg bg-accent py-2 text-sm font-bold text-white transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-soft focus-visible:ring-offset-2 focus-visible:ring-offset-ink-900">
+        ${ICONS.radio} Broadcast to Crew
       </button>
       <p class="mt-3 mb-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-500">Preview</p>
       <div id="workout-preview" class="rounded-lg border border-ink-600 bg-ink-950/40 p-3"></div>
@@ -809,7 +852,7 @@
       session.workout = draftEl.value;
       broadcastBtn.textContent = 'Broadcast sent!';
       setTimeout(() => {
-        broadcastBtn.innerHTML = '&#128225; Broadcast to Crew';
+        broadcastBtn.innerHTML = `${ICONS.radio} Broadcast to Crew`;
       }, 1800);
     });
   }
@@ -884,8 +927,12 @@
     boatGridEl.innerHTML = '';
     SEAT_ROWS.forEach(row => {
       const rowEl = document.createElement('div');
-      rowEl.className = 'flex justify-center gap-3 sm:gap-6 w-full';
+      rowEl.className = 'flex items-center justify-center gap-2 sm:gap-3 w-full';
+      const rowNum = document.createElement('span');
+      rowNum.className = 'font-display w-5 shrink-0 text-center text-sm font-bold tabular-nums text-ember/70';
+      rowNum.textContent = String(row);
       rowEl.appendChild(makeSeatEl(`L${row}`));
+      rowEl.appendChild(rowNum);
       rowEl.appendChild(makeSeatEl(`R${row}`));
       boatGridEl.appendChild(rowEl);
     });

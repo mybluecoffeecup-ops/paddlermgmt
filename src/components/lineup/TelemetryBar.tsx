@@ -69,7 +69,7 @@ export function TelemetryBar({
           <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">
             {groups.labelA}
           </p>
-          <p className="text-base font-extrabold tabular-nums text-slate-900 dark:text-white">
+          <p className="font-display text-xl font-bold tabular-nums text-slate-900 dark:text-white">
             {weightA.toFixed(0)} kg
           </p>
         </div>
@@ -78,7 +78,7 @@ export function TelemetryBar({
           <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">
             {groups.labelB}
           </p>
-          <p className="text-base font-extrabold tabular-nums text-slate-900 dark:text-white">
+          <p className="font-display text-xl font-bold tabular-nums text-slate-900 dark:text-white">
             {weightB.toFixed(0)} kg
           </p>
         </div>
@@ -91,13 +91,14 @@ export function TelemetryBar({
           )}
         >
           <span className="text-[10px] font-bold uppercase tracking-wide">Delta</span>
-          <span className="text-base font-extrabold tabular-nums">{delta.toFixed(1)} kg</span>
+          <span className="font-display text-xl font-bold tabular-nums">{delta.toFixed(1)} kg</span>
         </div>
       </div>
 
       {isImbalanced && (
-        <p className="w-full text-xs font-semibold text-amber-700 dark:text-amber-300">
-          ⚠ Structural imbalance exceeds {WEIGHT_IMBALANCE_WARNING_KG} kg — rebalance {groups.labelA}/{groups.labelB} before racing.
+        <p className="flex w-full items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300">
+          <AlertTriangle size={13} className="shrink-0" />
+          Structural imbalance exceeds {WEIGHT_IMBALANCE_WARNING_KG} kg — rebalance {groups.labelA}/{groups.labelB} before racing.
         </p>
       )}
     </div>

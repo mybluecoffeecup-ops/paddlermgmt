@@ -30,11 +30,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/90 backdrop-blur dark:border-white/10 dark:bg-[#0b1f2e]/90">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-4 px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 text-white shadow-sm">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-600 to-ember-500 text-white shadow-sm">
               <Anchor size={18} strokeWidth={2.5} />
             </div>
             <div className="leading-tight">
-              <p className="text-sm font-bold tracking-tight">Paddler</p>
+              <p className="font-display text-base font-bold uppercase tracking-wide">Paddler</p>
               <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                 Crew Management
               </p>
@@ -49,7 +49,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-colors",
+                    "flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
                     active
                       ? "bg-white text-teal-700 shadow-sm dark:bg-teal-500/20 dark:text-teal-300"
                       : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100"
@@ -75,7 +75,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </span>
                 <button
                   onClick={handleSignOut}
-                  className="flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition-colors hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100"
+                  className="flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition-colors hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 dark:text-slate-400 dark:hover:text-slate-100"
                 >
                   <LogOut size={14} />
                   Sign out
@@ -86,7 +86,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <button
                   onClick={() => setRole("paddler")}
                   className={cn(
-                    "rounded-full px-3 py-1.5 transition-colors",
+                    "rounded-full px-3 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
                     role === "paddler"
                       ? "bg-white text-teal-700 shadow-sm dark:bg-teal-500/20 dark:text-teal-300"
                       : "text-slate-500 dark:text-slate-400"
@@ -97,7 +97,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <button
                   onClick={() => setRole("coach")}
                   className={cn(
-                    "rounded-full px-3 py-1.5 transition-colors",
+                    "rounded-full px-3 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
                     role === "coach"
                       ? "bg-white text-teal-700 shadow-sm dark:bg-teal-500/20 dark:text-teal-300"
                       : "text-slate-500 dark:text-slate-400"
@@ -124,7 +124,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex flex-1 flex-col items-center gap-0.5 rounded-xl px-2 py-1.5 text-[11px] font-semibold transition-colors",
+                  "flex flex-1 flex-col items-center gap-0.5 rounded-xl px-2 py-1.5 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
                   active
                     ? "text-teal-600 dark:text-teal-300"
                     : "text-slate-400 dark:text-slate-500"

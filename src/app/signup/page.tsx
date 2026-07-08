@@ -14,11 +14,11 @@ export default async function SignupPage({
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 dark:bg-[#071620]">
       <div className="w-full max-w-sm rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#0b1f2e]">
         <div className="mb-6 flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 text-white shadow-sm">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-600 to-ember-500 text-white shadow-sm">
             <Anchor size={18} strokeWidth={2.5} />
           </div>
           <div className="leading-tight">
-            <p className="text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            <p className="font-display text-base font-bold uppercase tracking-wide text-slate-900 dark:text-slate-100">
               Paddler
             </p>
             <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
@@ -27,7 +27,7 @@ export default async function SignupPage({
           </div>
         </div>
 
-        <h1 className="mb-4 text-lg font-bold text-slate-900 dark:text-slate-100">
+        <h1 className="mb-4 font-display text-xl font-bold uppercase tracking-wide text-slate-900 dark:text-slate-100">
           Create an account
         </h1>
 
@@ -50,7 +50,7 @@ export default async function SignupPage({
               type="text"
               name="fullName"
               required
-              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 outline-none focus:border-teal-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-100"
+              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 outline-none focus:border-teal-500 focus-visible:ring-2 focus-visible:ring-teal-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-100"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -59,7 +59,7 @@ export default async function SignupPage({
               type="email"
               name="email"
               required
-              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 outline-none focus:border-teal-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-100"
+              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 outline-none focus:border-teal-500 focus-visible:ring-2 focus-visible:ring-teal-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-100"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -69,12 +69,12 @@ export default async function SignupPage({
               name="password"
               required
               minLength={6}
-              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 outline-none focus:border-teal-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-100"
+              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 outline-none focus:border-teal-500 focus-visible:ring-2 focus-visible:ring-teal-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-100"
             />
           </label>
           <button
             type="submit"
-            className="mt-2 rounded-lg bg-teal-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-teal-700"
+            className="mt-2 rounded-lg bg-teal-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-teal-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#0b1f2e]"
           >
             Sign up
           </button>

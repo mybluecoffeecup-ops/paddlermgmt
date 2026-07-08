@@ -41,7 +41,7 @@ export function UpcomingSessions() {
                 <button
                   onClick={() => rsvpToSession(session.id, "Attending")}
                   className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-full border transition-colors",
+                    "flex h-8 w-8 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
                     status === "Attending"
                       ? "border-emerald-500 bg-emerald-500 text-white"
                       : "border-slate-200 text-slate-400 hover:border-emerald-400 hover:text-emerald-500 dark:border-white/15"
@@ -53,7 +53,7 @@ export function UpcomingSessions() {
                 <button
                   onClick={() => rsvpToSession(session.id, "Absent")}
                   className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-full border transition-colors",
+                    "flex h-8 w-8 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
                     status === "Absent"
                       ? "border-rose-500 bg-rose-500 text-white"
                       : "border-slate-200 text-slate-400 hover:border-rose-400 hover:text-rose-500 dark:border-white/15"

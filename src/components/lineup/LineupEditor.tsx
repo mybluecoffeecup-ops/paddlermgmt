@@ -103,12 +103,12 @@ export function LineupEditor({ lineupId }: { lineupId: string }) {
           <div className="flex items-center gap-2">
             <Link
               href="/lineups"
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 dark:border-white/10 dark:text-slate-400 dark:hover:bg-white/5"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 dark:border-white/10 dark:text-slate-400 dark:hover:bg-white/5"
             >
               <ArrowLeft size={15} />
             </Link>
             <div>
-              <h1 className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white">
+              <h1 className="font-display text-xl font-bold uppercase tracking-wide text-slate-900 dark:text-white">
                 {lineup.title}
               </h1>
               <p className="text-xs text-slate-500 dark:text-slate-400">

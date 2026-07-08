@@ -3,6 +3,32 @@
 :root {
   --background: #f4f8fa;
   --foreground: #0b1f2e;
+
+  /* Regatta teal — deeper, more jade than stock Tailwind teal. The water. */
+  --color-teal-50: #eef6f5;
+  --color-teal-100: #d3e9e5;
+  --color-teal-200: #a8d3ca;
+  --color-teal-300: #78b8ac;
+  --color-teal-400: #4b9c8d;
+  --color-teal-500: #2f8074;
+  --color-teal-600: #1f6a60;
+  --color-teal-700: #17564e;
+  --color-teal-800: #12433d;
+  --color-teal-900: #0f3733;
+  --color-teal-950: #071e1c;
+
+  /* Ember — the dragon head's carved vermilion, used sparingly for signature moments. */
+  --color-ember-50: #fdf1ec;
+  --color-ember-100: #fbdccf;
+  --color-ember-200: #f6b79f;
+  --color-ember-300: #ef8d6c;
+  --color-ember-400: #e66c47;
+  --color-ember-500: #d9532c;
+  --color-ember-600: #b8431f;
+  --color-ember-700: #93361a;
+  --color-ember-800: #732c18;
+  --color-ember-900: #5c2617;
+  --color-ember-950: #301209;
 }
 
 @theme inline {
@@ -10,6 +36,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-barlow-condensed);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -35,6 +62,17 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(20, 120, 130, 0.35);
+  background: rgba(31, 106, 96, 0.4);
   border-radius: 9999px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

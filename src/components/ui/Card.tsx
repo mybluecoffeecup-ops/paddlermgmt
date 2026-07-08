@@ -39,7 +39,7 @@ export function CardHeader({
           </div>
         )}
         <div>
-          <h2 className="text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">
+          <h2 className="font-display text-base font-bold uppercase tracking-wide text-slate-900 dark:text-slate-100">
             {title}
           </h2>
           {subtitle && (

@@ -19,7 +19,7 @@ export function BenchList({ paddlers }: { paddlers: Profile[] }) {
           <Users2 size={16} />
         </div>
         <div>
-          <h2 className="text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">
+          <h2 className="font-display text-base font-bold uppercase tracking-wide text-slate-900 dark:text-slate-100">
             The Bench
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">

@@ -32,7 +32,7 @@ function MetricCard({
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="text-lg font-extrabold leading-tight text-slate-900 dark:text-white">
+        <p className="font-display text-2xl font-bold leading-tight tabular-nums text-slate-900 dark:text-white">
           {value}
         </p>
         <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-slate-400">

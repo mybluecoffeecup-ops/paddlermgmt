@@ -9,7 +9,7 @@ export function CoachingFeedback() {
   const { currentUser } = useAppData();
 
   return (
-    <Card className="border-teal-200 bg-gradient-to-br from-teal-50 to-cyan-50 dark:border-teal-500/20 dark:from-teal-500/5 dark:to-cyan-500/5">
+    <Card className="border-teal-200 bg-gradient-to-br from-teal-50 to-ember-50/60 dark:border-teal-500/20 dark:from-teal-500/5 dark:to-ember-500/5">
       <CardHeader
         title="Coaching Feedback Corner"
         subtitle="Private cues from your coaching staff"

@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 function CountdownUnit({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center rounded-lg bg-slate-900/5 px-2 py-1.5 dark:bg-white/10">
-      <span className="text-base font-extrabold tabular-nums text-slate-900 dark:text-white">
+      <span className="font-display text-lg font-bold tabular-nums text-slate-900 dark:text-white">
         {String(value).padStart(2, "0")}
       </span>
       <span className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">
@@ -67,7 +67,7 @@ function RaceRow({ race }: { race: import("@/types").Race }) {
             key={status}
             onClick={() => updateRaceCommitment(race.id, currentUserId, { status })}
             className={cn(
-              "flex-1 rounded-lg border py-1.5 text-xs font-semibold transition-colors",
+              "flex-1 rounded-lg border py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
               commitment?.status === status
                 ? status === "Attending"
                   ? "border-emerald-500 bg-emerald-500 text-white"

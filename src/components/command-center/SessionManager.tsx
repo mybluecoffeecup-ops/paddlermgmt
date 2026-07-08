@@ -37,7 +37,7 @@ function WorkoutBroadcastEditor({ session }: { session: Session }) {
       </div>
       <button
         onClick={broadcast}
-        className="flex items-center justify-center gap-1.5 rounded-lg bg-teal-600 py-2 text-sm font-bold text-white transition-colors hover:bg-teal-700"
+        className="flex items-center justify-center gap-1.5 rounded-lg bg-teal-600 py-2 text-sm font-bold text-white transition-colors hover:bg-teal-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#0b1f2e]"
       >
         <Radio size={14} />
         {saved ? "Broadcast sent!" : "Broadcast to Crew"}
@@ -86,7 +86,7 @@ export function SessionManager({
             key={session.id}
             onClick={() => onSelectSession(session.id)}
             className={cn(
-              "flex w-full items-center justify-between gap-2 border-b border-slate-50 px-4 py-2.5 text-left last:border-0 dark:border-white/5",
+              "flex w-full items-center justify-between gap-2 border-b border-slate-50 px-4 py-2.5 text-left last:border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500 dark:border-white/5",
               session.id === selectedSessionId
                 ? "bg-teal-50 dark:bg-teal-500/10"
                 : "hover:bg-slate-50 dark:hover:bg-white/5"

@@ -77,7 +77,7 @@ export function RosterTable({
                           STATUS_CYCLE[(STATUS_CYCLE.indexOf(status) + 1) % STATUS_CYCLE.length];
                         rsvpToSession(sessionId, next, p.id);
                       }}
-                      className="disabled:opacity-40"
+                      className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 disabled:opacity-40"
                       title="Click to cycle attendance status"
                     >
                       <AttendanceBadge status={status} />

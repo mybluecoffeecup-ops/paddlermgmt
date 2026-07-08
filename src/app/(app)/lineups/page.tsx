@@ -50,7 +50,7 @@ export default function LineupsPage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-4">
       <div>
-        <h1 className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
+        <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-slate-900 dark:text-white">
           Lineup Generator
         </h1>
         <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -110,7 +110,7 @@ export default function LineupsPage() {
           <button
             onClick={handleCreate}
             disabled={!sessionId}
-            className="mt-1 flex items-center justify-center gap-1.5 rounded-lg bg-teal-600 py-2 text-sm font-bold text-white transition-colors hover:bg-teal-700 disabled:opacity-40"
+            className="mt-1 flex items-center justify-center gap-1.5 rounded-lg bg-teal-600 py-2 text-sm font-bold text-white transition-colors hover:bg-teal-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 disabled:opacity-40 dark:focus-visible:ring-offset-[#0b1f2e]"
           >
             <Plus size={15} /> Create Lineup
           </button>

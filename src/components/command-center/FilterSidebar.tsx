@@ -28,7 +28,7 @@ function ToggleChip({
     <button
       onClick={onClick}
       className={cn(
-        "w-full rounded-lg border px-3 py-2 text-left text-sm font-semibold transition-colors",
+        "w-full rounded-lg border px-3 py-2 text-left text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
         active
           ? "border-teal-500 bg-teal-500/10 text-teal-700 dark:text-teal-300"
           : "border-slate-200 text-slate-500 hover:border-slate-300 dark:border-white/10 dark:text-slate-400"

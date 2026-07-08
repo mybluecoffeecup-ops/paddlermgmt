@@ -54,7 +54,7 @@ export function ProfileSummaryCard() {
 
   return (
     <Card className="overflow-hidden">
-      <div className="flex items-center gap-4 bg-gradient-to-br from-teal-600 to-cyan-700 px-4 py-5 text-white">
+      <div className="flex items-center gap-4 bg-gradient-to-br from-teal-600 to-ember-600 px-4 py-5 text-white">
         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/15 text-lg font-bold backdrop-blur">
           {currentUser.full_name
             .split(" ")
@@ -121,7 +121,7 @@ export function ProfileSummaryCard() {
           ) : (
             <button
               onClick={startEdit}
-              className="flex items-center gap-1 text-lg font-extrabold text-slate-900 dark:text-white"
+              className="flex items-center gap-1 font-display text-xl font-bold tabular-nums text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 dark:text-white"
             >
               {formatWeight(currentUser.weight_kg)}
               <Pencil size={11} className="text-slate-400" />
@@ -132,7 +132,7 @@ export function ProfileSummaryCard() {
           </span>
         </div>
         <div className="flex flex-col items-center justify-center gap-1 px-2 py-4">
-          <span className="text-lg font-extrabold text-emerald-600 dark:text-emerald-400">
+          <span className="font-display text-xl font-bold tabular-nums text-emerald-600 dark:text-emerald-400">
             {upcomingAttending}
           </span>
           <span className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
@@ -140,7 +140,7 @@ export function ProfileSummaryCard() {
           </span>
         </div>
         <div className="flex flex-col items-center justify-center gap-1 px-2 py-4">
-          <span className="text-lg font-extrabold text-amber-600 dark:text-amber-400">
+          <span className="font-display text-xl font-bold tabular-nums text-amber-600 dark:text-amber-400">
             {upcomingUnconfirmed}
           </span>
           <span className="text-[11px] font-medium uppercase tracking-wide text-slate-400">

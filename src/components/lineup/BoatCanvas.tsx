@@ -32,7 +32,7 @@ export function BoatCanvas({
           <Ship size={16} />
         </div>
         <div>
-          <h2 className="text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">
+          <h2 className="font-display text-base font-bold uppercase tracking-wide text-slate-900 dark:text-slate-100">
             The Boat
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">{layout.name}</p>
@@ -48,7 +48,7 @@ export function BoatCanvas({
             />
             {Array.from({ length: rows }, (_, i) => i + 1).map((row) => (
               <div key={row} className="grid grid-cols-[1.5rem_1fr_1fr] items-center gap-1.5">
-                <span className="text-center text-[10px] font-bold text-slate-300 dark:text-white/20">
+                <span className="text-center font-display text-sm font-bold tabular-nums text-ember-500/70 dark:text-ember-400/60">
                   {row}
                 </span>
                 <SeatSlot seat={layout.seats.find((s) => s.id === `${row}L`)!} occupant={occupantFor(`${row}L`)} />
