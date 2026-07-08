@@ -8,7 +8,7 @@ The live link above serves [`prototype.html`](prototype.html), a standalone, sin
 
 ## Features
 
-- **Paddler dashboard** (`/`) — RSVP to sessions, view race countdowns
+- **Paddler dashboard** (`/`) — an editable profile card (weight, preferred side for DB/Both paddlers), quick RSVP to a scrollable list of upcoming sessions, live race countdown tickers, and a private "Coaching Feedback Corner" for cues from coaching staff
 - **Coach/Captain command center** (`/command-center`) — a dense filter sidebar to segment the roster by discipline (DB/OC/Both) and crew category (Premier Mixed, Women, Men, Masters), a metrics summary (headcount vs. boat capacity, total attending weight, response rate, discipline), and a session manager for browsing sessions and broadcasting markdown workout/training logs
 - **Lineup builder** (`/lineups/[lineupId]`; standalone "Lineup Tool" tab in `prototype.html`) — drag-and-drop seat assignment across boat layouts (DB12, DB22, V6), including dedicated Drummer/Steer seats on dragon boats, with a live left/right (or bow/stern) weight-balance telemetry bar
 - Role switching (Paddler / Coach) as a UI toggle — no auth wired up yet
