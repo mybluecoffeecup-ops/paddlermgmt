@@ -6,6 +6,7 @@ import type {
   RaceCommitment,
   Session,
 } from "@/types";
+import { ALL_CREW_TAGS } from "@/types";
 
 const now = new Date().toISOString();
 
@@ -20,7 +21,7 @@ function makeProfile(i: number): Profile {
   const name = `${FIRST_NAMES[i % FIRST_NAMES.length]} ${LAST_INITIALS[i % LAST_INITIALS.length]}.`;
   const sides = ["Left", "Right", "Ambi"] as const;
   const disciplines = ["DB", "OC", "Both"] as const;
-  const crewTagPool = ["Premier Mixed", "Women", "Men", "Masters"];
+  const crewTagPool = ALL_CREW_TAGS;
   const eligibilities = ["Citizen", "PR", "Other"] as const;
   const ageRanges = ["Under 40", "40-50", "50-60", "60+"] as const;
   return {
@@ -52,7 +53,7 @@ function makeProfile(i: number): Profile {
   };
 }
 
-export const MOCK_PROFILES: Profile[] = Array.from({ length: 28 }, (_, i) => makeProfile(i));
+export const MOCK_PROFILES: Profile[] = Array.from({ length: 30 }, (_, i) => makeProfile(i));
 
 export const CURRENT_USER_ID = "paddler-3";
 export const CURRENT_COACH_ID = "paddler-0";
@@ -71,7 +72,7 @@ export const MOCK_SESSIONS: Session[] = [
     session_date: toDateString(1),
     start_time: "06:00",
     discipline: "DB",
-    type: "Practice",
+    type: "Training",
     capacity_limit: 22,
     workout_program:
       "## Warm-up\n- 15 min easy paddle\n\n## Main Set\n- 6x250m @ race pace, 2 min rest\n\n## Cool-down\n- 10 min easy paddle + stretch",
@@ -86,7 +87,7 @@ export const MOCK_SESSIONS: Session[] = [
     session_date: toDateString(2),
     start_time: "17:30",
     discipline: "OC",
-    type: "Practice",
+    type: "Training",
     capacity_limit: 6,
     workout_program:
       "## Main Set\n- 90 min continuous paddle, HR zone 2\n- Rotate steer every 20 min",
@@ -101,7 +102,7 @@ export const MOCK_SESSIONS: Session[] = [
     session_date: toDateString(4),
     start_time: "07:00",
     discipline: "Both",
-    type: "Race Prep",
+    type: "Race Simulation",
     capacity_limit: 22,
     workout_program:
       "## Main Set\n- 3x500m full race simulation\n- Lineup rotations between reps",
@@ -116,7 +117,7 @@ export const MOCK_SESSIONS: Session[] = [
     session_date: toDateString(6),
     start_time: "09:00",
     discipline: "DB",
-    type: "Recovery",
+    type: "Training",
     capacity_limit: 22,
     workout_program: "## Main Set\n- 40 min easy technical paddle\n- 20 min mobility circuit",
     created_by: CURRENT_COACH_ID,
@@ -130,7 +131,7 @@ export const MOCK_SESSIONS: Session[] = [
     session_date: toDateString(8),
     start_time: "18:00",
     discipline: "Both",
-    type: "Strength",
+    type: "Training",
     capacity_limit: 22,
     workout_program: "## Main Set\n- 4 rounds strength circuit\n- 5x500m erg @ threshold",
     created_by: CURRENT_COACH_ID,
@@ -144,7 +145,7 @@ export const MOCK_SESSIONS: Session[] = [
     session_date: toDateString(9),
     start_time: "17:30",
     discipline: "OC",
-    type: "Practice",
+    type: "Training",
     capacity_limit: 6,
     workout_program: "## Focus\n- Steering rotations\n- Catch-angle drills\n\n## Main Set\n- 8x300m",
     created_by: CURRENT_COACH_ID,
@@ -158,7 +159,7 @@ export const MOCK_SESSIONS: Session[] = [
     session_date: toDateString(11),
     start_time: "06:00",
     discipline: "DB",
-    type: "Practice",
+    type: "Training",
     capacity_limit: 22,
     workout_program: "## Warm-up\n- 15 min easy paddle\n\n## Main Set\n- 10x200m @ race pace, 90s rest",
     created_by: CURRENT_COACH_ID,
@@ -172,7 +173,7 @@ export const MOCK_SESSIONS: Session[] = [
     session_date: toDateString(13),
     start_time: "07:00",
     discipline: "Both",
-    type: "Race Prep",
+    type: "Race Simulation",
     capacity_limit: 22,
     workout_program: "## Main Set\n- 4x500m full race simulation\n- Lineup rotations between reps",
     created_by: CURRENT_COACH_ID,
@@ -186,7 +187,7 @@ export const MOCK_SESSIONS: Session[] = [
     session_date: toDateString(15),
     start_time: "07:30",
     discipline: "DB",
-    type: "Endurance",
+    type: "Training",
     capacity_limit: 22,
     workout_program: "## Main Set\n- 75 min continuous paddle, HR zone 2",
     created_by: CURRENT_COACH_ID,
@@ -200,7 +201,7 @@ export const MOCK_SESSIONS: Session[] = [
     session_date: toDateString(16),
     start_time: "06:00",
     discipline: "DB",
-    type: "Taper",
+    type: "Training",
     capacity_limit: 22,
     workout_program: "## Main Set\n- 20 min easy paddle\n- 4x100m starts @ race pace",
     created_by: CURRENT_COACH_ID,

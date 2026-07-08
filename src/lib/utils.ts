@@ -45,3 +45,17 @@ export function formatWeight(kg: number | null | undefined): string {
   if (kg == null) return "—";
   return `${kg.toFixed(1)} kg`;
 }
+
+function toIsoDate(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+export function todayIso(): string {
+  return toIsoDate(new Date());
+}
+
+export function addDaysIso(dateStr: string, days: number): string {
+  const d = new Date(`${dateStr}T00:00:00`);
+  d.setDate(d.getDate() + days);
+  return toIsoDate(d);
+}

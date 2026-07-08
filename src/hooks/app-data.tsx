@@ -214,7 +214,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     (session: Omit<Session, "id" | "created_at" | "updated_at">) => {
       const newSession: Session = {
         ...session,
-        id: `session-${Date.now()}`,
+        id: `session-${Date.now()}-${crypto.randomUUID()}`,
         created_at: nowIso(),
         updated_at: nowIso(),
       };

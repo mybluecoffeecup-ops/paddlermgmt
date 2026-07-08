@@ -56,6 +56,8 @@ export interface Profile {
   updated_at: string;
 }
 
+export type SessionType = "Training" | "Race Simulation" | "Race";
+
 export interface Session {
   id: string;
   title: string;
@@ -63,13 +65,19 @@ export interface Session {
   session_date: string; // YYYY-MM-DD
   start_time: string; // HH:MM
   discipline: Discipline;
-  type: string;
+  type: SessionType;
   capacity_limit: number | null;
   workout_program: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;
 }
+
+export const SESSION_TYPE_OPTIONS: SessionType[] = [
+  "Training",
+  "Race Simulation",
+  "Race",
+];
 
 export interface Attendance {
   id: string;
