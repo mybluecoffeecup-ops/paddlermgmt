@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { LayoutGrid, Users, Waves, Anchor } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { LayoutGrid, LogOut, Users, Waves, Anchor } from "lucide-react";
 
 import { useAppData } from "@/hooks/app-data";
+import { getSupabaseClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -15,7 +16,14 @@ const NAV_ITEMS = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { role, setRole, usingLiveBackend } = useAppData();
+
+  const handleSignOut = async () => {
+    await getSupabaseClient()?.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900 dark:bg-[#071620] dark:text-slate-100">
@@ -60,30 +68,45 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 Demo data
               </span>
             )}
-            <div className="flex items-center rounded-full bg-slate-100 p-1 text-xs font-semibold dark:bg-white/5">
-              <button
-                onClick={() => setRole("paddler")}
-                className={cn(
-                  "rounded-full px-3 py-1.5 transition-colors",
-                  role === "paddler"
-                    ? "bg-white text-teal-700 shadow-sm dark:bg-teal-500/20 dark:text-teal-300"
-                    : "text-slate-500 dark:text-slate-400"
-                )}
-              >
-                Paddler
-              </button>
-              <button
-                onClick={() => setRole("coach")}
-                className={cn(
-                  "rounded-full px-3 py-1.5 transition-colors",
-                  role === "coach"
-                    ? "bg-white text-teal-700 shadow-sm dark:bg-teal-500/20 dark:text-teal-300"
-                    : "text-slate-500 dark:text-slate-400"
-                )}
-              >
-                Coach
-              </button>
-            </div>
+            {usingLiveBackend ? (
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:bg-white/5 dark:text-slate-300">
+                  {role === "coach" ? "Coach" : "Paddler"}
+                </span>
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition-colors hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100"
+                >
+                  <LogOut size={14} />
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center rounded-full bg-slate-100 p-1 text-xs font-semibold dark:bg-white/5">
+                <button
+                  onClick={() => setRole("paddler")}
+                  className={cn(
+                    "rounded-full px-3 py-1.5 transition-colors",
+                    role === "paddler"
+                      ? "bg-white text-teal-700 shadow-sm dark:bg-teal-500/20 dark:text-teal-300"
+                      : "text-slate-500 dark:text-slate-400"
+                  )}
+                >
+                  Paddler
+                </button>
+                <button
+                  onClick={() => setRole("coach")}
+                  className={cn(
+                    "rounded-full px-3 py-1.5 transition-colors",
+                    role === "coach"
+                      ? "bg-white text-teal-700 shadow-sm dark:bg-teal-500/20 dark:text-teal-300"
+                      : "text-slate-500 dark:text-slate-400"
+                  )}
+                >
+                  Coach
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>

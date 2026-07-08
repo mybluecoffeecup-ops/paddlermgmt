@@ -15,7 +15,8 @@ import { updateLineupSeating as apiUpdateLineupSeating, createLineup as apiCreat
 import { fetchProfiles, updateProfile as apiUpdateProfile } from "@/lib/api/profiles";
 import { fetchRaceCommitments, fetchRaces, upsertRaceCommitment } from "@/lib/api/races";
 import { createSession as apiCreateSession, fetchSessions, updateSession as apiUpdateSession } from "@/lib/api/sessions";
-import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import type { Session as SupabaseSession } from "@supabase/supabase-js";
 import {
   CURRENT_COACH_ID,
   CURRENT_USER_ID,
@@ -83,7 +84,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [raceCommitments, setRaceCommitments] = useState<RaceCommitment[]>(MOCK_RACE_COMMITMENTS);
   const [lineups, setLineups] = useState<Lineup[]>(MOCK_LINEUPS);
   const [loading, setLoading] = useState(isSupabaseConfigured);
-  const [role, setRole] = useState<ViewRole>("paddler");
+  const [demoRole, setDemoRole] = useState<ViewRole>("paddler");
+  const [authUserId, setAuthUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
@@ -116,11 +118,42 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const currentUserId = role === "coach" ? CURRENT_COACH_ID : CURRENT_USER_ID;
+  // Real auth replaces the mock role toggle once Supabase is configured:
+  // currentUserId comes from the Supabase session instead of a fixed mock ID.
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    supabase.auth
+      .getUser()
+      .then(({ data }: { data: { user: { id: string } | null } }) =>
+        setAuthUserId(data.user?.id ?? null)
+      );
+    const { data: subscription } = supabase.auth.onAuthStateChange(
+      (_event: string, session: SupabaseSession | null) => {
+        setAuthUserId(session?.user?.id ?? null);
+      }
+    );
+    return () => subscription.subscription.unsubscribe();
+  }, []);
+
+  const currentUserId = isSupabaseConfigured
+    ? (authUserId ?? "")
+    : demoRole === "coach"
+      ? CURRENT_COACH_ID
+      : CURRENT_USER_ID;
   const currentUser = useMemo(
     () => profiles.find((p) => p.id === currentUserId),
     [profiles, currentUserId]
   );
+  const role: ViewRole = isSupabaseConfigured
+    ? currentUser?.is_coach
+      ? "coach"
+      : "paddler"
+    : demoRole;
+  const setRole = useCallback((r: ViewRole) => {
+    if (!isSupabaseConfigured) setDemoRole(r);
+  }, []);
 
   const rsvpToSession = useCallback(
     (sessionId: string, status: AttendanceStatus, paddlerId: string = currentUserId) => {
