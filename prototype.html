@@ -68,7 +68,10 @@
         Paddler Home
       </button>
       <button id="tab-btn-coach" class="tab-btn px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors">
-        Coach Command Center
+        Command Center
+      </button>
+      <button id="tab-btn-lineup" class="tab-btn px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors">
+        Lineup Tool
       </button>
     </nav>
 
@@ -132,8 +135,56 @@
     </div>
   </section>
 
-  <!-- ============ TAB 2: COACH COMMAND CENTER ============ -->
+  <!-- ============ TAB 2: COACH / CAPTAIN COMMAND CENTER ============ -->
   <section id="panel-coach" class="tab-panel flex-1 px-4 sm:px-6 py-6">
+
+    <div class="mb-4">
+      <h1 class="text-lg font-bold text-white leading-tight">Coach / Captain Command Center</h1>
+      <p class="text-xs text-slate-500 mt-0.5">Roster segmentation, session broadcasts, and readiness at a glance.</p>
+    </div>
+
+    <!-- Metrics summary -->
+    <div id="metrics-summary" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5"></div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-[14rem_1fr] gap-4 items-start">
+
+      <!-- Filter sidebar -->
+      <aside class="rounded-2xl border border-ink-600 bg-ink-800/60 p-4 space-y-4 xl:sticky xl:top-20">
+        <div class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wide text-slate-500">
+          <span>&#9881;</span> Segment Roster
+        </div>
+        <div>
+          <p class="mb-2 text-[10px] font-bold uppercase tracking-wide text-slate-500">Discipline</p>
+          <div id="filter-discipline" class="grid grid-cols-3 xl:grid-cols-1 gap-1.5"></div>
+        </div>
+        <div>
+          <p class="mb-2 text-[10px] font-bold uppercase tracking-wide text-slate-500">Crew Category</p>
+          <div id="filter-crew" class="grid grid-cols-2 xl:grid-cols-1 gap-1.5"></div>
+        </div>
+      </aside>
+
+      <!-- Session manager -->
+      <div class="rounded-2xl border border-ink-600 bg-ink-800/60 overflow-hidden flex flex-col xl:h-[34rem]">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-ink-600 shrink-0">
+          <div class="flex items-center gap-2">
+            <span class="text-sm">&#128197;</span>
+            <p class="text-sm font-semibold text-white">Session Manager</p>
+          </div>
+          <span id="session-count" class="text-[11px] text-slate-500">0 sessions</span>
+        </div>
+        <div id="session-list" class="max-h-48 overflow-y-auto border-b border-ink-600 shrink-0"></div>
+        <div id="session-detail" class="flex-1 overflow-y-auto p-4"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 3: LINEUP TOOL ============ -->
+  <section id="panel-lineup" class="tab-panel flex-1 px-4 sm:px-6 py-6">
+
+    <div class="mb-4">
+      <h1 class="text-lg font-bold text-white leading-tight">Lineup Tool</h1>
+      <p class="text-xs text-slate-500 mt-0.5">DB12 — Dragon Boat Lineup. Drag paddlers into seats.</p>
+    </div>
 
     <!-- Telemetry banner -->
     <div id="telemetry-banner" class="rounded-2xl border p-4 sm:p-5 mb-5 transition-colors duration-300 border-ink-600 bg-ink-800">
@@ -189,9 +240,9 @@
         </div>
         <div class="rounded-2xl border border-ink-600 bg-gradient-to-b from-ink-800/80 to-ink-900/80 p-4 sm:p-6">
 
-          <!-- Bow marker -->
-          <div class="flex justify-center mb-2">
-            <div class="px-3 py-1 rounded-full bg-ink-950 border border-ink-600 text-[10px] uppercase tracking-widest text-slate-500">Bow</div>
+          <!-- Drummer seat -->
+          <div id="seat-drummer-container" class="flex justify-center mb-3">
+            <!-- seat injected by JS -->
           </div>
 
           <div class="flex justify-center gap-3 sm:gap-6 mb-2">
@@ -203,9 +254,9 @@
             <!-- rows injected by JS -->
           </div>
 
-          <!-- Stern marker -->
-          <div class="flex justify-center mt-3">
-            <div class="px-3 py-1 rounded-full bg-ink-950 border border-ink-600 text-[10px] uppercase tracking-widest text-slate-500">Stern</div>
+          <!-- Steer seat -->
+          <div id="seat-steer-container" class="flex justify-center mt-3">
+            <!-- seat injected by JS -->
           </div>
         </div>
       </div>
@@ -225,59 +276,64 @@
   // Mock data — 20 paddlers
   // ---------------------------------------------------------------------
   const PADDLERS = [
-    { id: 'p1',  name: 'Aria Chen',        weight: 62, side: 'Left',  role: 'Stroke' },
-    { id: 'p2',  name: 'Marcus Webb',      weight: 88, side: 'Right', role: null },
-    { id: 'p3',  name: 'Priya Nair',       weight: 58, side: 'Left',  role: null },
-    { id: 'p4',  name: 'Diego Torres',     weight: 79, side: 'Right', role: null },
-    { id: 'p5',  name: 'Sofia Kim',        weight: 65, side: 'Ambi',  role: null },
-    { id: 'p6',  name: 'Jamal Brooks',     weight: 92, side: 'Right', role: null },
-    { id: 'p7',  name: 'Elena Petrova',    weight: 60, side: 'Left',  role: null },
-    { id: 'p8',  name: 'Noah Fitzgerald',  weight: 84, side: 'Right', role: 'Steer' },
-    { id: 'p9',  name: 'Mei Lin',          weight: 57, side: 'Left',  role: null },
-    { id: 'p10', name: 'Tyrone Jackson',   weight: 90, side: 'Right', role: null },
-    { id: 'p11', name: 'Isabella Rossi',   weight: 63, side: 'Left',  role: 'Stroke' },
-    { id: 'p12', name: 'Kai Anderson',     weight: 75, side: 'Ambi',  role: null },
-    { id: 'p13', name: 'Fatima Al-Sayed',  weight: 59, side: 'Left',  role: null },
-    { id: 'p14', name: "Liam O'Connor",    weight: 86, side: 'Right', role: null },
-    { id: 'p15', name: 'Yuki Tanaka',      weight: 61, side: 'Left',  role: null },
-    { id: 'p16', name: 'Andre Silva',      weight: 95, side: 'Right', role: null },
-    { id: 'p17', name: 'Grace Mensah',     weight: 55, side: 'Left',  role: null },
-    { id: 'p18', name: 'Ben Whitfield',    weight: 80, side: 'Ambi',  role: 'Steer' },
-    { id: 'p19', name: 'Chloe Dubois',     weight: 68, side: 'Left',  role: null },
-    { id: 'p20', name: 'Hiro Nakamura',    weight: 82, side: 'Right', role: null },
+    { id: 'p1',  name: 'Aria Chen',        weight: 62, side: 'Left',  role: 'Stroke', discipline: 'DB',   crewTags: ['Premier Mixed', 'Women'] },
+    { id: 'p2',  name: 'Marcus Webb',      weight: 88, side: 'Right', role: null,     discipline: 'DB',   crewTags: ['Premier Mixed', 'Men'] },
+    { id: 'p3',  name: 'Priya Nair',       weight: 58, side: 'Left',  role: null,     discipline: 'Both', crewTags: ['Women', 'Masters'] },
+    { id: 'p4',  name: 'Diego Torres',     weight: 79, side: 'Right', role: null,     discipline: 'OC',   crewTags: ['Men'] },
+    { id: 'p5',  name: 'Sofia Kim',        weight: 65, side: 'Ambi',  role: null,     discipline: 'DB',   crewTags: ['Premier Mixed', 'Women'] },
+    { id: 'p6',  name: 'Jamal Brooks',     weight: 92, side: 'Right', role: null,     discipline: 'DB',   crewTags: ['Men', 'Masters'] },
+    { id: 'p7',  name: 'Elena Petrova',    weight: 60, side: 'Left',  role: null,     discipline: 'OC',   crewTags: ['Women'] },
+    { id: 'p8',  name: 'Noah Fitzgerald',  weight: 84, side: 'Right', role: 'Steer',  discipline: 'DB',   crewTags: ['Premier Mixed', 'Men'] },
+    { id: 'p9',  name: 'Mei Lin',          weight: 57, side: 'Left',  role: null,     discipline: 'Both', crewTags: ['Women'] },
+    { id: 'p10', name: 'Tyrone Jackson',   weight: 90, side: 'Right', role: null,     discipline: 'DB',   crewTags: ['Men'] },
+    { id: 'p11', name: 'Isabella Rossi',   weight: 63, side: 'Left',  role: 'Stroke', discipline: 'DB',   crewTags: ['Premier Mixed', 'Women'] },
+    { id: 'p12', name: 'Kai Anderson',     weight: 75, side: 'Ambi',  role: null,     discipline: 'OC',   crewTags: ['Masters'] },
+    { id: 'p13', name: 'Fatima Al-Sayed',  weight: 59, side: 'Left',  role: null,     discipline: 'DB',   crewTags: ['Women', 'Masters'] },
+    { id: 'p14', name: "Liam O'Connor",    weight: 86, side: 'Right', role: null,     discipline: 'DB',   crewTags: ['Men'] },
+    { id: 'p15', name: 'Yuki Tanaka',      weight: 61, side: 'Left',  role: null,     discipline: 'Both', crewTags: ['Premier Mixed', 'Women'] },
+    { id: 'p16', name: 'Andre Silva',      weight: 95, side: 'Right', role: null,     discipline: 'OC',   crewTags: ['Men', 'Masters'] },
+    { id: 'p17', name: 'Grace Mensah',     weight: 55, side: 'Left',  role: null,     discipline: 'DB',   crewTags: ['Women'] },
+    { id: 'p18', name: 'Ben Whitfield',    weight: 80, side: 'Ambi',  role: 'Steer',  discipline: 'DB',   crewTags: ['Premier Mixed', 'Men'] },
+    { id: 'p19', name: 'Chloe Dubois',     weight: 68, side: 'Left',  role: null,     discipline: 'OC',   crewTags: ['Women', 'Masters'] },
+    { id: 'p20', name: 'Hiro Nakamura',    weight: 82, side: 'Right', role: null,     discipline: 'DB',   crewTags: ['Men'] },
   ];
 
   const paddlerById = Object.fromEntries(PADDLERS.map(p => [p.id, p]));
 
   const WEIGHT_IMBALANCE_WARNING_KG = 15;
 
-  // Seat layout: DB12 => 2 columns x 6 rows
+  // Seat layout: DB12 => 2 columns x 6 rows, plus drummer (bow) and steer (stern)
   const SEAT_ROWS = [1, 2, 3, 4, 5, 6];
+  const SEAT_LABELS = { drummer: 'Drummer', steer: 'Steer' };
   const seats = {}; // seatId -> paddlerId | null
+  seats.drummer = null;
   SEAT_ROWS.forEach(row => {
     seats[`L${row}`] = null;
     seats[`R${row}`] = null;
   });
+  seats.steer = null;
 
   let dragState = null; // { paddlerId, origin: 'bench' | seatId }
 
   // ---------------------------------------------------------------------
   // Tabs
   // ---------------------------------------------------------------------
-  const tabBtnHome = document.getElementById('tab-btn-home');
-  const tabBtnCoach = document.getElementById('tab-btn-coach');
-  const panelHome = document.getElementById('panel-home');
-  const panelCoach = document.getElementById('panel-coach');
+  const TABS = {
+    home: { btn: document.getElementById('tab-btn-home'), panel: document.getElementById('panel-home') },
+    coach: { btn: document.getElementById('tab-btn-coach'), panel: document.getElementById('panel-coach') },
+    lineup: { btn: document.getElementById('tab-btn-lineup'), panel: document.getElementById('panel-lineup') },
+  };
 
   function activateTab(which) {
-    const homeActive = which === 'home';
-    tabBtnHome.classList.toggle('active', homeActive);
-    tabBtnCoach.classList.toggle('active', !homeActive);
-    panelHome.classList.toggle('active', homeActive);
-    panelCoach.classList.toggle('active', !homeActive);
+    Object.entries(TABS).forEach(([key, { btn, panel }]) => {
+      const active = key === which;
+      btn.classList.toggle('active', active);
+      panel.classList.toggle('active', active);
+    });
   }
-  tabBtnHome.addEventListener('click', () => activateTab('home'));
-  tabBtnCoach.addEventListener('click', () => activateTab('coach'));
+  Object.entries(TABS).forEach(([key, { btn }]) => {
+    btn.addEventListener('click', () => activateTab(key));
+  });
 
   // Tab button visual state (Tailwind can't do this purely via classes above without JS toggle)
   const style = document.createElement('style');
@@ -385,6 +441,223 @@
   renderWorkoutLog();
 
   // ---------------------------------------------------------------------
+  // Coach / Captain Command Center
+  // ---------------------------------------------------------------------
+  const DISCIPLINE_OPTIONS = ['DB', 'OC', 'Both'];
+  const CREW_TAG_OPTIONS = ['Premier Mixed', 'Women', 'Men', 'Masters'];
+
+  const CC_SESSIONS = [
+    {
+      id: 'cs1', title: 'Tue Interval Training', date: 'Tue · Jul 8 · 6:00am',
+      discipline: 'DB', type: 'Sprint Intervals', capacity: 12,
+      workout: '## Warm-up\n- 15 min easy paddle\n\n## Main Set\n- 8 x 250m @ race pace, 90s rest\n\n## Cooldown\n- 10 min easy paddle + stretch',
+    },
+    {
+      id: 'cs2', title: 'Thu Technique Session', date: 'Thu · Jul 10 · 6:00am',
+      discipline: 'DB', type: 'Technique', capacity: 12,
+      workout: '## Focus\n- Catch timing drills\n- Rotation and reach\n\n## Main Set\n- 6 x 500m steady state',
+    },
+    {
+      id: 'cs3', title: 'Sat Long Paddle', date: 'Sat · Jul 12 · 7:30am',
+      discipline: 'OC', type: 'Endurance', capacity: 6,
+      workout: '## Main Set\n- 90 min continuous paddle, conversational pace\n\n## Notes\n- Bring extra water, forecast is hot',
+    },
+  ];
+
+  const ccSessionById = Object.fromEntries(CC_SESSIONS.map(s => [s.id, s]));
+
+  let ccDisciplines = new Set();
+  let ccCrewTags = new Set();
+  let ccSelectedSessionId = CC_SESSIONS[0].id;
+
+  function mockAttendanceStatus(paddlerId, sessionId) {
+    const p = parseInt(paddlerId.slice(1), 10);
+    const s = parseInt(sessionId.slice(2), 10);
+    const seed = (p * 7 + s * 13) % 10;
+    if (seed < 6) return 'Attending';
+    if (seed < 8) return 'Maybe';
+    if (seed < 9) return 'Declined';
+    return 'Unconfirmed';
+  }
+
+  function ccFilteredPaddlers() {
+    return PADDLERS.filter(p => {
+      const disciplineMatch = ccDisciplines.size === 0 || ccDisciplines.has(p.discipline);
+      const crewMatch = ccCrewTags.size === 0 || p.crewTags.some(t => ccCrewTags.has(t));
+      return disciplineMatch && crewMatch;
+    });
+  }
+
+  function renderInline(text) {
+    return text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  }
+
+  function renderMarkdownLite(text) {
+    const lines = text.split('\n');
+    const blocks = [];
+    let listItems = [];
+    function flushList() {
+      if (listItems.length === 0) return;
+      blocks.push(`<ul class="ml-4 list-disc space-y-0.5">${listItems.map(item => `<li>${renderInline(item)}</li>`).join('')}</ul>`);
+      listItems = [];
+    }
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('## ')) {
+        flushList();
+        blocks.push(`<h3 class="mt-3 text-sm font-bold text-accent-soft first:mt-0">${trimmed.slice(3)}</h3>`);
+      } else if (trimmed.startsWith('- ')) {
+        listItems.push(trimmed.slice(2));
+      } else if (trimmed.length === 0) {
+        flushList();
+      } else {
+        flushList();
+        blocks.push(`<p class="text-sm leading-relaxed text-slate-300">${renderInline(trimmed)}</p>`);
+      }
+    });
+    flushList();
+    return `<div class="space-y-1.5">${blocks.join('')}</div>`;
+  }
+
+  function chipClasses(active) {
+    return active
+      ? 'border-accent bg-accent/10 text-accent-soft'
+      : 'border-ink-600 text-slate-400 hover:border-ink-500';
+  }
+
+  function renderFilters() {
+    const disciplineEl = document.getElementById('filter-discipline');
+    disciplineEl.innerHTML = DISCIPLINE_OPTIONS.map(d => `
+      <button data-discipline="${d}" class="w-full rounded-lg border px-3 py-2 text-left text-xs font-semibold transition-colors ${chipClasses(ccDisciplines.has(d))}">${d}</button>
+    `).join('');
+    disciplineEl.querySelectorAll('button[data-discipline]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const d = btn.dataset.discipline;
+        ccDisciplines.has(d) ? ccDisciplines.delete(d) : ccDisciplines.add(d);
+        renderFilters();
+        renderMetrics();
+      });
+    });
+
+    const crewEl = document.getElementById('filter-crew');
+    crewEl.innerHTML = CREW_TAG_OPTIONS.map(tag => `
+      <button data-crew-tag="${tag}" class="w-full rounded-lg border px-3 py-2 text-left text-xs font-semibold transition-colors ${chipClasses(ccCrewTags.has(tag))}">${tag}</button>
+    `).join('');
+    crewEl.querySelectorAll('button[data-crew-tag]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tag = btn.dataset.crewTag;
+        ccCrewTags.has(tag) ? ccCrewTags.delete(tag) : ccCrewTags.add(tag);
+        renderFilters();
+        renderMetrics();
+      });
+    });
+  }
+
+  function metricCard(icon, label, value, hint, warn) {
+    return `
+      <div class="flex items-center gap-3 rounded-2xl border border-ink-600 bg-ink-800/60 px-4 py-3">
+        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg ${warn ? 'bg-amber-400/10 text-amber-300' : 'bg-accent/10 text-accent-soft'}">${icon}</div>
+        <div class="min-w-0">
+          <p class="text-lg font-extrabold leading-tight text-white">${value}</p>
+          <p class="truncate text-[11px] font-semibold uppercase tracking-wide text-slate-500">${label}</p>
+          ${hint ? `<p class="text-[11px] text-slate-500">${hint}</p>` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderMetrics() {
+    const container = document.getElementById('metrics-summary');
+    const session = ccSessionById[ccSelectedSessionId];
+    const roster = ccFilteredPaddlers();
+
+    if (!session) {
+      container.innerHTML = `<div class="col-span-full rounded-2xl border border-dashed border-ink-600 p-6 text-center text-sm text-slate-500">Select a session to see metrics.</div>`;
+      return;
+    }
+
+    const statuses = roster.map(p => ({ p, status: mockAttendanceStatus(p.id, session.id) }));
+    const attending = statuses.filter(s => s.status === 'Attending');
+    const responded = statuses.filter(s => s.status !== 'Unconfirmed');
+    const totalWeight = attending.reduce((sum, s) => sum + s.p.weight, 0);
+    const overCapacity = attending.length > session.capacity;
+    const attendancePct = roster.length ? Math.round((responded.length / roster.length) * 100) : 0;
+
+    container.innerHTML = [
+      metricCard('&#128101;', 'Headcount', `${attending.length} / ${session.capacity}`, overCapacity ? 'Over boat capacity' : 'vs. boat capacity', overCapacity),
+      metricCard('&#9878;&#65039;', 'Total Weight', `${totalWeight.toFixed(0)} kg`, 'attending paddlers'),
+      metricCard('&#128200;', 'Response Rate', `${attendancePct}%`, `${responded.length} of ${roster.length} replied`),
+      metricCard('&#128674;', 'Discipline', session.discipline, session.type),
+    ].join('');
+  }
+
+  function renderSessionList() {
+    const container = document.getElementById('session-list');
+    document.getElementById('session-count').textContent = `${CC_SESSIONS.length} sessions`;
+    container.innerHTML = CC_SESSIONS.map(session => `
+      <button data-session-id="${session.id}" class="flex w-full items-center justify-between gap-2 border-b border-ink-700 px-4 py-2.5 text-left last:border-0 transition-colors ${session.id === ccSelectedSessionId ? 'bg-accent/10' : 'hover:bg-ink-700/40'}">
+        <div class="min-w-0">
+          <p class="truncate text-sm font-semibold text-white">${session.title}</p>
+          <p class="text-[11px] text-slate-500">${session.date}</p>
+        </div>
+        <span class="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded border shrink-0 ${session.discipline === 'DB' ? 'bg-sky-500/10 text-sky-300 border-sky-500/30' : 'bg-orange-500/10 text-orange-300 border-orange-500/30'}">${session.discipline}</span>
+      </button>
+    `).join('');
+    container.querySelectorAll('button[data-session-id]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        ccSelectedSessionId = btn.dataset.sessionId;
+        renderSessionList();
+        renderSessionDetail();
+        renderMetrics();
+      });
+    });
+  }
+
+  function renderSessionDetail() {
+    const container = document.getElementById('session-detail');
+    const session = ccSessionById[ccSelectedSessionId];
+    if (!session) {
+      container.innerHTML = `<div class="flex h-full items-center justify-center text-center text-sm text-slate-500">Select a session above to broadcast a workout.</div>`;
+      return;
+    }
+    container.innerHTML = `
+      <label class="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-slate-500">Workout Program (markdown)</label>
+      <textarea id="workout-draft" rows="7" class="w-full rounded-lg border border-ink-600 bg-ink-950/60 p-2.5 font-mono text-xs leading-relaxed text-slate-200 focus:outline-none focus:ring-2 focus:ring-accent" placeholder="## Warm-up&#10;- 15 min easy paddle"></textarea>
+      <button id="btn-broadcast" class="mt-3 w-full flex items-center justify-center gap-1.5 rounded-lg bg-accent py-2 text-sm font-bold text-ink-950 transition-colors hover:bg-accent-soft">
+        &#128225; Broadcast to Crew
+      </button>
+      <p class="mt-3 mb-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-500">Preview</p>
+      <div id="workout-preview" class="rounded-lg border border-ink-600 bg-ink-950/40 p-3"></div>
+    `;
+
+    const draftEl = document.getElementById('workout-draft');
+    const previewEl = document.getElementById('workout-preview');
+    const broadcastBtn = document.getElementById('btn-broadcast');
+    draftEl.value = session.workout;
+
+    function updatePreview() {
+      previewEl.innerHTML = draftEl.value.trim()
+        ? renderMarkdownLite(draftEl.value)
+        : `<p class="text-xs text-slate-500">Nothing to preview yet.</p>`;
+    }
+    draftEl.addEventListener('input', updatePreview);
+    updatePreview();
+
+    broadcastBtn.addEventListener('click', () => {
+      session.workout = draftEl.value;
+      broadcastBtn.textContent = 'Broadcast sent!';
+      setTimeout(() => {
+        broadcastBtn.innerHTML = '&#128225; Broadcast to Crew';
+      }, 1800);
+    });
+  }
+
+  renderFilters();
+  renderSessionList();
+  renderSessionDetail();
+  renderMetrics();
+
+  // ---------------------------------------------------------------------
   // Bench + Boat rendering
   // ---------------------------------------------------------------------
   const benchEl = document.getElementById('bench');
@@ -450,13 +723,16 @@
     SEAT_ROWS.forEach(row => {
       const rowEl = document.createElement('div');
       rowEl.className = 'flex justify-center gap-3 sm:gap-6 w-full';
-      rowEl.appendChild(makeSeatEl(`L${row}`, row));
-      rowEl.appendChild(makeSeatEl(`R${row}`, row));
+      rowEl.appendChild(makeSeatEl(`L${row}`));
+      rowEl.appendChild(makeSeatEl(`R${row}`));
       boatGridEl.appendChild(rowEl);
     });
+
+    document.getElementById('seat-drummer-container').appendChild(makeSeatEl('drummer'));
+    document.getElementById('seat-steer-container').appendChild(makeSeatEl('steer'));
   }
 
-  function makeSeatEl(seatId, row) {
+  function makeSeatEl(seatId) {
     const wrapper = document.createElement('div');
     wrapper.className = 'w-24 sm:w-36';
     const seat = document.createElement('div');
@@ -477,14 +753,14 @@
 
     wrapper.appendChild(seat);
     const seatLabel = document.createElement('p');
-    seatLabel.className = 'text-center text-[9px] text-slate-600 mt-1 tracking-wide';
-    seatLabel.textContent = seatId;
+    seatLabel.className = 'text-center text-[9px] text-slate-600 mt-1 tracking-wide uppercase';
+    seatLabel.textContent = SEAT_LABELS[seatId] || seatId;
     wrapper.appendChild(seatLabel);
     return wrapper;
   }
 
   function renderSeat(seatId) {
-    const seatEl = boatGridEl.querySelector(`[data-seat-id="${seatId}"]`);
+    const seatEl = document.querySelector(`[data-seat-id="${seatId}"]`);
     seatEl.innerHTML = '';
     const paddlerId = seats[seatId];
     if (!paddlerId) {
