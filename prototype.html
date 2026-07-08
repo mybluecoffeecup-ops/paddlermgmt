@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Paddler Management — Interactive Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          ink: {
+            950: '#05070a',
+            900: '#0a0e14',
+            800: '#11161f',
+            700: '#181f2b',
+            600: '#232c3b',
+            500: '#334055',
+          },
+          accent: {
+            DEFAULT: '#38bdf8',
+            soft: '#7dd3fc',
+          },
+        },
+        fontFamily: {
+          sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Inter', 'sans-serif'],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  html, body { background:#05070a; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #232c3b; border-radius: 999px; }
+  .paddler-card { touch-action: none; }
+  .paddler-card.dragging { opacity: 0.35; }
+  .seat-drop.drag-over { outline: 2px dashed #38bdf8; outline-offset: -2px; background-color: rgba(56,189,248,0.12); }
+  .bench-drop.drag-over { outline: 2px dashed #38bdf8; outline-offset: -4px; background-color: rgba(56,189,248,0.06); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .side-left { border-left: 3px solid #38bdf8; }
+  .side-right { border-left: 3px solid #fb923c; }
+  .side-ambi { border-left: 3px solid #a78bfa; }
+  @keyframes pulse-warn { 0%,100%{opacity:1;} 50%{opacity:.55;} }
+  .pulse-warn { animation: pulse-warn 1.4s ease-in-out infinite; }
+</style>
+</head>
+<body class="min-h-screen bg-ink-950 text-slate-200 font-sans antialiased">
+
+<div class="mx-auto max-w-7xl min-h-screen flex flex-col">
+
+  <!-- Top App Bar -->
+  <header class="sticky top-0 z-30 border-b border-ink-700 bg-ink-950/90 backdrop-blur px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+    <div class="flex items-center gap-2.5">
+      <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-accent to-sky-600 flex items-center justify-center text-ink-950 font-bold text-sm shadow-lg shadow-accent/20">🐉</div>
+      <div>
+        <h1 class="text-sm font-semibold tracking-tight text-white leading-none">Paddler Management</h1>
+        <p class="text-[11px] text-slate-500 leading-none mt-0.5">Interactive Prototype</p>
+      </div>
+    </div>
+
+    <nav class="flex items-center gap-1 rounded-xl bg-ink-800 p-1 border border-ink-600">
+      <button id="tab-btn-home" class="tab-btn active px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors">
+        Paddler Home
+      </button>
+      <button id="tab-btn-coach" class="tab-btn px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors">
+        Coach Command Center
+      </button>
+    </nav>
+
+    <div class="hidden sm:flex items-center gap-2 text-xs text-slate-500">
+      <span class="h-2 w-2 rounded-full bg-emerald-400 shadow shadow-emerald-400/50"></span>
+      Mock data mode
+    </div>
+  </header>
+
+  <!-- ============ TAB 1: PADDLER HOME DASHBOARD ============ -->
+  <section id="panel-home" class="tab-panel active flex-1 px-4 sm:px-6 py-6">
+    <div class="mx-auto w-full max-w-md sm:max-w-lg">
+
+      <!-- Profile strip -->
+      <div class="flex items-center gap-3 mb-5">
+        <div class="h-12 w-12 rounded-full bg-gradient-to-br from-sky-400 to-indigo-500 flex items-center justify-center font-bold text-white text-lg shrink-0">AC</div>
+        <div class="min-w-0">
+          <p class="text-white font-semibold truncate">Aria Chen</p>
+          <p class="text-xs text-slate-500">Stroke • Left side • 62kg</p>
+        </div>
+        <span class="ml-auto text-[11px] px-2 py-1 rounded-full bg-sky-500/10 text-sky-300 border border-sky-500/30 font-medium">Paddler</span>
+      </div>
+
+      <!-- Race countdown -->
+      <div class="rounded-2xl bg-gradient-to-br from-ink-800 to-ink-900 border border-ink-600 p-5 mb-5 relative overflow-hidden">
+        <div class="absolute -right-6 -top-6 text-8xl opacity-[0.06] select-none">🏁</div>
+        <p class="text-xs uppercase tracking-wider text-accent-soft font-semibold mb-1">Next Race</p>
+        <p class="text-white font-bold text-lg leading-tight mb-3">Autumn Regatta — Grand Final</p>
+        <div id="countdown" class="grid grid-cols-4 gap-2">
+          <div class="rounded-xl bg-ink-950/60 border border-ink-600 py-2 text-center">
+            <p id="cd-days" class="text-xl font-bold text-white tabular-nums">--</p>
+            <p class="text-[10px] text-slate-500 uppercase">Days</p>
+          </div>
+          <div class="rounded-xl bg-ink-950/60 border border-ink-600 py-2 text-center">
+            <p id="cd-hours" class="text-xl font-bold text-white tabular-nums">--</p>
+            <p class="text-[10px] text-slate-500 uppercase">Hrs</p>
+          </div>
+          <div class="rounded-xl bg-ink-950/60 border border-ink-600 py-2 text-center">
+            <p id="cd-mins" class="text-xl font-bold text-white tabular-nums">--</p>
+            <p class="text-[10px] text-slate-500 uppercase">Min</p>
+          </div>
+          <div class="rounded-xl bg-ink-950/60 border border-ink-600 py-2 text-center">
+            <p id="cd-secs" class="text-xl font-bold text-white tabular-nums">--</p>
+            <p class="text-[10px] text-slate-500 uppercase">Sec</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RSVP -->
+      <div class="mb-5">
+        <h2 class="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2 px-1">Upcoming Sessions — RSVP</h2>
+        <div id="rsvp-list" class="space-y-2"></div>
+      </div>
+
+      <!-- Workout log -->
+      <div class="mb-6">
+        <h2 class="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2 px-1">Workout Log</h2>
+        <div id="workout-log" class="space-y-2"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ TAB 2: COACH COMMAND CENTER ============ -->
+  <section id="panel-coach" class="tab-panel flex-1 px-4 sm:px-6 py-6">
+
+    <!-- Telemetry banner -->
+    <div id="telemetry-banner" class="rounded-2xl border p-4 sm:p-5 mb-5 transition-colors duration-300 border-ink-600 bg-ink-800">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-6 sm:gap-10">
+          <div>
+            <p class="text-[11px] uppercase tracking-wider text-sky-300 font-semibold">Left Side</p>
+            <p id="tele-left" class="text-2xl font-bold text-white tabular-nums">0.0 <span class="text-sm font-normal text-slate-400">kg</span></p>
+          </div>
+          <div class="h-10 w-px bg-ink-600"></div>
+          <div>
+            <p class="text-[11px] uppercase tracking-wider text-orange-300 font-semibold">Right Side</p>
+            <p id="tele-right" class="text-2xl font-bold text-white tabular-nums">0.0 <span class="text-sm font-normal text-slate-400">kg</span></p>
+          </div>
+          <div class="h-10 w-px bg-ink-600"></div>
+          <div>
+            <p class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Variance</p>
+            <p id="tele-delta" class="text-2xl font-bold text-white tabular-nums">0.0 <span class="text-sm font-normal text-slate-400">kg</span></p>
+          </div>
+        </div>
+        <div id="tele-status" class="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
+          <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+          Balanced
+        </div>
+      </div>
+      <div class="mt-3 h-2 rounded-full bg-ink-950 overflow-hidden flex">
+        <div id="tele-bar-left" class="bg-sky-400 transition-all duration-300" style="width:50%"></div>
+        <div id="tele-bar-right" class="bg-orange-400 transition-all duration-300" style="width:50%"></div>
+      </div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-5">
+
+      <!-- Bench -->
+      <div class="lg:w-80 shrink-0">
+        <div class="flex items-center justify-between mb-2 px-1">
+          <h2 class="text-xs uppercase tracking-wider text-slate-500 font-semibold">The Bench</h2>
+          <span id="bench-count" class="text-[11px] text-slate-500">20 available</span>
+        </div>
+        <div id="bench" class="bench-drop rounded-2xl border border-ink-600 bg-ink-800/60 p-3 min-h-[420px] max-h-[70vh] overflow-y-auto space-y-2">
+        </div>
+        <div class="flex gap-2 mt-3">
+          <button id="btn-reset" class="flex-1 text-xs font-medium px-3 py-2 rounded-lg bg-ink-700 border border-ink-600 hover:bg-ink-600 transition-colors">Reset Lineup</button>
+          <button id="btn-autobalance" class="flex-1 text-xs font-medium px-3 py-2 rounded-lg bg-accent/10 border border-accent/40 text-accent-soft hover:bg-accent/20 transition-colors">Auto-Balance</button>
+        </div>
+      </div>
+
+      <!-- Boat -->
+      <div class="flex-1">
+        <div class="flex items-center justify-between mb-2 px-1">
+          <h2 class="text-xs uppercase tracking-wider text-slate-500 font-semibold">DB12 — Dragon Boat Lineup</h2>
+          <span class="text-[11px] text-slate-500">Drag paddlers into seats</span>
+        </div>
+        <div class="rounded-2xl border border-ink-600 bg-gradient-to-b from-ink-800/80 to-ink-900/80 p-4 sm:p-6">
+
+          <!-- Bow marker -->
+          <div class="flex justify-center mb-2">
+            <div class="px-3 py-1 rounded-full bg-ink-950 border border-ink-600 text-[10px] uppercase tracking-widest text-slate-500">Bow</div>
+          </div>
+
+          <div class="flex justify-center gap-3 sm:gap-6 mb-2">
+            <span class="text-[11px] uppercase tracking-wider text-sky-300 font-semibold w-24 sm:w-36 text-center">Left</span>
+            <span class="text-[11px] uppercase tracking-wider text-orange-300 font-semibold w-24 sm:w-36 text-center">Right</span>
+          </div>
+
+          <div id="boat-grid" class="flex flex-col items-center gap-2 sm:gap-3">
+            <!-- rows injected by JS -->
+          </div>
+
+          <!-- Stern marker -->
+          <div class="flex justify-center mt-3">
+            <div class="px-3 py-1 rounded-full bg-ink-950 border border-ink-600 text-[10px] uppercase tracking-widest text-slate-500">Stern</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="px-6 py-4 text-center text-[11px] text-slate-600 border-t border-ink-700">
+    Standalone prototype · all data is mock and in-memory · no network calls
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------------------------------------------------------------------
+  // Mock data — 20 paddlers
+  // ---------------------------------------------------------------------
+  const PADDLERS = [
+    { id: 'p1',  name: 'Aria Chen',        weight: 62, side: 'Left',  role: 'Stroke' },
+    { id: 'p2',  name: 'Marcus Webb',      weight: 88, side: 'Right', role: null },
+    { id: 'p3',  name: 'Priya Nair',       weight: 58, side: 'Left',  role: null },
+    { id: 'p4',  name: 'Diego Torres',     weight: 79, side: 'Right', role: null },
+    { id: 'p5',  name: 'Sofia Kim',        weight: 65, side: 'Ambi',  role: null },
+    { id: 'p6',  name: 'Jamal Brooks',     weight: 92, side: 'Right', role: null },
+    { id: 'p7',  name: 'Elena Petrova',    weight: 60, side: 'Left',  role: null },
+    { id: 'p8',  name: 'Noah Fitzgerald',  weight: 84, side: 'Right', role: 'Steer' },
+    { id: 'p9',  name: 'Mei Lin',          weight: 57, side: 'Left',  role: null },
+    { id: 'p10', name: 'Tyrone Jackson',   weight: 90, side: 'Right', role: null },
+    { id: 'p11', name: 'Isabella Rossi',   weight: 63, side: 'Left',  role: 'Stroke' },
+    { id: 'p12', name: 'Kai Anderson',     weight: 75, side: 'Ambi',  role: null },
+    { id: 'p13', name: 'Fatima Al-Sayed',  weight: 59, side: 'Left',  role: null },
+    { id: 'p14', name: "Liam O'Connor",    weight: 86, side: 'Right', role: null },
+    { id: 'p15', name: 'Yuki Tanaka',      weight: 61, side: 'Left',  role: null },
+    { id: 'p16', name: 'Andre Silva',      weight: 95, side: 'Right', role: null },
+    { id: 'p17', name: 'Grace Mensah',     weight: 55, side: 'Left',  role: null },
+    { id: 'p18', name: 'Ben Whitfield',    weight: 80, side: 'Ambi',  role: 'Steer' },
+    { id: 'p19', name: 'Chloe Dubois',     weight: 68, side: 'Left',  role: null },
+    { id: 'p20', name: 'Hiro Nakamura',    weight: 82, side: 'Right', role: null },
+  ];
+
+  const paddlerById = Object.fromEntries(PADDLERS.map(p => [p.id, p]));
+
+  const WEIGHT_IMBALANCE_WARNING_KG = 15;
+
+  // Seat layout: DB12 => 2 columns x 6 rows
+  const SEAT_ROWS = [1, 2, 3, 4, 5, 6];
+  const seats = {}; // seatId -> paddlerId | null
+  SEAT_ROWS.forEach(row => {
+    seats[`L${row}`] = null;
+    seats[`R${row}`] = null;
+  });
+
+  let dragState = null; // { paddlerId, origin: 'bench' | seatId }
+
+  // ---------------------------------------------------------------------
+  // Tabs
+  // ---------------------------------------------------------------------
+  const tabBtnHome = document.getElementById('tab-btn-home');
+  const tabBtnCoach = document.getElementById('tab-btn-coach');
+  const panelHome = document.getElementById('panel-home');
+  const panelCoach = document.getElementById('panel-coach');
+
+  function activateTab(which) {
+    const homeActive = which === 'home';
+    tabBtnHome.classList.toggle('active', homeActive);
+    tabBtnCoach.classList.toggle('active', !homeActive);
+    panelHome.classList.toggle('active', homeActive);
+    panelCoach.classList.toggle('active', !homeActive);
+  }
+  tabBtnHome.addEventListener('click', () => activateTab('home'));
+  tabBtnCoach.addEventListener('click', () => activateTab('coach'));
+
+  // Tab button visual state (Tailwind can't do this purely via classes above without JS toggle)
+  const style = document.createElement('style');
+  style.textContent = `
+    .tab-btn { color: #94a3b8; }
+    .tab-btn.active { background: #38bdf8; color: #05070a; }
+  `;
+  document.head.appendChild(style);
+
+  // ---------------------------------------------------------------------
+  // Race countdown
+  // ---------------------------------------------------------------------
+  const RACE_DATE = new Date('2026-08-15T08:00:00');
+  function tickCountdown() {
+    const now = new Date();
+    let diff = RACE_DATE - now;
+    if (diff < 0) diff = 0;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const mins = Math.floor((diff / (1000 * 60)) % 60);
+    const secs = Math.floor((diff / 1000) % 60);
+    document.getElementById('cd-days').textContent = String(days);
+    document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
+    document.getElementById('cd-mins').textContent = String(mins).padStart(2, '0');
+    document.getElementById('cd-secs').textContent = String(secs).padStart(2, '0');
+  }
+  tickCountdown();
+  setInterval(tickCountdown, 1000);
+
+  // ---------------------------------------------------------------------
+  // RSVP
+  // ---------------------------------------------------------------------
+  const SESSIONS = [
+    { id: 's1', label: 'Tue Interval Training', time: 'Tue · 6:00am', status: 'yes' },
+    { id: 's2', label: 'Thu Technique Session', time: 'Thu · 6:00am', status: null },
+    { id: 's3', label: 'Sat Long Paddle', time: 'Sat · 7:30am', status: 'maybe' },
+  ];
+
+  function renderRsvpList() {
+    const container = document.getElementById('rsvp-list');
+    container.innerHTML = '';
+    SESSIONS.forEach(session => {
+      const row = document.createElement('div');
+      row.className = 'rounded-xl bg-ink-800 border border-ink-600 p-3 flex items-center justify-between gap-3';
+      row.innerHTML = `
+        <div class="min-w-0">
+          <p class="text-sm font-medium text-white truncate">${session.label}</p>
+          <p class="text-[11px] text-slate-500">${session.time}</p>
+        </div>
+        <div class="flex gap-1 shrink-0" data-session="${session.id}">
+          ${rsvpButton(session, 'yes', 'Yes', 'emerald')}
+          ${rsvpButton(session, 'maybe', 'Maybe', 'amber')}
+          ${rsvpButton(session, 'no', 'No', 'rose')}
+        </div>
+      `;
+      container.appendChild(row);
+    });
+
+    container.querySelectorAll('button[data-status]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const sessionId = btn.closest('[data-session]').dataset.session;
+        const status = btn.dataset.status;
+        const session = SESSIONS.find(s => s.id === sessionId);
+        session.status = session.status === status ? null : status;
+        renderRsvpList();
+      });
+    });
+  }
+
+  function rsvpButton(session, status, label, color) {
+    const active = session.status === status;
+    const activeClasses = {
+      emerald: 'bg-emerald-500 text-ink-950 border-emerald-500',
+      amber: 'bg-amber-500 text-ink-950 border-amber-500',
+      rose: 'bg-rose-500 text-ink-950 border-rose-500',
+    }[color];
+    const inactiveClasses = 'bg-transparent text-slate-400 border-ink-600 hover:border-ink-500';
+    return `<button data-status="${status}" class="text-[11px] font-semibold px-2.5 py-1.5 rounded-lg border transition-colors ${active ? activeClasses : inactiveClasses}">${label}</button>`;
+  }
+
+  renderRsvpList();
+
+  // ---------------------------------------------------------------------
+  // Workout log
+  // ---------------------------------------------------------------------
+  const WORKOUTS = [
+    { date: 'Jul 6', type: 'Long Paddle', duration: '90 min', distance: '18.2 km' },
+    { date: 'Jul 2', type: 'Interval Training', duration: '60 min', distance: '11.4 km' },
+    { date: 'Jun 29', type: 'Technique Session', duration: '75 min', distance: '9.8 km' },
+    { date: 'Jun 25', type: 'Race Simulation', duration: '45 min', distance: '8.1 km' },
+  ];
+
+  function renderWorkoutLog() {
+    const container = document.getElementById('workout-log');
+    container.innerHTML = WORKOUTS.map(w => `
+      <div class="rounded-xl bg-ink-800 border border-ink-600 p-3 flex items-center gap-3">
+        <div class="h-9 w-9 rounded-lg bg-ink-700 flex items-center justify-center text-sm shrink-0">🛶</div>
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-medium text-white truncate">${w.type}</p>
+          <p class="text-[11px] text-slate-500">${w.date} · ${w.duration} · ${w.distance}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+  renderWorkoutLog();
+
+  // ---------------------------------------------------------------------
+  // Bench + Boat rendering
+  // ---------------------------------------------------------------------
+  const benchEl = document.getElementById('bench');
+  const boatGridEl = document.getElementById('boat-grid');
+  const benchCountEl = document.getElementById('bench-count');
+
+  function seatedPaddlerIds() {
+    return new Set(Object.values(seats).filter(Boolean));
+  }
+
+  function benchPaddlerIds() {
+    const seated = seatedPaddlerIds();
+    return PADDLERS.map(p => p.id).filter(id => !seated.has(id));
+  }
+
+  function sideClass(side) {
+    if (side === 'Left') return 'side-left';
+    if (side === 'Right') return 'side-right';
+    return 'side-ambi';
+  }
+
+  function roleBadge(role) {
+    if (!role) return '';
+    const color = role === 'Stroke' ? 'bg-accent/15 text-accent-soft border-accent/40' : 'bg-purple-500/15 text-purple-300 border-purple-500/40';
+    return `<span class="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded border ${color}">${role}</span>`;
+  }
+
+  function makePaddlerCard(paddler, origin) {
+    const card = document.createElement('div');
+    card.className = `paddler-card ${sideClass(paddler.side)} cursor-grab active:cursor-grabbing rounded-lg bg-ink-700 border border-ink-600 hover:border-accent/50 px-2.5 py-2 flex items-center justify-between gap-2 select-none transition-colors`;
+    card.draggable = true;
+    card.dataset.paddlerId = paddler.id;
+    card.dataset.origin = origin;
+    card.innerHTML = `
+      <div class="min-w-0">
+        <p class="text-xs font-semibold text-white truncate leading-tight">${paddler.name}</p>
+        <p class="text-[10px] text-slate-500 leading-tight">${paddler.weight}kg · ${paddler.side}</p>
+      </div>
+      ${roleBadge(paddler.role)}
+    `;
+    card.addEventListener('dragstart', e => {
+      dragState = { paddlerId: paddler.id, origin };
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', paddler.id);
+    });
+    card.addEventListener('dragend', () => {
+      card.classList.remove('dragging');
+      dragState = null;
+    });
+    return card;
+  }
+
+  function renderBench() {
+    const ids = benchPaddlerIds();
+    benchEl.innerHTML = '';
+    ids.forEach(id => benchEl.appendChild(makePaddlerCard(paddlerById[id], 'bench')));
+    benchCountEl.textContent = `${ids.length} available`;
+  }
+
+  function buildBoatGrid() {
+    boatGridEl.innerHTML = '';
+    SEAT_ROWS.forEach(row => {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'flex justify-center gap-3 sm:gap-6 w-full';
+      rowEl.appendChild(makeSeatEl(`L${row}`, row));
+      rowEl.appendChild(makeSeatEl(`R${row}`, row));
+      boatGridEl.appendChild(rowEl);
+    });
+  }
+
+  function makeSeatEl(seatId, row) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'w-24 sm:w-36';
+    const seat = document.createElement('div');
+    seat.dataset.seatId = seatId;
+    seat.className = 'seat-drop rounded-xl border-2 border-dashed border-ink-600 bg-ink-950/40 h-16 sm:h-[4.5rem] flex items-center justify-center px-2 transition-colors';
+
+    seat.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      seat.classList.add('drag-over');
+    });
+    seat.addEventListener('dragleave', () => seat.classList.remove('drag-over'));
+    seat.addEventListener('drop', e => {
+      e.preventDefault();
+      seat.classList.remove('drag-over');
+      handleDropOnSeat(seatId);
+    });
+
+    wrapper.appendChild(seat);
+    const seatLabel = document.createElement('p');
+    seatLabel.className = 'text-center text-[9px] text-slate-600 mt-1 tracking-wide';
+    seatLabel.textContent = seatId;
+    wrapper.appendChild(seatLabel);
+    return wrapper;
+  }
+
+  function renderSeat(seatId) {
+    const seatEl = boatGridEl.querySelector(`[data-seat-id="${seatId}"]`);
+    seatEl.innerHTML = '';
+    const paddlerId = seats[seatId];
+    if (!paddlerId) {
+      seatEl.innerHTML = `<span class="text-[10px] text-slate-600 uppercase tracking-wide">Empty</span>`;
+      return;
+    }
+    seatEl.appendChild(makePaddlerCard(paddlerById[paddlerId], seatId));
+  }
+
+  function renderAllSeats() {
+    Object.keys(seats).forEach(renderSeat);
+  }
+
+  function handleDropOnSeat(targetSeatId) {
+    if (!dragState) return;
+    const { paddlerId, origin } = dragState;
+
+    if (origin === targetSeatId) return; // no-op
+
+    const occupantId = seats[targetSeatId];
+
+    if (origin === 'bench') {
+      // Bench paddler dropped on seat: if occupied, bumped occupant goes to bench.
+      seats[targetSeatId] = paddlerId;
+    } else {
+      // Dragged from another seat.
+      if (occupantId) {
+        // Swap
+        seats[origin] = occupantId;
+        seats[targetSeatId] = paddlerId;
+      } else {
+        seats[origin] = null;
+        seats[targetSeatId] = paddlerId;
+      }
+    }
+
+    dragState = null;
+    renderAllSeats();
+    renderBench();
+    updateTelemetry();
+  }
+
+  // Bench acts as a drop zone too, so dragging a seated paddler back empties the seat.
+  benchEl.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    benchEl.classList.add('drag-over');
+  });
+  benchEl.addEventListener('dragleave', () => benchEl.classList.remove('drag-over'));
+  benchEl.addEventListener('drop', e => {
+    e.preventDefault();
+    benchEl.classList.remove('drag-over');
+    if (!dragState) return;
+    if (dragState.origin !== 'bench') {
+      seats[dragState.origin] = null;
+    }
+    dragState = null;
+    renderAllSeats();
+    renderBench();
+    updateTelemetry();
+  });
+
+  // ---------------------------------------------------------------------
+  // Telemetry
+  // ---------------------------------------------------------------------
+  function updateTelemetry() {
+    let leftTotal = 0;
+    let rightTotal = 0;
+    SEAT_ROWS.forEach(row => {
+      const l = seats[`L${row}`];
+      const r = seats[`R${row}`];
+      if (l) leftTotal += paddlerById[l].weight;
+      if (r) rightTotal += paddlerById[r].weight;
+    });
+
+    const delta = Math.abs(leftTotal - rightTotal);
+    document.getElementById('tele-left').innerHTML = `${leftTotal.toFixed(1)} <span class="text-sm font-normal text-slate-400">kg</span>`;
+    document.getElementById('tele-right').innerHTML = `${rightTotal.toFixed(1)} <span class="text-sm font-normal text-slate-400">kg</span>`;
+    document.getElementById('tele-delta').innerHTML = `${delta.toFixed(1)} <span class="text-sm font-normal text-slate-400">kg</span>`;
+
+    const total = leftTotal + rightTotal;
+    const leftPct = total === 0 ? 50 : (leftTotal / total) * 100;
+    document.getElementById('tele-bar-left').style.width = `${leftPct}%`;
+    document.getElementById('tele-bar-right').style.width = `${100 - leftPct}%`;
+
+    const banner = document.getElementById('telemetry-banner');
+    const status = document.getElementById('tele-status');
+    const deltaEl = document.getElementById('tele-delta');
+
+    if (delta > WEIGHT_IMBALANCE_WARNING_KG) {
+      banner.classList.remove('border-ink-600', 'bg-ink-800');
+      banner.classList.add('border-rose-500/40', 'bg-rose-500/5');
+      status.className = 'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-300 border border-rose-500/30 pulse-warn';
+      status.innerHTML = `<span class="h-1.5 w-1.5 rounded-full bg-rose-400"></span> Imbalanced`;
+      deltaEl.classList.add('text-rose-300');
+    } else {
+      banner.classList.add('border-ink-600', 'bg-ink-800');
+      banner.classList.remove('border-rose-500/40', 'bg-rose-500/5');
+      status.className = 'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30';
+      status.innerHTML = `<span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span> Balanced`;
+      deltaEl.classList.remove('text-rose-300');
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // Controls
+  // ---------------------------------------------------------------------
+  document.getElementById('btn-reset').addEventListener('click', () => {
+    Object.keys(seats).forEach(seatId => (seats[seatId] = null));
+    renderAllSeats();
+    renderBench();
+    updateTelemetry();
+  });
+
+  document.getElementById('btn-autobalance').addEventListener('click', () => {
+    // Simple greedy balance: sort all paddlers by weight desc, alternate assigning
+    // to whichever side currently has the lower running total.
+    Object.keys(seats).forEach(seatId => (seats[seatId] = null));
+    const sorted = [...PADDLERS].sort((a, b) => b.weight - a.weight);
+    const leftSeats = SEAT_ROWS.map(r => `L${r}`);
+    const rightSeats = SEAT_ROWS.map(r => `R${r}`);
+    let leftIdx = 0, rightIdx = 0, leftTotal = 0, rightTotal = 0;
+
+    sorted.forEach(p => {
+      if (leftIdx >= leftSeats.length && rightIdx >= rightSeats.length) return; // boat full
+      const putLeft = leftTotal <= rightTotal && leftIdx < leftSeats.length;
+      if (putLeft) {
+        seats[leftSeats[leftIdx]] = p.id;
+        leftTotal += p.weight;
+        leftIdx += 1;
+      } else if (rightIdx < rightSeats.length) {
+        seats[rightSeats[rightIdx]] = p.id;
+        rightTotal += p.weight;
+        rightIdx += 1;
+      }
+    });
+
+    renderAllSeats();
+    renderBench();
+    updateTelemetry();
+  });
+
+  // ---------------------------------------------------------------------
+  // Init
+  // ---------------------------------------------------------------------
+  buildBoatGrid();
+  renderAllSeats();
+  renderBench();
+  updateTelemetry();
+})();
+</script>
+</body>
+</html>

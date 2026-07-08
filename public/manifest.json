@@ -1,0 +1,12 @@
+{
+  "name": "Paddler — Crew Management",
+  "short_name": "Paddler",
+  "description": "Mobile & tablet crew management for dragon boat and outrigger teams.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f8fa",
+  "theme_color": "#0f766e",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
