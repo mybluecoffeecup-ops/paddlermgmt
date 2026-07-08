@@ -85,45 +85,40 @@
   <section id="panel-home" class="tab-panel active flex-1 px-4 sm:px-6 py-6">
     <div class="mx-auto w-full max-w-md sm:max-w-lg">
 
-      <!-- Profile strip -->
-      <div class="flex items-center gap-3 mb-5">
-        <div class="h-12 w-12 rounded-full bg-gradient-to-br from-sky-400 to-indigo-500 flex items-center justify-center font-bold text-white text-lg shrink-0">AC</div>
-        <div class="min-w-0">
-          <p class="text-white font-semibold truncate">Aria Chen</p>
-          <p class="text-xs text-slate-500">Stroke • Left side • 62kg</p>
+      <!-- Profile card -->
+      <div class="rounded-2xl border border-ink-600 bg-ink-800/60 overflow-hidden mb-5">
+        <div class="flex items-center gap-3 bg-gradient-to-br from-sky-500 to-indigo-600 px-4 py-4">
+          <div id="profile-avatar" class="h-12 w-12 rounded-2xl bg-white/15 flex items-center justify-center font-bold text-white text-lg shrink-0 backdrop-blur"></div>
+          <div class="min-w-0 flex-1">
+            <p id="profile-name" class="text-white font-bold truncate"></p>
+            <div id="profile-badges" class="mt-1 flex flex-wrap items-center gap-1.5"></div>
+          </div>
+          <span class="ml-auto shrink-0 text-[11px] px-2 py-1 rounded-full bg-white/15 text-white font-medium">Paddler</span>
         </div>
-        <span class="ml-auto text-[11px] px-2 py-1 rounded-full bg-sky-500/10 text-sky-300 border border-sky-500/30 font-medium">Paddler</span>
+        <div id="profile-stats" class="grid grid-cols-3 divide-x divide-ink-600"></div>
       </div>
 
-      <!-- Race countdown -->
-      <div class="rounded-2xl bg-gradient-to-br from-ink-800 to-ink-900 border border-ink-600 p-5 mb-5 relative overflow-hidden">
-        <div class="absolute -right-6 -top-6 text-8xl opacity-[0.06] select-none">🏁</div>
-        <p class="text-xs uppercase tracking-wider text-accent-soft font-semibold mb-1">Next Race</p>
-        <p class="text-white font-bold text-lg leading-tight mb-3">Autumn Regatta — Grand Final</p>
-        <div id="countdown" class="grid grid-cols-4 gap-2">
-          <div class="rounded-xl bg-ink-950/60 border border-ink-600 py-2 text-center">
-            <p id="cd-days" class="text-xl font-bold text-white tabular-nums">--</p>
-            <p class="text-[10px] text-slate-500 uppercase">Days</p>
-          </div>
-          <div class="rounded-xl bg-ink-950/60 border border-ink-600 py-2 text-center">
-            <p id="cd-hours" class="text-xl font-bold text-white tabular-nums">--</p>
-            <p class="text-[10px] text-slate-500 uppercase">Hrs</p>
-          </div>
-          <div class="rounded-xl bg-ink-950/60 border border-ink-600 py-2 text-center">
-            <p id="cd-mins" class="text-xl font-bold text-white tabular-nums">--</p>
-            <p class="text-[10px] text-slate-500 uppercase">Min</p>
-          </div>
-          <div class="rounded-xl bg-ink-950/60 border border-ink-600 py-2 text-center">
-            <p id="cd-secs" class="text-xl font-bold text-white tabular-nums">--</p>
-            <p class="text-[10px] text-slate-500 uppercase">Sec</p>
-          </div>
-        </div>
+      <!-- Race tracking -->
+      <div class="mb-5">
+        <h2 class="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2 px-1">Race Tracking</h2>
+        <div id="race-list" class="space-y-3"></div>
       </div>
 
       <!-- RSVP -->
       <div class="mb-5">
         <h2 class="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2 px-1">Upcoming Sessions — RSVP</h2>
-        <div id="rsvp-list" class="space-y-2"></div>
+        <div id="rsvp-list" class="max-h-64 overflow-y-auto space-y-2 pr-1"></div>
+      </div>
+
+      <!-- Coaching Feedback Corner -->
+      <div class="mb-5">
+        <div class="flex items-center justify-between mb-2 px-1">
+          <h2 class="text-xs uppercase tracking-wider text-slate-500 font-semibold">Coaching Feedback Corner</h2>
+          <span class="flex items-center gap-1 text-[10px] font-semibold text-accent-soft">&#128274; Private</span>
+        </div>
+        <div class="rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/5 to-sky-500/5 p-4">
+          <blockquote id="coaching-feedback" class="border-l-4 border-accent/50 pl-3 text-sm italic leading-relaxed text-slate-300"></blockquote>
+        </div>
       </div>
 
       <!-- Workout log -->
@@ -276,7 +271,7 @@
   // Mock data — 20 paddlers
   // ---------------------------------------------------------------------
   const PADDLERS = [
-    { id: 'p1',  name: 'Aria Chen',        weight: 62, side: 'Left',  role: 'Stroke', discipline: 'DB',   crewTags: ['Premier Mixed', 'Women'] },
+    { id: 'p1',  name: 'Aria Chen',        weight: 62, side: 'Left',  role: 'Pacer', discipline: 'DB',   crewTags: ['Premier Mixed', 'Women'] },
     { id: 'p2',  name: 'Marcus Webb',      weight: 88, side: 'Right', role: null,     discipline: 'DB',   crewTags: ['Premier Mixed', 'Men'] },
     { id: 'p3',  name: 'Priya Nair',       weight: 58, side: 'Left',  role: null,     discipline: 'Both', crewTags: ['Women', 'Masters'] },
     { id: 'p4',  name: 'Diego Torres',     weight: 79, side: 'Right', role: null,     discipline: 'OC',   crewTags: ['Men'] },
@@ -286,7 +281,7 @@
     { id: 'p8',  name: 'Noah Fitzgerald',  weight: 84, side: 'Right', role: 'Steer',  discipline: 'DB',   crewTags: ['Premier Mixed', 'Men'] },
     { id: 'p9',  name: 'Mei Lin',          weight: 57, side: 'Left',  role: null,     discipline: 'Both', crewTags: ['Women'] },
     { id: 'p10', name: 'Tyrone Jackson',   weight: 90, side: 'Right', role: null,     discipline: 'DB',   crewTags: ['Men'] },
-    { id: 'p11', name: 'Isabella Rossi',   weight: 63, side: 'Left',  role: 'Stroke', discipline: 'DB',   crewTags: ['Premier Mixed', 'Women'] },
+    { id: 'p11', name: 'Isabella Rossi',   weight: 63, side: 'Left',  role: 'Pacer', discipline: 'DB',   crewTags: ['Premier Mixed', 'Women'] },
     { id: 'p12', name: 'Kai Anderson',     weight: 75, side: 'Ambi',  role: null,     discipline: 'OC',   crewTags: ['Masters'] },
     { id: 'p13', name: 'Fatima Al-Sayed',  weight: 59, side: 'Left',  role: null,     discipline: 'DB',   crewTags: ['Women', 'Masters'] },
     { id: 'p14', name: "Liam O'Connor",    weight: 86, side: 'Right', role: null,     discipline: 'DB',   crewTags: ['Men'] },
@@ -344,33 +339,207 @@
   document.head.appendChild(style);
 
   // ---------------------------------------------------------------------
-  // Race countdown
+  // Current paddler profile (editable, mirrors the Next.js ProfileSummaryCard)
   // ---------------------------------------------------------------------
-  const RACE_DATE = new Date('2026-08-15T08:00:00');
-  function tickCountdown() {
-    const now = new Date();
-    let diff = RACE_DATE - now;
-    if (diff < 0) diff = 0;
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const mins = Math.floor((diff / (1000 * 60)) % 60);
-    const secs = Math.floor((diff / 1000) % 60);
-    document.getElementById('cd-days').textContent = String(days);
-    document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
-    document.getElementById('cd-mins').textContent = String(mins).padStart(2, '0');
-    document.getElementById('cd-secs').textContent = String(secs).padStart(2, '0');
+  const CURRENT_PADDLER = {
+    name: 'Aria Chen',
+    initials: 'AC',
+    discipline: 'DB', // DB | OC | Both — preferred side only applies to DB/Both
+    side: 'Left',
+    weight: 62,
+    isPacer: true,
+    isSteer: false,
+    isDrummer: false,
+    coachingFeedback:
+      'Focus on early catch and vertical paddle angle — great power phase last session. Keep working on relaxing your grip during the recovery.',
+  };
+
+  let editingWeight = false;
+
+  function cyclePreferredSide() {
+    const next = SIDE_CYCLE[(SIDE_CYCLE.indexOf(CURRENT_PADDLER.side) + 1) % SIDE_CYCLE.length];
+    CURRENT_PADDLER.side = next;
+    renderProfileCard();
   }
-  tickCountdown();
-  setInterval(tickCountdown, 1000);
+
+  const SIDE_CYCLE = ['Left', 'Right', 'Ambi'];
+  const SIDE_DOT = { Left: 'bg-rose-400', Right: 'bg-blue-400', Ambi: 'bg-violet-400' };
+
+  function renderProfileCard() {
+    document.getElementById('profile-avatar').textContent = CURRENT_PADDLER.initials;
+    document.getElementById('profile-name').textContent = CURRENT_PADDLER.name;
+
+    const showSide = CURRENT_PADDLER.discipline === 'DB' || CURRENT_PADDLER.discipline === 'Both';
+    const badgesEl = document.getElementById('profile-badges');
+    badgesEl.innerHTML = `
+      <span class="inline-flex items-center gap-1 rounded-full bg-white/15 text-white text-[11px] font-semibold px-2.5 py-0.5">${CURRENT_PADDLER.discipline}</span>
+      ${showSide ? `
+        <button id="btn-cycle-side" class="inline-flex items-center gap-1 rounded-full bg-white/15 text-white text-[11px] font-semibold px-2.5 py-0.5" aria-label="Cycle preferred side">
+          <span class="h-1.5 w-1.5 rounded-full ${SIDE_DOT[CURRENT_PADDLER.side]}"></span>${CURRENT_PADDLER.side}
+          <span class="text-white/60">&#9998;</span>
+        </button>` : ''}
+      ${CURRENT_PADDLER.isPacer ? `<span class="inline-flex items-center gap-1 rounded-full bg-white/15 text-white text-[11px] font-semibold px-2.5 py-0.5">&#9875; Pacer</span>` : ''}
+      ${CURRENT_PADDLER.isSteer ? `<span class="inline-flex items-center gap-1 rounded-full bg-white/15 text-white text-[11px] font-semibold px-2.5 py-0.5">&#129517; Steer</span>` : ''}
+      ${CURRENT_PADDLER.isDrummer ? `<span class="inline-flex items-center gap-1 rounded-full bg-white/15 text-white text-[11px] font-semibold px-2.5 py-0.5">&#127908; Drummer</span>` : ''}
+    `;
+    const sideBtn = document.getElementById('btn-cycle-side');
+    if (sideBtn) sideBtn.addEventListener('click', cyclePreferredSide);
+
+    const attending = SESSIONS.filter(s => s.status === 'attending').length;
+    const needsRsvp = SESSIONS.filter(s => s.status === null).length;
+    const statsEl = document.getElementById('profile-stats');
+    statsEl.innerHTML = `
+      <div class="flex flex-col items-center justify-center gap-1 px-2 py-4">
+        <div id="weight-display"></div>
+        <span class="text-[11px] font-medium uppercase tracking-wide text-slate-500">Weight</span>
+      </div>
+      <div class="flex flex-col items-center justify-center gap-1 px-2 py-4">
+        <span class="text-lg font-extrabold text-emerald-400">${attending}</span>
+        <span class="text-[11px] font-medium uppercase tracking-wide text-slate-500">Attending</span>
+      </div>
+      <div class="flex flex-col items-center justify-center gap-1 px-2 py-4">
+        <span class="text-lg font-extrabold text-amber-400">${needsRsvp}</span>
+        <span class="text-[11px] font-medium uppercase tracking-wide text-slate-500">Needs RSVP</span>
+      </div>
+    `;
+    renderWeightDisplay();
+  }
+
+  function renderWeightDisplay() {
+    const el = document.getElementById('weight-display');
+    if (!el) return;
+    if (editingWeight) {
+      el.innerHTML = `
+        <div class="flex items-center gap-1">
+          <input id="weight-input" type="number" inputmode="decimal" value="${CURRENT_PADDLER.weight}" class="w-16 rounded-md border border-accent/40 bg-ink-950 px-1.5 py-1 text-center text-lg font-bold text-white focus:outline-none focus:ring-2 focus:ring-accent" />
+          <button id="btn-save-weight" class="rounded-md bg-accent p-1.5 text-ink-950" aria-label="Save weight">&#10003;</button>
+        </div>
+      `;
+      const input = document.getElementById('weight-input');
+      input.focus();
+      input.select();
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') saveWeight(); });
+      document.getElementById('btn-save-weight').addEventListener('click', saveWeight);
+    } else {
+      el.innerHTML = `
+        <button id="btn-edit-weight" class="flex items-center gap-1 text-lg font-extrabold text-white">
+          ${CURRENT_PADDLER.weight}kg <span class="text-xs text-slate-500">&#9998;</span>
+        </button>
+      `;
+      document.getElementById('btn-edit-weight').addEventListener('click', () => {
+        editingWeight = true;
+        renderWeightDisplay();
+      });
+    }
+  }
+
+  function saveWeight() {
+    const val = parseFloat(document.getElementById('weight-input').value);
+    if (!Number.isNaN(val)) CURRENT_PADDLER.weight = val;
+    editingWeight = false;
+    renderWeightDisplay();
+  }
+
+  document.getElementById('coaching-feedback').textContent = `“${CURRENT_PADDLER.coachingFeedback}”`;
 
   // ---------------------------------------------------------------------
-  // RSVP
+  // Race tracking — multiple races, each with its own live countdown ticker
+  // ---------------------------------------------------------------------
+  const RACES = [
+    {
+      id: 'r1', name: 'Autumn Regatta — Grand Final', location: 'Lake Union',
+      date: new Date('2026-08-15T08:00:00'), commitment: { status: 'Attending', hasPaid: true },
+    },
+    {
+      id: 'r2', name: 'Coastal OC6 Distance Cup', location: 'Harbor Point',
+      date: new Date('2026-09-01T07:00:00'), commitment: { status: 'Unconfirmed', hasPaid: false },
+    },
+  ];
+
+  function getCountdown(target) {
+    let diff = target - new Date();
+    if (diff < 0) diff = 0;
+    return {
+      days: Math.floor(diff / 86400000),
+      hours: Math.floor((diff / 3600000) % 24),
+      minutes: Math.floor((diff / 60000) % 60),
+      seconds: Math.floor((diff / 1000) % 60),
+    };
+  }
+
+  function countdownUnit(value, label) {
+    return `<div class="rounded-xl bg-ink-950/60 border border-ink-600 py-2 text-center"><p class="text-lg font-bold text-white tabular-nums">${String(value).padStart(2, '0')}</p><p class="text-[9px] text-slate-500 uppercase">${label}</p></div>`;
+  }
+
+  function raceStatusClasses(status) {
+    if (status === 'Attending') return 'border-emerald-500 bg-emerald-500 text-white';
+    if (status === 'Absent') return 'border-rose-500 bg-rose-500 text-white';
+    return 'border-slate-400 bg-slate-400 text-white';
+  }
+
+  function renderRaceList() {
+    const container = document.getElementById('race-list');
+    container.innerHTML = RACES.map(race => `
+      <div class="rounded-2xl bg-gradient-to-br from-ink-800 to-ink-900 border border-ink-600 p-4 relative overflow-hidden">
+        <div class="absolute -right-6 -top-6 text-7xl opacity-[0.06] select-none">🏁</div>
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            <p class="text-white font-bold text-sm leading-tight truncate">${race.name}</p>
+            ${race.location ? `<p class="text-[11px] text-slate-500 mt-0.5">&#128205; ${race.location}</p>` : ''}
+          </div>
+          ${race.commitment.status === 'Attending' ? `<span class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${race.commitment.hasPaid ? 'bg-emerald-500/15 text-emerald-300' : 'bg-amber-500/15 text-amber-300'}">${race.commitment.hasPaid ? 'Paid' : 'Payment due'}</span>` : ''}
+        </div>
+        <div class="grid grid-cols-4 gap-1.5 mt-3" data-countdown="${race.id}"></div>
+        <div class="flex gap-1.5 mt-3">
+          ${['Attending', 'Unconfirmed', 'Absent'].map(status => `
+            <button data-race-id="${race.id}" data-status="${status}" class="flex-1 rounded-lg border py-1.5 text-[11px] font-semibold transition-colors ${race.commitment.status === status ? raceStatusClasses(status) : 'border-ink-600 text-slate-400'}">${status}</button>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+
+    RACES.forEach(renderRaceCountdown);
+
+    container.querySelectorAll('button[data-race-id]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const race = RACES.find(r => r.id === btn.dataset.raceId);
+        race.commitment.status = btn.dataset.status;
+        renderRaceList();
+      });
+    });
+  }
+
+  function renderRaceCountdown(race) {
+    const el = document.querySelector(`[data-countdown="${race.id}"]`);
+    if (!el) return;
+    const c = getCountdown(race.date);
+    el.innerHTML = `${countdownUnit(c.days, 'Days')}${countdownUnit(c.hours, 'Hrs')}${countdownUnit(c.minutes, 'Min')}${countdownUnit(c.seconds, 'Sec')}`;
+  }
+
+  renderRaceList();
+  setInterval(() => RACES.forEach(renderRaceCountdown), 1000);
+
+  // ---------------------------------------------------------------------
+  // RSVP — up to 10 sessions, quick Attending/Absent, scrolled to ~3 visible
   // ---------------------------------------------------------------------
   const SESSIONS = [
-    { id: 's1', label: 'Tue Interval Training', time: 'Tue · 6:00am', status: 'yes' },
-    { id: 's2', label: 'Thu Technique Session', time: 'Thu · 6:00am', status: null },
-    { id: 's3', label: 'Sat Long Paddle', time: 'Sat · 7:30am', status: 'maybe' },
+    { id: 's1', label: 'Tue Interval Training', time: 'Tue · 6:00am', discipline: 'DB', status: 'attending' },
+    { id: 's2', label: 'Thu Technique Session', time: 'Thu · 6:00am', discipline: 'DB', status: null },
+    { id: 's3', label: 'Sat Long Paddle', time: 'Sat · 7:30am', discipline: 'OC', status: null },
+    { id: 's4', label: 'Recovery & Mobility', time: 'Mon · 9:00am', discipline: 'DB', status: 'attending' },
+    { id: 's5', label: 'PM Strength & Erg', time: 'Tue · 6:00pm', discipline: 'Both', status: null },
+    { id: 's6', label: 'OC Technique Drills', time: 'Wed · 5:30pm', discipline: 'OC', status: 'absent' },
+    { id: 's7', label: 'AM Interval Training', time: 'Thu · 6:00am', discipline: 'DB', status: null },
+    { id: 's8', label: 'Full Crew Scrimmage', time: 'Sat · 7:00am', discipline: 'Both', status: 'attending' },
+    { id: 's9', label: 'Long Steady-State Paddle', time: 'Sun · 7:30am', discipline: 'DB', status: null },
+    { id: 's10', label: 'Pre-Regatta Taper', time: 'Tue · 6:00am', discipline: 'DB', status: null },
   ];
+
+  const SESSION_DISCIPLINE_CLASSES = {
+    DB: 'bg-sky-500/10 text-sky-300 border-sky-500/30',
+    OC: 'bg-orange-500/10 text-orange-300 border-orange-500/30',
+    Both: 'bg-accent/10 text-accent-soft border-accent/30',
+  };
 
   function renderRsvpList() {
     const container = document.getElementById('rsvp-list');
@@ -380,13 +549,15 @@
       row.className = 'rounded-xl bg-ink-800 border border-ink-600 p-3 flex items-center justify-between gap-3';
       row.innerHTML = `
         <div class="min-w-0">
-          <p class="text-sm font-medium text-white truncate">${session.label}</p>
+          <div class="flex items-center gap-2">
+            <p class="text-sm font-medium text-white truncate">${session.label}</p>
+            <span class="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded border shrink-0 ${SESSION_DISCIPLINE_CLASSES[session.discipline]}">${session.discipline}</span>
+          </div>
           <p class="text-[11px] text-slate-500">${session.time}</p>
         </div>
-        <div class="flex gap-1 shrink-0" data-session="${session.id}">
-          ${rsvpButton(session, 'yes', 'Yes', 'emerald')}
-          ${rsvpButton(session, 'maybe', 'Maybe', 'amber')}
-          ${rsvpButton(session, 'no', 'No', 'rose')}
+        <div class="flex gap-1.5 shrink-0" data-session="${session.id}">
+          <button data-status="attending" aria-label="RSVP Attending" class="flex h-8 w-8 items-center justify-center rounded-full border transition-colors ${session.status === 'attending' ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-ink-600 text-slate-400 hover:border-emerald-400 hover:text-emerald-400'}">&#10003;</button>
+          <button data-status="absent" aria-label="RSVP Absent" class="flex h-8 w-8 items-center justify-center rounded-full border transition-colors ${session.status === 'absent' ? 'border-rose-500 bg-rose-500 text-white' : 'border-ink-600 text-slate-400 hover:border-rose-400 hover:text-rose-400'}">&#10005;</button>
         </div>
       `;
       container.appendChild(row);
@@ -399,22 +570,13 @@
         const session = SESSIONS.find(s => s.id === sessionId);
         session.status = session.status === status ? null : status;
         renderRsvpList();
+        renderProfileCard();
       });
     });
   }
 
-  function rsvpButton(session, status, label, color) {
-    const active = session.status === status;
-    const activeClasses = {
-      emerald: 'bg-emerald-500 text-ink-950 border-emerald-500',
-      amber: 'bg-amber-500 text-ink-950 border-amber-500',
-      rose: 'bg-rose-500 text-ink-950 border-rose-500',
-    }[color];
-    const inactiveClasses = 'bg-transparent text-slate-400 border-ink-600 hover:border-ink-500';
-    return `<button data-status="${status}" class="text-[11px] font-semibold px-2.5 py-1.5 rounded-lg border transition-colors ${active ? activeClasses : inactiveClasses}">${label}</button>`;
-  }
-
   renderRsvpList();
+  renderProfileCard();
 
   // ---------------------------------------------------------------------
   // Workout log
@@ -681,7 +843,7 @@
 
   function roleBadge(role) {
     if (!role) return '';
-    const color = role === 'Stroke' ? 'bg-accent/15 text-accent-soft border-accent/40' : 'bg-purple-500/15 text-purple-300 border-purple-500/40';
+    const color = role === 'Pacer' ? 'bg-accent/15 text-accent-soft border-accent/40' : 'bg-purple-500/15 text-purple-300 border-purple-500/40';
     return `<span class="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded border ${color}">${role}</span>`;
   }
 
