@@ -10,10 +10,11 @@ The live link above serves [`prototype.html`](prototype.html), a standalone, sin
 
 ## Features
 
-- **Paddler dashboard** (`/`; mirrored in the "Paddler Home" tab in `prototype.html`) — an editable profile card (weight, preferred side for DB/Both paddlers, Pacer/Steer/Drummer role badges), quick Attending/Absent RSVP to a scrollable list of upcoming sessions, live per-race countdown tickers with RSVP and payment status, and a private "Coaching Feedback Corner" for cues from coaching staff
-- **Coach/Captain command center** (`/command-center`) — a dense filter sidebar to segment the roster by discipline (DB/OC/Both) and crew category (Premier Mixed, Women, Men, Masters), a metrics summary (headcount vs. boat capacity, total attending weight, response rate, discipline), and a session manager for browsing sessions and broadcasting markdown workout/training logs
-- **Lineup builder** (`/lineups/[lineupId]`; standalone "Lineup Tool" tab in `prototype.html`) — drag-and-drop seat assignment across boat layouts (DB12, DB22, V6), including dedicated Drummer/Steer seats on dragon boats, with a live left/right (or bow/stern) weight-balance telemetry bar
-- **Auth** — real Supabase Auth (email/password) once a Supabase project is configured: `/login` and `/signup`, route protection via `src/proxy.ts`, and a `profiles` row auto-created per signup. Paddler vs. Coach view is derived from `profiles.is_coach`. Without Supabase configured, the app falls back to a Paddler/Coach UI toggle over mock data (no login required) for local development
+- **Paddler dashboard** (`/`; mirrored in the "Paddler Home" tab in `prototype.html`) — a profile summary card (weight, preferred side for DB/Both paddlers, Pacer/OC Steer/DB Steer/Drummer role badges), quick Attending/Absent RSVP to a scrollable list of upcoming sessions, live per-race countdown tickers with RSVP and payment status, and a private "Coaching Feedback Corner" for cues from coaching staff. Works identically for coaches, since a coach is also a full paddler in the data model
+- **Profile page** (`/profile`) — self-service editing of name, weight, discipline, preferred side, eligibility (Citizen/PR/Other), age range, boat roles (Pacer, Drummer, OC Steer, DB Steer), and crew categories, reachable via the header avatar
+- **Coach/Captain command center** (`/command-center`) — a dense filter sidebar to segment the roster by discipline (DB/OC/Both) and crew category (Premier Mixed, Women, Men, Masters, Youth, Novice), a metrics summary (headcount vs. boat capacity, total attending weight, response rate, discipline), and a session manager for browsing sessions and broadcasting markdown workout/training logs. Restricted to coaches client-side
+- **Lineup builder** (`/lineups/[lineupId]`; standalone "Lineup Tool" tab in `prototype.html`) — drag-and-drop seat assignment across boat layouts (DB12, DB22, V6), including dedicated Drummer/Steer seats on dragon boats, with a live left/right (or bow/stern) weight-balance telemetry bar. Restricted to coaches client-side
+- **Auth** — real Supabase Auth (email/password) once a Supabase project is configured: `/login` and `/signup`, route protection via `src/proxy.ts`, and a `profiles` row auto-created per signup. Paddler vs. Coach view is derived from `profiles.is_coach`; Command Center and Lineups are gated client-side via `RequireCoach` since a coach is also a paddler and `/`/`/profile` stay open to both roles. Without Supabase configured, the app falls back to a Paddler/Coach UI toggle over mock data (no login required) for local development
 
 ## Running locally
 
@@ -30,17 +31,18 @@ npm run lint     # ESLint
 npx tsc --noEmit # type-check only
 ```
 
-By default the app runs entirely on mock data from `src/lib/mock-data.ts` — no environment setup required, and `/login`/`/signup` are bypassed. To connect a real Supabase project, copy `.env.local.example` to `.env.local`, fill in your project's URL and anon key (plus `NEXT_PUBLIC_SITE_URL` for email-confirmation redirects), and apply both `supabase/migrations/0001_init.sql` and `0002_handle_new_user.sql` to your database.
+By default the app runs entirely on mock data from `src/lib/mock-data.ts` — no environment setup required, and `/login`/`/signup` are bypassed. To connect a real Supabase project, copy `.env.local.example` to `.env.local`, fill in your project's URL and anon key (plus `NEXT_PUBLIC_SITE_URL` for email-confirmation redirects), and apply the migrations in `supabase/migrations/` (`0001_init.sql`, `0002_handle_new_user.sql`, `0003_profile_eligibility_age_steer.sql`) to your database in order.
 
 ## Project structure
 
 ```
 src/
   app/
-    (app)/                # routes wrapped in AppDataProvider + AppShell: /, /command-center, /lineups, /lineups/[lineupId]
+    (app)/                # routes wrapped in AppDataProvider + AppShell: /, /profile, /command-center, /lineups, /lineups/[lineupId]
     login/, signup/       # auth pages (server actions, no AppShell chrome)
     auth/callback/        # exchanges Supabase email-confirmation code for a session
   components/
+    auth/                 # RequireCoach client-side route guard
     dashboard/            # paddler home dashboard widgets
     command-center/        # coach roster, filters, session manager
     lineup/               # drag-and-drop boat editor, telemetry, seat/bench UI
