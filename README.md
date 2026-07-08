@@ -4,13 +4,13 @@ A team management app for dragon boat crews — RSVPs, attendance, race commitme
 
 **Live prototype:** https://mybluecoffeecup-ops.github.io/paddlermgmt/
 
-The live link above serves [`prototype.html`](prototype.html), a standalone, single-file interactive mockup of the lineup builder (mock data, drag-and-drop seating, live weight-balance telemetry) that runs entirely in the browser with no backend. The full Next.js application described below is the real app and currently runs locally.
+The live link above serves [`prototype.html`](prototype.html), a standalone, single-file interactive mockup (mock data, no backend) with three tabs — Paddler Home, Coach/Captain Command Center, and a Lineup Tool — that runs entirely in the browser. The full Next.js application described below is the real app and currently runs locally.
 
 ## Features
 
 - **Paddler dashboard** (`/`) — RSVP to sessions, view race countdowns
-- **Coach command center** (`/command-center`) — roster, attendance, and session management
-- **Lineup builder** (`/lineups/[lineupId]`) — drag-and-drop seat assignment across boat layouts (DB12, DB22, V6) with a live left/right (or bow/stern) weight-balance telemetry bar
+- **Coach/Captain command center** (`/command-center`) — a dense filter sidebar to segment the roster by discipline (DB/OC/Both) and crew category (Premier Mixed, Women, Men, Masters), a metrics summary (headcount vs. boat capacity, total attending weight, response rate, discipline), and a session manager for browsing sessions and broadcasting markdown workout/training logs
+- **Lineup builder** (`/lineups/[lineupId]`; standalone "Lineup Tool" tab in `prototype.html`) — drag-and-drop seat assignment across boat layouts (DB12, DB22, V6), including dedicated Drummer/Steer seats on dragon boats, with a live left/right (or bow/stern) weight-balance telemetry bar
 - Role switching (Paddler / Coach) as a UI toggle — no auth wired up yet
 
 ## Running locally
