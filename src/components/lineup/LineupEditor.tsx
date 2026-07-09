@@ -46,9 +46,9 @@ export function LineupEditor({ lineupId }: { lineupId: string }) {
 
   if (!lineup || !session) {
     return (
-      <div className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-400 dark:border-white/15">
+      <div className="rounded-3xl border border-dashed border-slate-300 p-8 text-center text-sm font-semibold text-slate-600 dark:border-white/15 dark:text-slate-300">
         Lineup not found.{" "}
-        <Link href="/lineups" className="font-semibold text-teal-600 dark:text-teal-300">
+        <Link href="/lineups" className="font-bold text-green-700 dark:text-green-400">
           Back to lineups
         </Link>
       </div>
@@ -103,7 +103,7 @@ export function LineupEditor({ lineupId }: { lineupId: string }) {
           <div className="flex items-center gap-2">
             <Link
               href="/lineups"
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 dark:border-white/10 dark:text-slate-400 dark:hover:bg-white/5"
+              className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200/70 text-slate-700 shadow-soft transition-all hover:bg-slate-100 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/5"
             >
               <ArrowLeft size={15} />
             </Link>
@@ -111,7 +111,7 @@ export function LineupEditor({ lineupId }: { lineupId: string }) {
               <h1 className="font-display text-xl font-bold uppercase tracking-wide text-slate-900 dark:text-white">
                 {lineup.title}
               </h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
                 {session.title} · {layout.name}
               </p>
             </div>

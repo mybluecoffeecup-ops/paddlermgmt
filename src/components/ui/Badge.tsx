@@ -11,7 +11,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
+        "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide",
         className
       )}
     >
@@ -20,11 +20,17 @@ export function Badge({
   );
 }
 
+// Soft tinted pills — strong solid color is reserved for meaningful,
+// singular moments (e.g. an active RSVP selection), not passive repeated
+// labels like these, which appear many times per screen (roster rows,
+// race lists). Contrast-verified: dark text tints hit AAA on their own
+// light wash in light mode; dark mode swaps to white text since the same
+// translucent wash reads much darker over the dark Pitch surface.
 const STATUS_STYLES: Record<AttendanceStatus, string> = {
-  Attending: "bg-emerald-100 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300",
-  Unconfirmed: "bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-slate-300",
-  Absent: "bg-rose-100 text-rose-700 dark:bg-rose-400/10 dark:text-rose-300",
-  Waitlist: "bg-amber-100 text-amber-700 dark:bg-amber-400/10 dark:text-amber-300",
+  Attending: "bg-green-500/15 text-green-800 dark:bg-green-400/20 dark:text-white",
+  Unconfirmed: "border border-slate-300 text-slate-700 dark:border-white/30 dark:text-white",
+  Absent: "bg-redcard-500/15 text-redcard-700 dark:bg-redcard-500/25 dark:text-white",
+  Waitlist: "bg-gold-500/20 text-gold-900 dark:bg-gold-400/25 dark:text-white",
 };
 
 export function AttendanceBadge({ status }: { status: AttendanceStatus }) {
@@ -32,9 +38,9 @@ export function AttendanceBadge({ status }: { status: AttendanceStatus }) {
 }
 
 const DISCIPLINE_STYLES: Record<Discipline, string> = {
-  DB: "bg-cyan-100 text-cyan-700 dark:bg-cyan-400/10 dark:text-cyan-300",
-  OC: "bg-violet-100 text-violet-700 dark:bg-violet-400/10 dark:text-violet-300",
-  Both: "bg-teal-100 text-teal-700 dark:bg-teal-400/10 dark:text-teal-300",
+  DB: "bg-green-500/15 text-green-800 dark:bg-green-400/20 dark:text-white",
+  OC: "bg-gold-500/20 text-gold-900 dark:bg-gold-400/25 dark:text-white",
+  Both: "bg-pitch-900/10 text-pitch-900 dark:bg-white/10 dark:text-white",
 };
 
 export function DisciplineBadge({ discipline }: { discipline: Discipline }) {

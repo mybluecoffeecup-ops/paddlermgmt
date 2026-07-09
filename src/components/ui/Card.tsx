@@ -10,7 +10,7 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/5",
+        "rounded-3xl border border-slate-200/60 bg-white shadow-soft dark:border-white/10 dark:bg-pitch-900/70",
         className
       )}
     >
@@ -34,16 +34,16 @@ export function CardHeader({
     <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 dark:border-white/10">
       <div className="flex items-center gap-2.5">
         {icon && (
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-50 text-teal-600 dark:bg-teal-500/10 dark:text-teal-300">
+          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gold-500/15 text-gold-700 dark:text-gold-300">
             {icon}
           </div>
         )}
         <div>
-          <h2 className="font-display text-base font-bold uppercase tracking-wide text-slate-900 dark:text-slate-100">
+          <h2 className="font-display text-base font-bold uppercase tracking-wide text-slate-900 dark:text-white">
             {title}
           </h2>
           {subtitle && (
-            <p className="text-xs text-slate-500 dark:text-slate-400">{subtitle}</p>
+            <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">{subtitle}</p>
           )}
         </div>
       </div>

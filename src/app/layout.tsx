@@ -1,9 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Barlow_Condensed } from "next/font/google";
+import { Geist_Mono, Barlow, Barlow_Condensed } from "next/font/google";
 import "./globals.css";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();`;
+
+const barlow = Barlow({
+  variable: "--font-barlow",
+  weight: ["500", "600", "700"],
   subsets: ["latin"],
 });
 
@@ -29,7 +33,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   viewportFit: "cover",
-  themeColor: "#1f6a60",
+  themeColor: "#082618",
 };
 
 export default function RootLayout({
@@ -40,9 +44,16 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${barlowCondensed.variable} h-full antialiased`}
+      className={`${barlow.variable} ${geistMono.variable} ${barlowCondensed.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
+      <body className="flex min-h-full flex-col">
+        {children}
+        <ThemeToggle />
+      </body>
     </html>
   );
 }

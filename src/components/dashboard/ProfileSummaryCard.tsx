@@ -54,8 +54,8 @@ export function ProfileSummaryCard() {
 
   return (
     <Card className="overflow-hidden">
-      <div className="flex items-center gap-4 bg-gradient-to-br from-teal-600 to-ember-600 px-4 py-5 text-white">
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/15 text-lg font-bold backdrop-blur">
+      <div className="flex items-center gap-4 bg-pitch-900 px-4 py-5 text-white">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gold-500 text-lg font-bold text-ink shadow-[0_0_20px_rgba(253,189,28,0.35)]">
           {currentUser.full_name
             .split(" ")
             .map((p) => p[0])
@@ -113,11 +113,11 @@ export function ProfileSummaryCard() {
                 value={weightInput}
                 onChange={(e) => setWeightInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && saveWeight()}
-                className="w-16 rounded-md border border-teal-300 bg-white px-1.5 py-1 text-center text-lg font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-slate-800 dark:text-white"
+                className="w-16 rounded-xl border border-slate-200/70 bg-white px-1.5 py-1 text-center text-lg font-bold text-ink focus:outline-none focus:ring-2 focus:ring-green-500 dark:border-white/10 dark:bg-pitch-900/70 dark:text-white"
               />
               <button
                 onClick={saveWeight}
-                className="rounded-md bg-teal-600 p-1.5 text-white"
+                className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-700 text-white shadow-soft transition-all active:scale-95"
                 aria-label="Save weight"
               >
                 <Check size={14} />
@@ -126,29 +126,29 @@ export function ProfileSummaryCard() {
           ) : (
             <button
               onClick={startEdit}
-              className="flex items-center gap-1 font-display text-xl font-bold tabular-nums text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 dark:text-white"
+              className="flex items-center gap-1 font-display text-xl font-bold tabular-nums text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 dark:text-white"
             >
               {formatWeight(currentUser.weight_kg)}
-              <Pencil size={11} className="text-slate-400" />
+              <Pencil size={11} className="text-slate-500" />
             </button>
           )}
-          <span className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+          <span className="text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
             Weight
           </span>
         </div>
         <div className="flex flex-col items-center justify-center gap-1 px-2 py-4">
-          <span className="font-display text-xl font-bold tabular-nums text-emerald-600 dark:text-emerald-400">
+          <span className="font-display text-xl font-bold tabular-nums text-green-700 dark:text-green-400">
             {upcomingAttending}
           </span>
-          <span className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+          <span className="text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
             Attending
           </span>
         </div>
         <div className="flex flex-col items-center justify-center gap-1 px-2 py-4">
-          <span className="font-display text-xl font-bold tabular-nums text-amber-600 dark:text-amber-400">
+          <span className="font-display text-xl font-bold tabular-nums text-ink dark:text-white">
             {upcomingUnconfirmed}
           </span>
-          <span className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+          <span className="text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
             Needs RSVP
           </span>
         </div>

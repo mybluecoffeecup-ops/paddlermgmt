@@ -33,7 +33,7 @@ export function UpcomingSessions() {
                   </p>
                   <DisciplineBadge discipline={session.discipline} />
                 </div>
-                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                <p className="mt-0.5 text-xs font-semibold text-slate-600 dark:text-slate-300">
                   {formatSessionDate(session.session_date, session.start_time)} · {session.type}
                 </p>
               </div>
@@ -41,10 +41,10 @@ export function UpcomingSessions() {
                 <button
                   onClick={() => rsvpToSession(session.id, "Attending")}
                   className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
+                    "flex h-11 w-11 items-center justify-center rounded-full border transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500",
                     status === "Attending"
-                      ? "border-emerald-500 bg-emerald-500 text-white"
-                      : "border-slate-200 text-slate-400 hover:border-emerald-400 hover:text-emerald-500 dark:border-white/15"
+                      ? "border-green-700 bg-green-700 text-white shadow-soft"
+                      : "border-slate-200/70 text-slate-600 hover:border-green-700 hover:text-green-700 dark:border-white/15"
                   )}
                   aria-label="RSVP Attending"
                 >
@@ -53,10 +53,10 @@ export function UpcomingSessions() {
                 <button
                   onClick={() => rsvpToSession(session.id, "Absent")}
                   className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
+                    "flex h-11 w-11 items-center justify-center rounded-full border transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500",
                     status === "Absent"
-                      ? "border-rose-500 bg-rose-500 text-white"
-                      : "border-slate-200 text-slate-400 hover:border-rose-400 hover:text-rose-500 dark:border-white/15"
+                      ? "border-redcard-700 bg-redcard-700 text-white shadow-soft"
+                      : "border-slate-200/70 text-slate-600 hover:border-redcard-700 hover:text-redcard-700 dark:border-white/15"
                   )}
                   aria-label="RSVP Absent"
                 >

@@ -30,7 +30,7 @@ export function MarkdownLite({ text }: { text: string }) {
     if (trimmed.startsWith("## ")) {
       flushList();
       blocks.push(
-        <h3 key={blocks.length} className="mt-3 text-sm font-bold text-teal-700 first:mt-0 dark:text-teal-300">
+        <h3 key={blocks.length} className="mt-3 text-sm font-bold text-green-700 first:mt-0 dark:text-green-300">
           {trimmed.slice(3)}
         </h3>
       );

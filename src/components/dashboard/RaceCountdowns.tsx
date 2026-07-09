@@ -7,16 +7,22 @@ import { useCountdown } from "@/hooks/use-countdown";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
 
+const STATUS_LABELS: Record<"Attending" | "Unconfirmed" | "Absent", string> = {
+  Attending: "Going",
+  Unconfirmed: "Maybe",
+  Absent: "Not Going",
+};
+
 function CountdownUnit({ value, label }: { value: number; label: string }) {
   return (
-    <div className="flex flex-col items-center rounded-lg bg-slate-900/5 px-2 py-1.5 dark:bg-white/10">
+    <div className="flex flex-col items-center rounded-2xl border border-slate-200/70 bg-white px-3 py-2 shadow-soft dark:border-white/10 dark:bg-pitch-900/70">
       <span
-        className="font-display text-lg font-bold tabular-nums text-slate-900 dark:text-white"
+        className="font-display text-lg font-bold tabular-nums text-ink dark:text-white"
         suppressHydrationWarning
       >
         {String(value).padStart(2, "0")}
       </span>
-      <span className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+      <span className="text-[9px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
         {label}
       </span>
     </div>
@@ -46,7 +52,7 @@ function RaceRow({ race }: { race: import("@/types").Race }) {
             {race.name}
           </p>
           {race.location && (
-            <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+            <p className="mt-0.5 flex items-center gap-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
               <MapPin size={11} /> {race.location}
             </p>
           )}
@@ -54,10 +60,10 @@ function RaceRow({ race }: { race: import("@/types").Race }) {
         {commitment && (
           <span
             className={cn(
-              "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold",
+              "shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide",
               commitment.has_paid
-                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300"
-                : "bg-amber-100 text-amber-700 dark:bg-amber-400/10 dark:text-amber-300"
+                ? "bg-green-500/15 text-green-800 dark:bg-green-400/20 dark:text-white"
+                : "bg-gold-500/20 text-gold-900 dark:bg-gold-400/25 dark:text-white"
             )}
           >
             {commitment.has_paid ? "Paid" : "Payment due"}
@@ -65,7 +71,7 @@ function RaceRow({ race }: { race: import("@/types").Race }) {
         )}
       </div>
 
-      <p className="mt-3 flex items-center gap-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+      <p className="mt-3 flex items-center gap-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
         <Calendar size={11} /> {raceDateLabel}
       </p>
 
@@ -74,14 +80,14 @@ function RaceRow({ race }: { race: import("@/types").Race }) {
           <CountdownUnit value={countdown.days} label="days" />
         </div>
 
-        <div className="flex shrink-0 flex-col items-center justify-center gap-0.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 dark:border-white/10 dark:bg-white/5">
+        <div className="flex shrink-0 flex-col items-center justify-center gap-0.5 rounded-2xl border border-lime-400/40 bg-lime-400/20 px-3 py-2 shadow-soft dark:border-lime-400/30 dark:bg-lime-400/15">
           <span
-            className="font-display text-lg font-bold tabular-nums text-slate-900 dark:text-white"
+            className="font-display text-lg font-bold tabular-nums text-ink dark:text-white"
             suppressHydrationWarning
           >
             {goingCount}
           </span>
-          <span className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+          <span className="text-[9px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
             going
           </span>
         </div>
@@ -92,17 +98,17 @@ function RaceRow({ race }: { race: import("@/types").Race }) {
               key={status}
               onClick={() => updateRaceCommitment(race.id, currentUserId, { status })}
               className={cn(
-                "flex flex-1 items-center justify-center rounded-lg border px-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
+                "flex min-h-11 flex-1 items-center justify-center rounded-2xl border px-2 text-xs font-bold uppercase tracking-wide transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500",
                 commitment?.status === status
                   ? status === "Attending"
-                    ? "border-emerald-500 bg-emerald-500 text-white"
+                    ? "border-green-700 bg-green-700 text-white shadow-soft"
                     : status === "Absent"
-                      ? "border-rose-500 bg-rose-500 text-white"
-                      : "border-slate-400 bg-slate-400 text-white"
-                  : "border-slate-200 text-slate-500 dark:border-white/15 dark:text-slate-400"
+                      ? "border-redcard-700 bg-redcard-700 text-white shadow-soft"
+                      : "border-ink bg-ink text-white shadow-soft dark:border-white dark:bg-white dark:text-ink"
+                  : "border-slate-200/70 text-slate-600 dark:border-white/15 dark:text-slate-300"
               )}
             >
-              {status}
+              {STATUS_LABELS[status]}
             </button>
           ))}
         </div>

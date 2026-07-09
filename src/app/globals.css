@@ -1,49 +1,88 @@
 @import "tailwindcss";
 
+/* Manual dark mode: redefine what `dark:` means app-wide, from "OS
+   prefers-color-scheme" to "inside an element with the `.dark` class".
+   Every existing `dark:*` utility across the app keeps working unchanged —
+   only the trigger changes, flipped by ThemeToggle.tsx via a class on
+   <html> instead of the OS setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Design tokens MUST live in an `@theme` block, not plain `:root` — Tailwind
+   v4 only auto-generates utility classes (bg-, text-, border- variants) for
+   colors registered via `@theme`. A `--color-green-700` declared in `:root`
+   does NOT make `bg-green-700` use it: `green` is already a stock Tailwind
+   color family, so `bg-green-700` silently falls back to Tailwind's own
+   built-in green instead, and non-stock names (gold/pitch/redcard/ink/chalk)
+   don't generate any utility at all. This bit us once already — don't move
+   these back to `:root`. */
+@theme {
+  /* Kit Green — the pitch. Primary brand/action color; 700 is the
+     AAA-safe (7.9:1 white text) solid-fill shade for buttons/badges. */
+  --color-green-50: #effaf5;
+  --color-green-100: #d6f5e7;
+  --color-green-200: #a7eccc;
+  --color-green-300: #6ae7ac;
+  --color-green-400: #23e78b;
+  --color-green-500: #0cc06c;
+  --color-green-600: #089b56;
+  --color-green-700: #085e36;
+  --color-green-800: #07502e;
+  --color-green-900: #053920;
+  --color-green-950: #032113;
+
+  /* Gold — the trim. Secondary accent / "caution" semantic. Always a
+     fill block with Ink text on top, never gold text on a light bg. */
+  --color-gold-50: #fcf8ee;
+  --color-gold-100: #faeed1;
+  --color-gold-200: #f9df9f;
+  --color-gold-300: #f9d16c;
+  --color-gold-400: #fac642;
+  --color-gold-500: #fdbd1c;
+  --color-gold-600: #ebaa05;
+  --color-gold-700: #ba8808;
+  --color-gold-800: #8e690b;
+  --color-gold-900: #644b0c;
+  --color-gold-950: #3b2e0c;
+
+  /* Pitch — deep green-black. The nav bar's constant "team color" toolbar
+     in both light and dark mode, and the dark-mode background. */
+  --color-pitch-700: #174f35;
+  --color-pitch-800: #0e3925;
+  --color-pitch-900: #082618;
+  --color-pitch-950: #04160d;
+
+  /* Redcard — functional-only alert color (Absent, destructive, errors).
+     Never decorative. */
+  --color-redcard-50: #fcedf0;
+  --color-redcard-100: #f9d2d9;
+  --color-redcard-500: #dc1839;
+  --color-redcard-600: #ba122e;
+  --color-redcard-700: #9c0d24;
+
+  /* Ink / Chalk — the flat, stark text/background pair panel borders and
+     text reach for directly (as opposed to a tinted scale step). */
+  --color-ink: #101410;
+  --color-chalk: #ffffff;
+}
+
 :root {
-  --background: #f4f8fa;
-  --foreground: #0b1f2e;
+  --background: #ffffff;
+  --foreground: #101410;
+  color-scheme: light;
+}
 
-  /* Regatta teal — deeper, more jade than stock Tailwind teal. The water. */
-  --color-teal-50: #eef6f5;
-  --color-teal-100: #d3e9e5;
-  --color-teal-200: #a8d3ca;
-  --color-teal-300: #78b8ac;
-  --color-teal-400: #4b9c8d;
-  --color-teal-500: #2f8074;
-  --color-teal-600: #1f6a60;
-  --color-teal-700: #17564e;
-  --color-teal-800: #12433d;
-  --color-teal-900: #0f3733;
-  --color-teal-950: #071e1c;
-
-  /* Ember — the dragon head's carved vermilion, used sparingly for signature moments. */
-  --color-ember-50: #fdf1ec;
-  --color-ember-100: #fbdccf;
-  --color-ember-200: #f6b79f;
-  --color-ember-300: #ef8d6c;
-  --color-ember-400: #e66c47;
-  --color-ember-500: #d9532c;
-  --color-ember-600: #b8431f;
-  --color-ember-700: #93361a;
-  --color-ember-800: #732c18;
-  --color-ember-900: #5c2617;
-  --color-ember-950: #301209;
+.dark {
+  --background: #04160d;
+  --foreground: #ffffff;
+  color-scheme: dark;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-barlow);
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-barlow-condensed);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #071620;
-    --foreground: #e6f1f5;
-  }
 }
 
 body {
@@ -62,8 +101,34 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(31, 106, 96, 0.4);
+  background: rgba(8, 94, 54, 0.4);
   border-radius: 9999px;
+}
+
+/* Soft, tinted elevation (mobile-app-ui-design skill: shadows should be
+   tinted to the background hue, never neutral gray/black). Used in place
+   of hard borders as the primary "this is a surface" cue. */
+.shadow-soft {
+  box-shadow:
+    0 1px 2px rgba(8, 38, 24, 0.06),
+    0 4px 12px rgba(8, 38, 24, 0.08);
+}
+
+.shadow-soft-lg {
+  box-shadow:
+    0 4px 8px rgba(8, 38, 24, 0.08),
+    0 12px 24px rgba(8, 38, 24, 0.12);
+}
+
+/* Primary-CTA elevation: the tinted soft shadow plus a tiny white inner
+   highlight for dimension (mobile-app-ui-design skill: "subtle white
+   inner shadows on buttons"). One combined box-shadow, since stacking
+   `shadow-soft` with a separate inset utility would just override it. */
+.shadow-cta {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 1px 2px rgba(8, 38, 24, 0.06),
+    0 4px 12px rgba(8, 38, 24, 0.08);
 }
 
 @media (prefers-reduced-motion: reduce) {

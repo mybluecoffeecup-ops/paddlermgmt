@@ -3,6 +3,7 @@
 import { Ship } from "lucide-react";
 
 import { SeatSlot } from "@/components/lineup/SeatSlot";
+import { Card, CardHeader } from "@/components/ui/Card";
 import type { BoatLayout } from "@/lib/boat-config";
 import type { Profile, SeatingConfiguration } from "@/types";
 
@@ -26,18 +27,8 @@ export function BoatCanvas({
     : 0;
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/5">
-      <div className="flex items-center gap-2 border-b border-slate-100 px-4 py-3 dark:border-white/10">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-50 text-teal-600 dark:bg-teal-500/10 dark:text-teal-300">
-          <Ship size={16} />
-        </div>
-        <div>
-          <h2 className="font-display text-base font-bold uppercase tracking-wide text-slate-900 dark:text-slate-100">
-            The Boat
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">{layout.name}</p>
-        </div>
-      </div>
+    <Card className="flex h-full flex-col overflow-hidden">
+      <CardHeader title="The Boat" subtitle={layout.name} icon={<Ship size={16} />} />
 
       <div className="flex-1 overflow-y-auto p-4">
         {isDragonBoat ? (
@@ -48,7 +39,7 @@ export function BoatCanvas({
             />
             {Array.from({ length: rows }, (_, i) => i + 1).map((row) => (
               <div key={row} className="grid grid-cols-[1.5rem_1fr_1fr] items-center gap-1.5">
-                <span className="text-center font-display text-sm font-bold tabular-nums text-ember-500/70 dark:text-ember-400/60">
+                <span className="text-center font-display text-sm font-bold tabular-nums text-slate-600 dark:text-slate-300">
                   {row}
                 </span>
                 <SeatSlot seat={layout.seats.find((s) => s.id === `${row}L`)!} occupant={occupantFor(`${row}L`)} />
@@ -68,6 +59,6 @@ export function BoatCanvas({
           </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

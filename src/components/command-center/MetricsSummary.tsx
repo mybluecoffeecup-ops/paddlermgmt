@@ -20,13 +20,13 @@ function MetricCard({
   warn?: boolean;
 }) {
   return (
-    <div className="flex flex-1 items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm dark:border-white/10 dark:bg-white/5">
+    <div className="flex flex-1 items-center gap-3 rounded-3xl border border-slate-200/60 bg-white px-4 py-3 shadow-soft dark:border-white/10 dark:bg-pitch-900/70">
       <div
         className={cn(
-          "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+          "flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl",
           warn
-            ? "bg-amber-100 text-amber-600 dark:bg-amber-400/10 dark:text-amber-300"
-            : "bg-teal-50 text-teal-600 dark:bg-teal-500/10 dark:text-teal-300"
+            ? "bg-gold-500/20 text-gold-800 dark:bg-gold-400/25 dark:text-white"
+            : "bg-green-500/15 text-green-700 dark:bg-green-400/20 dark:text-white"
         )}
       >
         {icon}
@@ -35,10 +35,10 @@ function MetricCard({
         <p className="font-display text-2xl font-bold leading-tight tabular-nums text-slate-900 dark:text-white">
           {value}
         </p>
-        <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+        <p className="truncate text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
           {label}
         </p>
-        {hint && <p className="text-[11px] text-slate-400">{hint}</p>}
+        {hint && <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">{hint}</p>}
       </div>
     </div>
   );
@@ -55,7 +55,7 @@ export function MetricsSummary({
 
   if (!session) {
     return (
-      <div className="rounded-2xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-400 dark:border-white/15">
+      <div className="rounded-3xl border border-dashed border-slate-300 p-6 text-center text-sm font-semibold text-slate-600 dark:border-white/15 dark:text-slate-300">
         Select a session to see metrics.
       </div>
     );

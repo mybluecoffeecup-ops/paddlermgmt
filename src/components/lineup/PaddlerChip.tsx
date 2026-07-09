@@ -44,10 +44,10 @@ export function PaddlerChip({
       {...listeners}
       {...attributes}
       className={cn(
-        "touch-none select-none rounded-lg border border-slate-200 border-l-4 bg-white px-2.5 py-2 shadow-sm transition-shadow active:shadow-md dark:border-white/10 dark:bg-slate-800",
+        "touch-none select-none rounded-2xl border border-slate-200/70 border-l-4 bg-white px-2.5 py-2 shadow-soft transition-all active:scale-[1.02] active:shadow-soft-lg dark:border-white/10 dark:bg-pitch-900/70",
         SIDE_BORDER[paddler.preferred_side],
         isDragging && "opacity-40",
-        mismatch && "ring-1 ring-amber-400",
+        mismatch && "ring-2 ring-gold-500",
         compact ? "cursor-grab" : "cursor-grab"
       )}
     >
@@ -58,8 +58,10 @@ export function PaddlerChip({
         <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", SIDE_DOT[paddler.preferred_side])} />
       </div>
       <div className="mt-0.5 flex items-center justify-between gap-1">
-        <p className="text-[11px] font-semibold text-slate-400">{formatWeight(paddler.weight_kg)}</p>
-        <div className="flex items-center gap-0.5 text-slate-400">
+        <p className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+          {formatWeight(paddler.weight_kg)}
+        </p>
+        <div className="flex items-center gap-0.5 text-slate-600 dark:text-slate-300">
           {paddler.is_pacer && <Anchor size={10} />}
           {(paddler.is_oc_steer || paddler.is_db_steer) && <Compass size={10} />}
           {paddler.is_drummer && <Mic2 size={10} />}

@@ -66,10 +66,10 @@ function Chip({
       type="button"
       onClick={onClick}
       className={cn(
-        "flex items-center gap-1.5 rounded-lg border px-3 py-2 text-left text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
+        "flex items-center gap-1.5 rounded-2xl border px-3 py-2.5 text-left text-sm font-semibold transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500",
         active
-          ? "border-teal-500 bg-teal-500/10 text-teal-700 dark:text-teal-300"
-          : "border-slate-200 text-slate-500 hover:border-slate-300 dark:border-white/10 dark:text-slate-400"
+          ? "border-green-700/30 bg-green-500/10 text-green-700 shadow-soft dark:border-green-400/30 dark:text-green-300"
+          : "border-slate-200/70 text-slate-600 hover:border-slate-300 dark:border-white/10 dark:text-slate-300"
       )}
     >
       {children}
@@ -78,9 +78,10 @@ function Chip({
 }
 
 const selectClassName =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 dark:border-white/10 dark:bg-slate-800 dark:text-slate-100";
+  "w-full rounded-2xl border border-slate-200/70 bg-white px-3 py-2.5 text-sm text-ink transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:shadow-soft dark:border-white/10 dark:bg-pitch-900/70 dark:text-white";
 const inputClassName = selectClassName;
-const labelClassName = "mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-400";
+const labelClassName =
+  "mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300";
 
 export default function ProfilePage() {
   const { currentUser, currentUserId, updateProfile, loading } = useAppData();
@@ -95,7 +96,7 @@ export default function ProfilePage() {
 
   if (loading || !draft) {
     return (
-      <p className="p-4 text-sm text-slate-500 dark:text-slate-400">Loading profile…</p>
+      <p className="p-4 text-sm font-semibold text-slate-600 dark:text-slate-300">Loading profile…</p>
     );
   }
 
@@ -139,7 +140,7 @@ export default function ProfilePage() {
         <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-slate-900 dark:text-white">
           My Profile
         </h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+        <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">
           Keep your paddling info up to date — your coach uses this for lineups.
         </p>
       </div>
@@ -259,7 +260,7 @@ export default function ProfilePage() {
           <div className="flex flex-col gap-3">
             <label className={labelClassName}>Crew categories</label>
             <div>
-              <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-400">
+              <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
                 Gender
               </p>
               <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
@@ -275,7 +276,7 @@ export default function ProfilePage() {
               </div>
             </div>
             <div>
-              <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-400">
+              <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
                 Age Range
               </p>
               <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
@@ -291,7 +292,7 @@ export default function ProfilePage() {
               </div>
             </div>
             <div>
-              <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-400">
+              <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
                 Other
               </p>
               <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
@@ -310,7 +311,10 @@ export default function ProfilePage() {
 
           <button
             onClick={handleSave}
-            className="mt-1 flex items-center justify-center gap-1.5 rounded-lg bg-teal-600 py-2 text-sm font-bold text-white transition-colors hover:bg-teal-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#0b1f2e]"
+            className={cn(
+              "mt-1 flex min-h-11 items-center justify-center gap-1.5 rounded-2xl py-2 text-sm font-bold uppercase tracking-wide text-white shadow-cta transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-pitch-900",
+              saved ? "scale-[1.02] bg-green-800" : "bg-green-700 hover:bg-green-800"
+            )}
           >
             <Save size={15} /> {saved ? "Saved!" : "Save Profile"}
           </button>
