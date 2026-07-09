@@ -16,15 +16,32 @@ import Link from "next/link";
 
 import { useAppData } from "@/hooks/app-data";
 import { getBoatLayout } from "@/lib/boat-config";
+import { autoAssignSeat } from "@/lib/auto-assign-seat";
+import { cn } from "@/lib/utils";
 import { BenchList, BENCH_DROPPABLE_ID } from "@/components/lineup/BenchList";
 import { BoatCanvas } from "@/components/lineup/BoatCanvas";
 import { TelemetryBar } from "@/components/lineup/TelemetryBar";
 import { PaddlerChip } from "@/components/lineup/PaddlerChip";
-import type { Profile, SeatingConfiguration } from "@/types";
+import { PaddlerColorKey } from "@/components/lineup/PaddlerColorKey";
+import type { BoatType, Profile, SeatingConfiguration } from "@/types";
+
+const BOAT_TOGGLE_OPTIONS: { value: BoatType; label: string }[] = [
+  { value: "DB12", label: "DB12" },
+  { value: "DB22", label: "DB22" },
+  { value: "V6", label: "V6" },
+];
 
 export function LineupEditor({ lineupId }: { lineupId: string }) {
-  const { lineups, sessions, races, raceCommitments, profiles, attendanceFor, saveLineupSeating } =
-    useAppData();
+  const {
+    lineups,
+    sessions,
+    races,
+    raceCommitments,
+    profiles,
+    attendanceFor,
+    saveLineupSeating,
+    updateLineupBoat,
+  } = useAppData();
   const [activePaddler, setActivePaddler] = useState<Profile | null>(null);
 
   const sensors = useSensors(
@@ -102,6 +119,28 @@ export function LineupEditor({ lineupId }: { lineupId: string }) {
     saveLineupSeating(lineup.id, next);
   }
 
+  function handleBenchClick(paddler: Profile) {
+    if (!lineup) return;
+    const seatId = autoAssignSeat(paddler, layout, seating);
+    if (!seatId) return;
+    saveLineupSeating(lineup.id, { ...seating, [seatId]: paddler.id });
+  }
+
+  function handleBoatChange(nextBoat: BoatType) {
+    if (!lineup || nextBoat === lineup.boat) return;
+    const validSeatIds = new Set(getBoatLayout(nextBoat).seats.map((s) => s.id));
+    const droppedCount = Object.entries(seating).filter(
+      ([seatId, paddlerId]) => paddlerId && !validSeatIds.has(seatId)
+    ).length;
+    if (droppedCount > 0) {
+      const confirmed = window.confirm(
+        `Switching boats will move ${droppedCount} paddler${droppedCount === 1 ? "" : "s"} back to the bench — their seats don't exist in the new layout. Continue?`
+      );
+      if (!confirmed) return;
+    }
+    updateLineupBoat(lineup.id, nextBoat);
+  }
+
   return (
     <DndContext
       sensors={sensors}
@@ -127,13 +166,32 @@ export function LineupEditor({ lineupId }: { lineupId: string }) {
               </p>
             </div>
           </div>
+
+          <div className="flex items-center gap-1 rounded-full border border-slate-200/70 p-1 dark:border-white/10">
+            {BOAT_TOGGLE_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => handleBoatChange(opt.value)}
+                className={cn(
+                  "min-h-9 rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500",
+                  opt.value === lineup.boat
+                    ? "bg-green-700 text-white shadow-soft"
+                    : "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <TelemetryBar layout={layout} seating={seating} profileById={profileById} />
+        <PaddlerColorKey />
 
         <div className="grid flex-1 grid-cols-1 gap-3 md:grid-cols-[16rem_1fr] md:items-start">
           <div className="md:h-[65vh]">
-            <BenchList paddlers={benchPaddlers} />
+            <BenchList paddlers={benchPaddlers} onPaddlerClick={handleBenchClick} />
           </div>
           <div className="md:h-[65vh]">
             <BoatCanvas layout={layout} seating={seating} profileById={profileById} />

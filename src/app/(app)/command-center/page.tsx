@@ -8,6 +8,7 @@ import { MetricsSummary } from "@/components/command-center/MetricsSummary";
 import { RaceManager } from "@/components/command-center/RaceManager";
 import { SessionManager } from "@/components/command-center/SessionManager";
 import { RosterTable } from "@/components/command-center/RosterTable";
+import { WorkoutProgramPanel } from "@/components/command-center/WorkoutProgramPanel";
 import type { Discipline } from "@/types";
 
 export default function CommandCenterPage() {
@@ -84,6 +85,8 @@ export default function CommandCenterPage() {
         />
         <RosterTable sessionId={selectedSessionId} profiles={filteredProfiles} />
       </div>
+
+      <WorkoutProgramPanel />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import type {
   Race,
   RaceCommitment,
   Session,
+  WorkoutProgram,
 } from "@/types";
 import { ALL_CREW_TAGS } from "@/types";
 
@@ -77,8 +78,6 @@ export const MOCK_SESSIONS: Session[] = [
     discipline: "DB",
     type: "Training",
     capacity_limit: 22,
-    workout_program:
-      "## Warm-up\n- 15 min easy paddle\n\n## Main Set\n- 6x250m @ race pace, 2 min rest\n\n## Cool-down\n- 10 min easy paddle + stretch",
     created_by: CURRENT_COACH_ID,
     created_at: now,
     updated_at: now,
@@ -93,8 +92,6 @@ export const MOCK_SESSIONS: Session[] = [
     discipline: "OC",
     type: "Training",
     capacity_limit: 6,
-    workout_program:
-      "## Main Set\n- 90 min continuous paddle, HR zone 2\n- Rotate steer every 20 min",
     created_by: CURRENT_COACH_ID,
     created_at: now,
     updated_at: now,
@@ -109,8 +106,6 @@ export const MOCK_SESSIONS: Session[] = [
     discipline: "Both",
     type: "Race Simulation",
     capacity_limit: 22,
-    workout_program:
-      "## Main Set\n- 3x500m full race simulation\n- Lineup rotations between reps",
     created_by: CURRENT_COACH_ID,
     created_at: now,
     updated_at: now,
@@ -125,7 +120,6 @@ export const MOCK_SESSIONS: Session[] = [
     discipline: "DB",
     type: "Training",
     capacity_limit: 22,
-    workout_program: "## Main Set\n- 40 min easy technical paddle\n- 20 min mobility circuit",
     created_by: CURRENT_COACH_ID,
     created_at: now,
     updated_at: now,
@@ -140,7 +134,6 @@ export const MOCK_SESSIONS: Session[] = [
     discipline: "Both",
     type: "Training",
     capacity_limit: 22,
-    workout_program: "## Main Set\n- 4 rounds strength circuit\n- 5x500m erg @ threshold",
     created_by: CURRENT_COACH_ID,
     created_at: now,
     updated_at: now,
@@ -155,7 +148,6 @@ export const MOCK_SESSIONS: Session[] = [
     discipline: "OC",
     type: "Training",
     capacity_limit: 6,
-    workout_program: "## Focus\n- Steering rotations\n- Catch-angle drills\n\n## Main Set\n- 8x300m",
     created_by: CURRENT_COACH_ID,
     created_at: now,
     updated_at: now,
@@ -170,7 +162,6 @@ export const MOCK_SESSIONS: Session[] = [
     discipline: "DB",
     type: "Training",
     capacity_limit: 22,
-    workout_program: "## Warm-up\n- 15 min easy paddle\n\n## Main Set\n- 10x200m @ race pace, 90s rest",
     created_by: CURRENT_COACH_ID,
     created_at: now,
     updated_at: now,
@@ -185,7 +176,6 @@ export const MOCK_SESSIONS: Session[] = [
     discipline: "Both",
     type: "Race Simulation",
     capacity_limit: 22,
-    workout_program: "## Main Set\n- 4x500m full race simulation\n- Lineup rotations between reps",
     created_by: CURRENT_COACH_ID,
     created_at: now,
     updated_at: now,
@@ -200,7 +190,6 @@ export const MOCK_SESSIONS: Session[] = [
     discipline: "DB",
     type: "Training",
     capacity_limit: 22,
-    workout_program: "## Main Set\n- 75 min continuous paddle, HR zone 2",
     created_by: CURRENT_COACH_ID,
     created_at: now,
     updated_at: now,
@@ -215,12 +204,21 @@ export const MOCK_SESSIONS: Session[] = [
     discipline: "DB",
     type: "Training",
     capacity_limit: 22,
-    workout_program: "## Main Set\n- 20 min easy paddle\n- 4x100m starts @ race pace",
     created_by: CURRENT_COACH_ID,
     created_at: now,
     updated_at: now,
   },
 ];
+
+export const WORKOUT_PROGRAM_ID = "00000000-0000-0000-0000-000000000001";
+
+export const MOCK_WORKOUT_PROGRAM: WorkoutProgram = {
+  id: WORKOUT_PROGRAM_ID,
+  content:
+    "## Warm-up\n- 10 min dynamic mobility\n\n## Strength Circuit (3 rounds)\n- 12x kettlebell swings\n- 10x med ball rotational throws (each side)\n- 30s plank hold\n\n## Erg Finisher\n- 5x500m @ threshold, 90s rest",
+  updated_by: CURRENT_COACH_ID,
+  updated_at: now,
+};
 
 const STATUS_CYCLE: Attendance["status"][] = ["Attending", "Attending", "Attending", "Unconfirmed", "Absent", "Waitlist"];
 

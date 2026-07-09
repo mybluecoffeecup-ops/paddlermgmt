@@ -2,6 +2,7 @@ import { ProfileSummaryCard } from "@/components/dashboard/ProfileSummaryCard";
 import { UpcomingSessions } from "@/components/dashboard/UpcomingSessions";
 import { RaceCountdowns } from "@/components/dashboard/RaceCountdowns";
 import { CoachingFeedback } from "@/components/dashboard/CoachingFeedback";
+import { WeeklyProgramCard } from "@/components/dashboard/WeeklyProgramCard";
 
 export default function HomeDashboardPage() {
   return (
@@ -11,6 +12,9 @@ export default function HomeDashboardPage() {
       </div>
       <UpcomingSessions />
       <RaceCountdowns />
+      <div className="md:col-span-2">
+        <WeeklyProgramCard />
+      </div>
       <div className="md:col-span-2">
         <CoachingFeedback />
       </div>

@@ -81,9 +81,15 @@ export interface Session {
   discipline: Discipline;
   type: SessionType;
   capacity_limit: number | null;
-  workout_program: string | null;
   created_by: string | null;
   created_at: string;
+  updated_at: string;
+}
+
+export interface WorkoutProgram {
+  id: string;
+  content: string;
+  updated_by: string | null;
   updated_at: string;
 }
 

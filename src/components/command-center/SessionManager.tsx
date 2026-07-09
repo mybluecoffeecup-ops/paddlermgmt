@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarClock, Plus, Radio, X } from "lucide-react";
+import Link from "next/link";
+import { CalendarClock, ChevronRight, Plus, X } from "lucide-react";
 
 import { useAppData } from "@/hooks/app-data";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { DisciplineBadge } from "@/components/ui/Badge";
-import { MarkdownLite } from "@/components/ui/MarkdownLite";
 import { addDaysIso, cn, formatSessionDate, todayIso } from "@/lib/utils";
 import { SESSION_TYPE_OPTIONS, type Discipline, type Session, type SessionType } from "@/types";
 
@@ -44,7 +44,6 @@ function NewSessionForm({ onCreated }: { onCreated: (session: Session) => void }
       discipline,
       type,
       capacity_limit: capacityLimit.trim() === "" ? null : parseInt(capacityLimit, 10),
-      workout_program: null,
       created_by: currentUserId,
     };
 
@@ -202,57 +201,6 @@ function NewSessionForm({ onCreated }: { onCreated: (session: Session) => void }
   );
 }
 
-function WorkoutBroadcastEditor({ session }: { session: Session }) {
-  const { updateSession } = useAppData();
-  const [draft, setDraft] = useState(session.workout_program ?? "");
-  const [saved, setSaved] = useState(false);
-
-  function broadcast() {
-    updateSession(session.id, { workout_program: draft });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 1800);
-  }
-
-  return (
-    <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-4">
-      <div>
-        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-          Workout Program (markdown)
-        </label>
-        <textarea
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          rows={7}
-          className="w-full rounded-2xl border border-slate-200/70 bg-white p-3 font-mono text-xs leading-relaxed text-slate-700 transition-shadow focus:shadow-soft focus:outline-none focus:ring-2 focus:ring-green-500 dark:border-white/10 dark:bg-pitch-950/60 dark:text-slate-200"
-          placeholder={"## Warm-up\n- 15 min easy paddle"}
-        />
-      </div>
-      <button
-        onClick={broadcast}
-        className="flex min-h-11 items-center justify-center gap-1.5 rounded-2xl bg-green-700 py-2 text-sm font-bold uppercase tracking-wide text-white shadow-cta transition-all hover:bg-green-800 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-pitch-900"
-      >
-        <Radio size={14} />
-        {saved ? "Broadcast sent!" : "Broadcast to Crew"}
-      </button>
-
-      <div>
-        <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-          Preview
-        </p>
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-3 dark:border-white/10 dark:bg-pitch-900/50">
-          {draft.trim() ? (
-            <MarkdownLite text={draft} />
-          ) : (
-            <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-              Nothing to preview yet.
-            </p>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function SessionManager({
   selectedSessionId,
   onSelectSession,
@@ -266,10 +214,9 @@ export function SessionManager({
   const sorted = [...sessions].sort((a, b) =>
     `${a.session_date}${a.start_time}`.localeCompare(`${b.session_date}${b.start_time}`)
   );
-  const selected: Session | undefined = sorted.find((s) => s.id === selectedSessionId);
 
   return (
-    <Card className="flex flex-col overflow-hidden">
+    <Card className="overflow-hidden">
       <CardHeader
         title="Session Manager"
         subtitle={`${sessions.length} sessions`}
@@ -293,37 +240,40 @@ export function SessionManager({
           }}
         />
       ) : (
-        <div className="max-h-48 overflow-y-auto border-b border-slate-100 dark:border-white/10">
+        <div className="max-h-72 overflow-y-auto">
           {sorted.map((session) => (
-            <button
+            <div
               key={session.id}
-              onClick={() => onSelectSession(session.id)}
               className={cn(
-                "flex w-full items-center justify-between gap-2 border-b border-slate-100 px-4 py-2.5 text-left last:border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500 dark:border-white/5",
+                "flex items-center gap-1 border-b border-slate-100 last:border-0 dark:border-white/5",
                 session.id === selectedSessionId
                   ? "bg-green-50 dark:bg-green-500/10"
                   : "hover:bg-slate-50 dark:hover:bg-white/5"
               )}
             >
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
-                  {session.title}
-                </p>
-                <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
-                  {formatSessionDate(session.session_date, session.start_time)}
-                </p>
-              </div>
-              <DisciplineBadge discipline={session.discipline} />
-            </button>
+              <button
+                onClick={() => onSelectSession(session.id)}
+                className="flex min-w-0 flex-1 items-center justify-between gap-2 px-4 py-2.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
+                    {session.title}
+                  </p>
+                  <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                    {formatSessionDate(session.session_date, session.start_time)}
+                  </p>
+                </div>
+                <DisciplineBadge discipline={session.discipline} />
+              </button>
+              <Link
+                href={`/sessions/${session.id}`}
+                aria-label={`View details for ${session.title}`}
+                className="mr-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 dark:text-slate-400 dark:hover:bg-white/10"
+              >
+                <ChevronRight size={16} />
+              </Link>
+            </div>
           ))}
-        </div>
-      )}
-
-      {selected ? (
-        <WorkoutBroadcastEditor key={selected.id} session={selected} />
-      ) : (
-        <div className="flex flex-1 items-center justify-center p-6 text-center text-sm font-semibold text-slate-600 dark:text-slate-300">
-          Select a session above to broadcast a workout.
         </div>
       )}
     </Card>

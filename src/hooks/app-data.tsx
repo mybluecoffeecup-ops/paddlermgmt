@@ -12,7 +12,13 @@ import {
 
 import { fetchAttendance, upsertAttendance } from "@/lib/api/attendance";
 import { createComment as apiCreateComment, deleteComment as apiDeleteComment, fetchComments } from "@/lib/api/comments";
-import { updateLineupSeating as apiUpdateLineupSeating, createLineup as apiCreateLineup, fetchLineups } from "@/lib/api/lineups";
+import {
+  createLineup as apiCreateLineup,
+  fetchLineups,
+  updateLineupBoat as apiUpdateLineupBoat,
+  updateLineupSeating as apiUpdateLineupSeating,
+} from "@/lib/api/lineups";
+import { getBoatLayout } from "@/lib/boat-config";
 import {
   createNotification as apiCreateNotification,
   fetchNotifications,
@@ -27,6 +33,7 @@ import {
   upsertRaceCommitment,
 } from "@/lib/api/races";
 import { createSession as apiCreateSession, fetchSessions, updateSession as apiUpdateSession } from "@/lib/api/sessions";
+import { fetchWorkoutProgram, upsertWorkoutProgram as apiUpsertWorkoutProgram } from "@/lib/api/workout-program";
 import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import type { Session as SupabaseSession } from "@supabase/supabase-js";
 import {
@@ -40,10 +47,12 @@ import {
   MOCK_RACES,
   MOCK_RACE_COMMITMENTS,
   MOCK_SESSIONS,
+  MOCK_WORKOUT_PROGRAM,
 } from "@/lib/mock-data";
 import type {
   Attendance,
   AttendanceStatus,
+  BoatType,
   Comment,
   Lineup,
   Notification,
@@ -52,6 +61,7 @@ import type {
   RaceCommitment,
   SeatingConfiguration,
   Session,
+  WorkoutProgram,
 } from "@/types";
 
 export type ViewRole = "paddler" | "coach";
@@ -65,6 +75,7 @@ interface AppDataValue {
   lineups: Lineup[];
   comments: Comment[];
   notifications: Notification[];
+  workoutProgram: WorkoutProgram | null;
   loading: boolean;
   usingLiveBackend: boolean;
 
@@ -86,6 +97,7 @@ interface AppDataValue {
   ) => void;
   createLineup: (lineup: Omit<Lineup, "id" | "created_at" | "updated_at">) => Lineup;
   saveLineupSeating: (lineupId: string, seating: SeatingConfiguration) => void;
+  updateLineupBoat: (lineupId: string, boat: BoatType) => void;
   attendanceFor: (sessionId: string) => Attendance[];
   attendanceStatusFor: (sessionId: string, paddlerId: string) => AttendanceStatus;
   lineupsFor: (params: { sessionId?: string; raceId?: string }) => Lineup[];
@@ -98,6 +110,7 @@ interface AppDataValue {
     target: { sessionId?: string; raceId?: string }
   ) => void;
   markNotificationRead: (id: string) => void;
+  updateWorkoutProgram: (content: string) => void;
 }
 
 const AppDataContext = createContext<AppDataValue | null>(null);
@@ -115,6 +128,9 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [lineups, setLineups] = useState<Lineup[]>(MOCK_LINEUPS);
   const [comments, setComments] = useState<Comment[]>(MOCK_COMMENTS);
   const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
+  const [workoutProgram, setWorkoutProgram] = useState<WorkoutProgram | null>(
+    MOCK_WORKOUT_PROGRAM
+  );
   const [loading, setLoading] = useState(isSupabaseConfigured);
   const [demoRole, setDemoRole] = useState<ViewRole>("paddler");
   const [authUserId, setAuthUserId] = useState<string | null>(null);
@@ -124,7 +140,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     (async () => {
       try {
-        const [p, s, a, r, rc, l, cm, n] = await Promise.all([
+        const [p, s, a, r, rc, l, cm, n, wp] = await Promise.all([
           fetchProfiles(),
           fetchSessions(),
           fetchAttendance(),
@@ -133,6 +149,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           fetchLineups(),
           fetchComments(),
           fetchNotifications(),
+          fetchWorkoutProgram(),
         ]);
         if (cancelled) return;
         if (p) setProfiles(p);
@@ -143,6 +160,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         if (l) setLineups(l);
         if (cm) setComments(cm);
         if (n) setNotifications(n);
+        if (wp) setWorkoutProgram(wp);
       } catch (err) {
         console.error("Failed to load live Supabase data, staying on mock state:", err);
       } finally {
@@ -367,6 +385,27 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const updateLineupBoat = useCallback(
+    (lineupId: string, boat: BoatType) => {
+      setLineups((prev) =>
+        prev.map((l) => {
+          if (l.id !== lineupId) return l;
+          const validSeatIds = new Set(getBoatLayout(boat).seats.map((s) => s.id));
+          const prunedSeating: SeatingConfiguration = Object.fromEntries(
+            Object.entries(l.seating_configuration).filter(([seatId]) => validSeatIds.has(seatId))
+          );
+          if (isSupabaseConfigured) {
+            apiUpdateLineupBoat(lineupId, boat, prunedSeating).catch((err) =>
+              console.error("Failed to sync lineup boat change to Supabase:", err)
+            );
+          }
+          return { ...l, boat, seating_configuration: prunedSeating, updated_at: nowIso() };
+        })
+      );
+    },
+    []
+  );
+
   const attendanceFor = useCallback(
     (sessionId: string) => attendance.filter((a) => a.session_id === sessionId),
     [attendance]
@@ -464,6 +503,23 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     [currentUserId]
   );
 
+  const updateWorkoutProgram = useCallback(
+    (content: string) => {
+      setWorkoutProgram((prev) => ({
+        id: prev?.id ?? "00000000-0000-0000-0000-000000000001",
+        content,
+        updated_by: currentUserId,
+        updated_at: nowIso(),
+      }));
+      if (isSupabaseConfigured) {
+        apiUpsertWorkoutProgram(content, currentUserId).catch((err) =>
+          console.error("Failed to sync workout program to Supabase:", err)
+        );
+      }
+    },
+    [currentUserId]
+  );
+
   const value: AppDataValue = {
     profiles,
     sessions,
@@ -473,6 +529,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     lineups,
     comments,
     notifications,
+    workoutProgram,
     loading,
     usingLiveBackend: isSupabaseConfigured,
     role,
@@ -488,6 +545,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     updateRaceCommitment,
     createLineup,
     saveLineupSeating,
+    updateLineupBoat,
     attendanceFor,
     attendanceStatusFor,
     lineupsFor,
@@ -496,6 +554,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     deleteComment,
     notifyAll,
     markNotificationRead,
+    updateWorkoutProgram,
   };
 
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;

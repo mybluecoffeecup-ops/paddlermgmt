@@ -10,7 +10,13 @@ import type { Profile } from "@/types";
 
 export const BENCH_DROPPABLE_ID = "bench";
 
-export function BenchList({ paddlers }: { paddlers: Profile[] }) {
+export function BenchList({
+  paddlers,
+  onPaddlerClick,
+}: {
+  paddlers: Profile[];
+  onPaddlerClick?: (paddler: Profile) => void;
+}) {
   const { setNodeRef, isOver } = useDroppable({ id: BENCH_DROPPABLE_ID });
 
   return (
@@ -28,7 +34,7 @@ export function BenchList({ paddlers }: { paddlers: Profile[] }) {
         )}
       >
         {paddlers.map((p) => (
-          <PaddlerChip key={p.id} paddler={p} />
+          <PaddlerChip key={p.id} paddler={p} onClick={() => onPaddlerClick?.(p)} />
         ))}
         {paddlers.length === 0 && (
           <div className="flex flex-col items-center gap-2 px-2 py-8 text-center">

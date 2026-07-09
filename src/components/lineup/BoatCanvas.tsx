@@ -33,10 +33,15 @@ export function BoatCanvas({
       <div className="flex-1 overflow-y-auto p-4">
         {isDragonBoat ? (
           <div className="mx-auto flex max-w-sm flex-col gap-1.5">
-            <SeatSlot
-              seat={layout.seats.find((s) => s.id === "drummer")!}
-              occupant={occupantFor("drummer")}
-            />
+            <div className="grid grid-cols-[1.5rem_1fr_1fr] items-center gap-1.5">
+              <span />
+              <div className="col-span-2 mx-auto w-1/2">
+                <SeatSlot
+                  seat={layout.seats.find((s) => s.id === "drummer")!}
+                  occupant={occupantFor("drummer")}
+                />
+              </div>
+            </div>
             {Array.from({ length: rows }, (_, i) => i + 1).map((row) => (
               <div key={row} className="grid grid-cols-[1.5rem_1fr_1fr] items-center gap-1.5">
                 <span className="text-center font-display text-sm font-bold tabular-nums text-slate-600 dark:text-slate-300">
@@ -46,10 +51,15 @@ export function BoatCanvas({
                 <SeatSlot seat={layout.seats.find((s) => s.id === `${row}R`)!} occupant={occupantFor(`${row}R`)} />
               </div>
             ))}
-            <SeatSlot
-              seat={layout.seats.find((s) => s.id === "steer")!}
-              occupant={occupantFor("steer")}
-            />
+            <div className="grid grid-cols-[1.5rem_1fr_1fr] items-center gap-1.5">
+              <span />
+              <div className="col-span-2 mx-auto w-1/2">
+                <SeatSlot
+                  seat={layout.seats.find((s) => s.id === "steer")!}
+                  occupant={occupantFor("steer")}
+                />
+              </div>
+            </div>
           </div>
         ) : (
           <div className="mx-auto flex max-w-xs flex-col gap-1.5">
