@@ -57,32 +57,32 @@ function RaceRow({ race }: { race: import("@/types").Race }) {
         )}
       </div>
 
-      <div className="mt-3 flex items-center gap-1.5">
-        <CountdownUnit value={countdown.days} label="days" />
-        <CountdownUnit value={countdown.hours} label="hrs" />
-        <CountdownUnit value={countdown.minutes} label="min" />
-        <CountdownUnit value={countdown.seconds} label="sec" />
-      </div>
+      <div className="mt-3 flex items-center gap-3">
+        <div className="flex items-center gap-1.5">
+          <CountdownUnit value={countdown.days} label="days" />
+          <CountdownUnit value={countdown.hours} label="hrs" />
+        </div>
 
-      <div className="mt-3 flex gap-1.5">
-        {(["Attending", "Unconfirmed", "Absent"] as const).map((status) => (
-          <button
-            key={status}
-            onClick={() => updateRaceCommitment(race.id, currentUserId, { status })}
-            className={cn(
-              "flex-1 rounded-lg border py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
-              commitment?.status === status
-                ? status === "Attending"
-                  ? "border-emerald-500 bg-emerald-500 text-white"
-                  : status === "Absent"
-                    ? "border-rose-500 bg-rose-500 text-white"
-                    : "border-slate-400 bg-slate-400 text-white"
-                : "border-slate-200 text-slate-500 dark:border-white/15 dark:text-slate-400"
-            )}
-          >
-            {status}
-          </button>
-        ))}
+        <div className="flex flex-1 flex-col gap-1">
+          {(["Attending", "Unconfirmed", "Absent"] as const).map((status) => (
+            <button
+              key={status}
+              onClick={() => updateRaceCommitment(race.id, currentUserId, { status })}
+              className={cn(
+                "rounded-lg border py-1 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
+                commitment?.status === status
+                  ? status === "Attending"
+                    ? "border-emerald-500 bg-emerald-500 text-white"
+                    : status === "Absent"
+                      ? "border-rose-500 bg-rose-500 text-white"
+                      : "border-slate-400 bg-slate-400 text-white"
+                  : "border-slate-200 text-slate-500 dark:border-white/15 dark:text-slate-400"
+              )}
+            >
+              {status}
+            </button>
+          ))}
+        </div>
       </div>
     </li>
   );

@@ -33,8 +33,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900 dark:bg-[#071620] dark:text-slate-100">
       <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/90 backdrop-blur dark:border-white/10 dark:bg-[#0b1f2e]/90">
-        <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-4 px-4 py-3">
-          <div className="flex items-center gap-2">
+        <div className="mx-auto grid max-w-[1400px] grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 py-3">
+          <div className="flex items-center gap-2 justify-self-start">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-600 to-ember-500 text-white shadow-sm">
               <Anchor size={18} strokeWidth={2.5} />
             </div>
@@ -46,7 +46,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <nav className="hidden items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-white/5 md:flex">
+          <nav className="hidden items-center gap-1 justify-self-center rounded-full bg-slate-100 p-1 dark:bg-white/5 md:flex">
             {visibleNavItems.map((item) => {
               const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
               return (
@@ -67,7 +67,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 justify-self-end">
             {!usingLiveBackend && (
               <span className="hidden rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-semibold text-amber-800 sm:inline dark:bg-amber-400/10 dark:text-amber-300">
                 Demo data
