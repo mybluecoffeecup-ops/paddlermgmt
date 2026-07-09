@@ -22,6 +22,7 @@ function NewSessionForm({ onCreated }: { onCreated: (session: Session) => void }
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [location, setLocation] = useState("");
   const [sessionDate, setSessionDate] = useState(() => todayIso());
   const [startTime, setStartTime] = useState("17:30");
   const [discipline, setDiscipline] = useState<Discipline>("Both");
@@ -38,6 +39,7 @@ function NewSessionForm({ onCreated }: { onCreated: (session: Session) => void }
     const base = {
       title: title.trim(),
       description: description.trim() === "" ? null : description.trim(),
+      location: location.trim() === "" ? null : location.trim(),
       start_time: startTime,
       discipline,
       type,
@@ -81,6 +83,16 @@ function NewSessionForm({ onCreated }: { onCreated: (session: Session) => void }
           onChange={(e) => setDescription(e.target.value)}
           rows={2}
           className={inputClassName}
+        />
+      </div>
+
+      <div>
+        <label className={labelClassName}>Location</label>
+        <input
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          className={inputClassName}
+          placeholder="Lake Union Boathouse"
         />
       </div>
 

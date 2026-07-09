@@ -22,6 +22,19 @@ export async function createRace(
   return data as Race;
 }
 
+export async function updateRace(id: string, patch: Partial<Race>): Promise<Race | null> {
+  const supabase = getSupabaseClient();
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from("races")
+    .update(patch)
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as Race;
+}
+
 export async function fetchRaceCommitments(): Promise<RaceCommitment[] | null> {
   const supabase = getSupabaseClient();
   if (!supabase) return null;

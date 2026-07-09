@@ -7,7 +7,7 @@ import { LayoutGrid, Plus } from "lucide-react";
 import { useAppData } from "@/hooks/app-data";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { getBoatLayout } from "@/lib/boat-config";
-import { formatSessionDate } from "@/lib/utils";
+import { cn, formatSessionDate } from "@/lib/utils";
 import type { BoatType } from "@/types";
 
 const BOAT_OPTIONS: { value: BoatType; label: string }[] = [
@@ -16,8 +16,33 @@ const BOAT_OPTIONS: { value: BoatType; label: string }[] = [
   { value: "V6", label: "V6 — Outrigger Six (1×6)" },
 ];
 
+function TargetToggle({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "flex-1 rounded-2xl border px-3 py-2.5 text-sm font-bold uppercase tracking-wide transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500",
+        active
+          ? "border-green-700/30 bg-green-500/10 text-green-700 shadow-soft dark:border-green-400/30 dark:text-green-300"
+          : "border-slate-200/70 text-slate-600 hover:border-slate-300 dark:border-white/10 dark:text-slate-300"
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
 export default function LineupsPage() {
-  const { sessions, lineups, createLineup } = useAppData();
+  const { sessions, races, lineups, createLineup } = useAppData();
   const router = useRouter();
 
   const sortedSessions = useMemo(
@@ -27,24 +52,47 @@ export default function LineupsPage() {
       ),
     [sessions]
   );
+  const sortedRaces = useMemo(
+    () => [...races].sort((a, b) => a.race_date.localeCompare(b.race_date)),
+    [races]
+  );
 
+  const [target, setTarget] = useState<"session" | "race">("session");
   const [sessionId, setSessionId] = useState(sortedSessions[0]?.id ?? "");
+  const [raceId, setRaceId] = useState(sortedRaces[0]?.id ?? "");
   const [boat, setBoat] = useState<BoatType>("DB22");
   const [title, setTitle] = useState("");
 
-  const sessionLineups = lineups.filter((l) => l.session_id === sessionId);
+  const selectedId = target === "session" ? sessionId : raceId;
+  const targetLineups = lineups.filter((l) =>
+    target === "session" ? l.session_id === selectedId : l.race_id === selectedId
+  );
 
   function handleCreate() {
-    if (!sessionId) return;
-    const session = sessions.find((s) => s.id === sessionId);
-    const newLineup = createLineup({
-      session_id: sessionId,
-      title: title.trim() || `${session?.title ?? "Session"} Lineup`,
-      boat,
-      seating_configuration: {},
-      created_by: null,
-    });
-    router.push(`/lineups/${newLineup.id}`);
+    if (!selectedId) return;
+    if (target === "session") {
+      const session = sessions.find((s) => s.id === sessionId);
+      const newLineup = createLineup({
+        session_id: sessionId,
+        race_id: null,
+        title: title.trim() || `${session?.title ?? "Session"} Lineup`,
+        boat,
+        seating_configuration: {},
+        created_by: null,
+      });
+      router.push(`/lineups/${newLineup.id}`);
+    } else {
+      const race = races.find((r) => r.id === raceId);
+      const newLineup = createLineup({
+        session_id: null,
+        race_id: raceId,
+        title: title.trim() || `${race?.name ?? "Race"} Lineup`,
+        boat,
+        seating_configuration: {},
+        created_by: null,
+      });
+      router.push(`/lineups/${newLineup.id}`);
+    }
   }
 
   return (
@@ -61,22 +109,50 @@ export default function LineupsPage() {
       <Card>
         <CardHeader title="New Lineup" icon={<Plus size={16} />} />
         <div className="flex flex-col gap-3 p-4">
-          <div>
-            <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+          <div className="flex gap-2">
+            <TargetToggle active={target === "session"} onClick={() => setTarget("session")}>
               Session
-            </label>
-            <select
-              value={sessionId}
-              onChange={(e) => setSessionId(e.target.value)}
-              className="w-full rounded-2xl border border-slate-200/70 bg-white px-3 py-2.5 text-sm text-ink transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:shadow-soft dark:border-white/10 dark:bg-pitch-900/70 dark:text-white"
-            >
-              {sortedSessions.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.title} — {formatSessionDate(s.session_date, s.start_time)}
-                </option>
-              ))}
-            </select>
+            </TargetToggle>
+            <TargetToggle active={target === "race"} onClick={() => setTarget("race")}>
+              Race
+            </TargetToggle>
           </div>
+
+          {target === "session" ? (
+            <div>
+              <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+                Session
+              </label>
+              <select
+                value={sessionId}
+                onChange={(e) => setSessionId(e.target.value)}
+                className="w-full rounded-2xl border border-slate-200/70 bg-white px-3 py-2.5 text-sm text-ink transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:shadow-soft dark:border-white/10 dark:bg-pitch-900/70 dark:text-white"
+              >
+                {sortedSessions.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.title} — {formatSessionDate(s.session_date, s.start_time)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <div>
+              <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+                Race
+              </label>
+              <select
+                value={raceId}
+                onChange={(e) => setRaceId(e.target.value)}
+                className="w-full rounded-2xl border border-slate-200/70 bg-white px-3 py-2.5 text-sm text-ink transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:shadow-soft dark:border-white/10 dark:bg-pitch-900/70 dark:text-white"
+              >
+                {sortedRaces.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.name} — {r.race_date}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div>
             <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
@@ -109,7 +185,7 @@ export default function LineupsPage() {
 
           <button
             onClick={handleCreate}
-            disabled={!sessionId}
+            disabled={!selectedId}
             className="mt-1 flex min-h-11 items-center justify-center gap-1.5 rounded-2xl bg-green-700 py-2 text-sm font-bold uppercase tracking-wide text-white shadow-cta transition-all hover:bg-green-800 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 disabled:opacity-40 dark:focus-visible:ring-offset-pitch-900"
           >
             <Plus size={15} /> Create Lineup
@@ -120,11 +196,11 @@ export default function LineupsPage() {
       <Card>
         <CardHeader
           title="Existing Lineups"
-          subtitle={sessionId ? `${sessionLineups.length} for selected session` : undefined}
+          subtitle={selectedId ? `${targetLineups.length} for selected ${target}` : undefined}
           icon={<LayoutGrid size={16} />}
         />
         <ul className="divide-y divide-slate-100 dark:divide-white/10">
-          {sessionLineups.map((l) => (
+          {targetLineups.map((l) => (
             <li key={l.id}>
               <button
                 onClick={() => router.push(`/lineups/${l.id}`)}
@@ -142,11 +218,11 @@ export default function LineupsPage() {
               </button>
             </li>
           ))}
-          {sessionLineups.length === 0 && (
+          {targetLineups.length === 0 && (
             <li className="flex flex-col items-center gap-2 px-4 py-8 text-center">
               <LayoutGrid size={28} className="text-slate-300 dark:text-white/20" />
               <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">
-                No lineups yet for this session.
+                No lineups yet for this {target}.
               </span>
             </li>
           )}

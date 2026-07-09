@@ -77,6 +77,7 @@ export interface Session {
   description: string | null;
   session_date: string; // YYYY-MM-DD
   start_time: string; // HH:MM
+  location: string | null;
   discipline: Discipline;
   type: SessionType;
   capacity_limit: number | null;
@@ -140,11 +141,32 @@ export type SeatingConfiguration = Record<string, string | null>;
 
 export interface Lineup {
   id: string;
-  session_id: string;
+  session_id: string | null;
+  race_id: string | null;
   title: string;
   boat: BoatType;
   seating_configuration: SeatingConfiguration;
   created_by: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface Comment {
+  id: string;
+  session_id: string | null;
+  race_id: string | null;
+  author_id: string;
+  body: string;
+  created_at: string;
+}
+
+export interface Notification {
+  id: string;
+  session_id: string | null;
+  race_id: string | null;
+  title: string;
+  body: string;
+  read_by: string[];
+  created_by: string | null;
+  created_at: string;
 }

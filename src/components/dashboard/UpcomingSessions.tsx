@@ -1,6 +1,7 @@
 "use client";
 
 import { Calendar, Check, X } from "lucide-react";
+import Link from "next/link";
 
 import { useAppData } from "@/hooks/app-data";
 import { Card, CardHeader } from "@/components/ui/Card";
@@ -26,7 +27,10 @@ export function UpcomingSessions() {
           const status = attendanceStatusFor(session.id, currentUserId);
           return (
             <li key={session.id} className="flex items-center justify-between gap-3 px-4 py-3">
-              <div className="min-w-0 flex-1">
+              <Link
+                href={`/sessions/${session.id}`}
+                className="min-w-0 flex-1 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+              >
                 <div className="flex items-center gap-2">
                   <p className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">
                     {session.title}
@@ -36,7 +40,7 @@ export function UpcomingSessions() {
                 <p className="mt-0.5 text-xs font-semibold text-slate-600 dark:text-slate-300">
                   {formatSessionDate(session.session_date, session.start_time)} · {session.type}
                 </p>
-              </div>
+              </Link>
               <div className="flex shrink-0 items-center gap-1.5">
                 <button
                   onClick={() => rsvpToSession(session.id, "Attending")}

@@ -59,3 +59,18 @@ export function addDaysIso(dateStr: string, days: number): string {
   d.setDate(d.getDate() + days);
   return toIsoDate(d);
 }
+
+// Callers must set suppressHydrationWarning on the element that renders
+// this — it's computed against `Date.now()`, so the server-rendered string
+// is stale by the time the client hydrates (see formatSessionDate above).
+export function formatRelativeTime(isoStr: string, now: Date = new Date()): string {
+  const diffMs = now.getTime() - new Date(isoStr).getTime();
+  const diffMin = Math.round(diffMs / (1000 * 60));
+  if (diffMin < 1) return "just now";
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.round(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}h ago`;
+  const diffDay = Math.round(diffHr / 24);
+  if (diffDay < 7) return `${diffDay}d ago`;
+  return new Date(isoStr).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}

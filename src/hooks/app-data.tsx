@@ -11,12 +11,19 @@ import {
 } from "react";
 
 import { fetchAttendance, upsertAttendance } from "@/lib/api/attendance";
+import { createComment as apiCreateComment, deleteComment as apiDeleteComment, fetchComments } from "@/lib/api/comments";
 import { updateLineupSeating as apiUpdateLineupSeating, createLineup as apiCreateLineup, fetchLineups } from "@/lib/api/lineups";
+import {
+  createNotification as apiCreateNotification,
+  fetchNotifications,
+  markNotificationRead as apiMarkNotificationRead,
+} from "@/lib/api/notifications";
 import { fetchProfiles, updateProfile as apiUpdateProfile } from "@/lib/api/profiles";
 import {
   createRace as apiCreateRace,
   fetchRaceCommitments,
   fetchRaces,
+  updateRace as apiUpdateRace,
   upsertRaceCommitment,
 } from "@/lib/api/races";
 import { createSession as apiCreateSession, fetchSessions, updateSession as apiUpdateSession } from "@/lib/api/sessions";
@@ -26,7 +33,9 @@ import {
   CURRENT_COACH_ID,
   CURRENT_USER_ID,
   MOCK_ATTENDANCE,
+  MOCK_COMMENTS,
   MOCK_LINEUPS,
+  MOCK_NOTIFICATIONS,
   MOCK_PROFILES,
   MOCK_RACES,
   MOCK_RACE_COMMITMENTS,
@@ -35,7 +44,9 @@ import {
 import type {
   Attendance,
   AttendanceStatus,
+  Comment,
   Lineup,
+  Notification,
   Profile,
   Race,
   RaceCommitment,
@@ -52,6 +63,8 @@ interface AppDataValue {
   races: Race[];
   raceCommitments: RaceCommitment[];
   lineups: Lineup[];
+  comments: Comment[];
+  notifications: Notification[];
   loading: boolean;
   usingLiveBackend: boolean;
 
@@ -65,6 +78,7 @@ interface AppDataValue {
   updateSession: (id: string, patch: Partial<Session>) => void;
   createSession: (session: Omit<Session, "id" | "created_at" | "updated_at">) => Session;
   createRace: (race: Omit<Race, "id" | "created_at" | "updated_at">) => Race;
+  updateRace: (id: string, patch: Partial<Race>) => void;
   updateRaceCommitment: (
     raceId: string,
     paddlerId: string,
@@ -74,6 +88,16 @@ interface AppDataValue {
   saveLineupSeating: (lineupId: string, seating: SeatingConfiguration) => void;
   attendanceFor: (sessionId: string) => Attendance[];
   attendanceStatusFor: (sessionId: string, paddlerId: string) => AttendanceStatus;
+  lineupsFor: (params: { sessionId?: string; raceId?: string }) => Lineup[];
+  commentsFor: (params: { sessionId?: string; raceId?: string }) => Comment[];
+  createComment: (comment: Omit<Comment, "id" | "created_at">) => void;
+  deleteComment: (id: string) => void;
+  notifyAll: (
+    title: string,
+    body: string,
+    target: { sessionId?: string; raceId?: string }
+  ) => void;
+  markNotificationRead: (id: string) => void;
 }
 
 const AppDataContext = createContext<AppDataValue | null>(null);
@@ -89,6 +113,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [races, setRaces] = useState<Race[]>(MOCK_RACES);
   const [raceCommitments, setRaceCommitments] = useState<RaceCommitment[]>(MOCK_RACE_COMMITMENTS);
   const [lineups, setLineups] = useState<Lineup[]>(MOCK_LINEUPS);
+  const [comments, setComments] = useState<Comment[]>(MOCK_COMMENTS);
+  const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
   const [loading, setLoading] = useState(isSupabaseConfigured);
   const [demoRole, setDemoRole] = useState<ViewRole>("paddler");
   const [authUserId, setAuthUserId] = useState<string | null>(null);
@@ -98,13 +124,15 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     (async () => {
       try {
-        const [p, s, a, r, rc, l] = await Promise.all([
+        const [p, s, a, r, rc, l, cm, n] = await Promise.all([
           fetchProfiles(),
           fetchSessions(),
           fetchAttendance(),
           fetchRaces(),
           fetchRaceCommitments(),
           fetchLineups(),
+          fetchComments(),
+          fetchNotifications(),
         ]);
         if (cancelled) return;
         if (p) setProfiles(p);
@@ -113,6 +141,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         if (r) setRaces(r);
         if (rc) setRaceCommitments(rc);
         if (l) setLineups(l);
+        if (cm) setComments(cm);
+        if (n) setNotifications(n);
       } catch (err) {
         console.error("Failed to load live Supabase data, staying on mock state:", err);
       } finally {
@@ -254,6 +284,17 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  const updateRace = useCallback((id: string, patch: Partial<Race>) => {
+    setRaces((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, ...patch, updated_at: nowIso() } : r))
+    );
+    if (isSupabaseConfigured) {
+      apiUpdateRace(id, patch).catch((err) =>
+        console.error("Failed to sync race to Supabase:", err)
+      );
+    }
+  }, []);
+
   const updateRaceCommitment = useCallback(
     (
       raceId: string,
@@ -338,6 +379,91 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     [attendance]
   );
 
+  const lineupsFor = useCallback(
+    ({ sessionId, raceId }: { sessionId?: string; raceId?: string }) =>
+      lineups.filter((l) =>
+        sessionId ? l.session_id === sessionId : raceId ? l.race_id === raceId : false
+      ),
+    [lineups]
+  );
+
+  const commentsFor = useCallback(
+    ({ sessionId, raceId }: { sessionId?: string; raceId?: string }) =>
+      comments.filter((c) =>
+        sessionId ? c.session_id === sessionId : raceId ? c.race_id === raceId : false
+      ),
+    [comments]
+  );
+
+  const createComment = useCallback(
+    (comment: Omit<Comment, "id" | "created_at">) => {
+      const newComment: Comment = {
+        ...comment,
+        id: `comment-${Date.now()}-${crypto.randomUUID()}`,
+        created_at: nowIso(),
+      };
+      setComments((prev) => [...prev, newComment]);
+      if (isSupabaseConfigured) {
+        apiCreateComment(comment).catch((err) =>
+          console.error("Failed to sync comment to Supabase:", err)
+        );
+      }
+    },
+    []
+  );
+
+  const deleteComment = useCallback((id: string) => {
+    setComments((prev) => prev.filter((c) => c.id !== id));
+    if (isSupabaseConfigured) {
+      apiDeleteComment(id).catch((err) =>
+        console.error("Failed to sync comment deletion to Supabase:", err)
+      );
+    }
+  }, []);
+
+  const notifyAll = useCallback(
+    (title: string, body: string, target: { sessionId?: string; raceId?: string }) => {
+      const notification: Omit<Notification, "id" | "created_at" | "read_by"> = {
+        title,
+        body,
+        session_id: target.sessionId ?? null,
+        race_id: target.raceId ?? null,
+        created_by: currentUserId,
+      };
+      const newNotification: Notification = {
+        ...notification,
+        id: `notification-${Date.now()}-${crypto.randomUUID()}`,
+        read_by: [],
+        created_at: nowIso(),
+      };
+      setNotifications((prev) => [newNotification, ...prev]);
+      if (isSupabaseConfigured) {
+        apiCreateNotification(notification).catch((err) =>
+          console.error("Failed to sync notification to Supabase:", err)
+        );
+      }
+    },
+    [currentUserId]
+  );
+
+  const markNotificationRead = useCallback(
+    (id: string) => {
+      setNotifications((prev) =>
+        prev.map((n) => {
+          if (n.id !== id || n.read_by.includes(currentUserId)) return n;
+          const readBy = [...n.read_by, currentUserId];
+          if (isSupabaseConfigured) {
+            apiMarkNotificationRead(id, readBy).catch((err) =>
+              console.error("Failed to sync notification read state to Supabase:", err)
+            );
+          }
+          return { ...n, read_by: readBy };
+        })
+      );
+    },
+    [currentUserId]
+  );
+
   const value: AppDataValue = {
     profiles,
     sessions,
@@ -345,6 +471,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     races,
     raceCommitments,
     lineups,
+    comments,
+    notifications,
     loading,
     usingLiveBackend: isSupabaseConfigured,
     role,
@@ -356,11 +484,18 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     updateSession,
     createSession,
     createRace,
+    updateRace,
     updateRaceCommitment,
     createLineup,
     saveLineupSeating,
     attendanceFor,
     attendanceStatusFor,
+    lineupsFor,
+    commentsFor,
+    createComment,
+    deleteComment,
+    notifyAll,
+    markNotificationRead,
   };
 
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;

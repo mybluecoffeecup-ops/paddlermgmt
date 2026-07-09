@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { LayoutGrid, LogOut, User, Users, Waves, Anchor } from "lucide-react";
 
 import { useAppData } from "@/hooks/app-data";
+import { NotificationBell } from "@/components/nav/NotificationBell";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -112,6 +113,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </button>
               </div>
             )}
+            <NotificationBell />
             <Link
               href="/profile"
               aria-label="My profile"

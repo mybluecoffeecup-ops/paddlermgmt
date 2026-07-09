@@ -1,6 +1,7 @@
 "use client";
 
 import { Calendar, Flag, MapPin } from "lucide-react";
+import Link from "next/link";
 
 import { useAppData } from "@/hooks/app-data";
 import { useCountdown } from "@/hooks/use-countdown";
@@ -47,7 +48,10 @@ function RaceRow({ race }: { race: import("@/types").Race }) {
   return (
     <li className="px-4 py-3">
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
+        <Link
+          href={`/races/${race.id}`}
+          className="min-w-0 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+        >
           <p className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">
             {race.name}
           </p>
@@ -56,7 +60,7 @@ function RaceRow({ race }: { race: import("@/types").Race }) {
               <MapPin size={11} /> {race.location}
             </p>
           )}
-        </div>
+        </Link>
         {commitment && (
           <span
             className={cn(

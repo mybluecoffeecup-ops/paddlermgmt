@@ -23,7 +23,8 @@ import { PaddlerChip } from "@/components/lineup/PaddlerChip";
 import type { Profile, SeatingConfiguration } from "@/types";
 
 export function LineupEditor({ lineupId }: { lineupId: string }) {
-  const { lineups, sessions, profiles, attendanceFor, saveLineupSeating } = useAppData();
+  const { lineups, sessions, races, raceCommitments, profiles, attendanceFor, saveLineupSeating } =
+    useAppData();
   const [activePaddler, setActivePaddler] = useState<Profile | null>(null);
 
   const sensors = useSensors(
@@ -33,18 +34,28 @@ export function LineupEditor({ lineupId }: { lineupId: string }) {
 
   const lineup = lineups.find((l) => l.id === lineupId);
   const session = sessions.find((s) => s.id === lineup?.session_id);
+  const race = races.find((r) => r.id === lineup?.race_id);
+  const target = session ?? race;
 
   const profileById = useMemo(() => new Map(profiles.map((p) => [p.id, p])), [profiles]);
 
   const attendingProfiles = useMemo(() => {
-    if (!session) return [];
-    const ids = attendanceFor(session.id)
-      .filter((a) => a.status === "Attending")
-      .map((a) => a.paddler_id);
-    return ids.map((id) => profileById.get(id)).filter((p): p is Profile => Boolean(p));
-  }, [session, attendanceFor, profileById]);
+    if (session) {
+      const ids = attendanceFor(session.id)
+        .filter((a) => a.status === "Attending")
+        .map((a) => a.paddler_id);
+      return ids.map((id) => profileById.get(id)).filter((p): p is Profile => Boolean(p));
+    }
+    if (race) {
+      const ids = raceCommitments
+        .filter((c) => c.race_id === race.id && c.status === "Attending")
+        .map((c) => c.paddler_id);
+      return ids.map((id) => profileById.get(id)).filter((p): p is Profile => Boolean(p));
+    }
+    return [];
+  }, [session, race, attendanceFor, raceCommitments, profileById]);
 
-  if (!lineup || !session) {
+  if (!lineup || !target) {
     return (
       <div className="rounded-3xl border border-dashed border-slate-300 p-8 text-center text-sm font-semibold text-slate-600 dark:border-white/15 dark:text-slate-300">
         Lineup not found.{" "}
@@ -112,7 +123,7 @@ export function LineupEditor({ lineupId }: { lineupId: string }) {
                 {lineup.title}
               </h1>
               <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-                {session.title} · {layout.name}
+                {session ? session.title : race!.name} · {layout.name}
               </p>
             </div>
           </div>

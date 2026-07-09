@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trophy, X } from "lucide-react";
 import Link from "next/link";
+import { ArrowLeft, Calendar, MapPin, Pencil, Trophy, X } from "lucide-react";
 
 import { useAppData } from "@/hooks/app-data";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { DisciplineBadge } from "@/components/ui/Badge";
-import { cn, todayIso } from "@/lib/utils";
+import { CommentsSection } from "@/components/shared/CommentsSection";
+import { LineupsSection } from "@/components/shared/LineupsSection";
+import { cn } from "@/lib/utils";
 import {
   ALL_COMPETITIVENESS_LEVELS,
   CREW_TAG_AGE_RANGE_OPTIONS,
@@ -58,21 +60,25 @@ function CategoryChip({
   );
 }
 
-function NewRaceForm({ onCreated }: { onCreated: (race: Race) => void }) {
-  const { createRace, currentUserId } = useAppData();
+function EditForm({ race, onDone }: { race: Race; onDone: () => void }) {
+  const { updateRace, notifyAll } = useAppData();
 
-  const [name, setName] = useState("");
-  const [location, setLocation] = useState("");
-  const [description, setDescription] = useState("");
-  const [raceDate, setRaceDate] = useState(() => todayIso());
-  const [registrationDeadline, setRegistrationDeadline] = useState("");
-  const [discipline, setDiscipline] = useState<Discipline>("DB");
-  const [competitivenessLevel, setCompetitivenessLevel] = useState<CompetitivenessLevel>(
-    ALL_COMPETITIVENESS_LEVELS[0]
+  const [name, setName] = useState(race.name);
+  const [location, setLocation] = useState(race.location ?? "");
+  const [description, setDescription] = useState(race.description ?? "");
+  const [raceDate, setRaceDate] = useState(race.race_date);
+  const [registrationDeadline, setRegistrationDeadline] = useState(
+    race.registration_deadline ?? ""
   );
-  const [raceCategories, setRaceCategories] = useState<Set<string>>(new Set());
+  const [discipline, setDiscipline] = useState<Discipline>(race.discipline);
+  const [competitivenessLevel, setCompetitivenessLevel] = useState<CompetitivenessLevel>(
+    race.competitiveness_level
+  );
+  const [raceCategories, setRaceCategories] = useState<Set<string>>(
+    new Set(race.race_categories)
+  );
 
-  const canSubmit = name.trim() !== "" && raceDate !== "" && location.trim() !== "";
+  const canSave = name.trim() !== "" && raceDate !== "" && location.trim() !== "";
 
   function toggleCategory(tag: string) {
     setRaceCategories((prev) => {
@@ -86,9 +92,9 @@ function NewRaceForm({ onCreated }: { onCreated: (race: Race) => void }) {
     });
   }
 
-  function handleCreate() {
-    if (!canSubmit) return;
-    const created = createRace({
+  function handleSave() {
+    if (!canSave) return;
+    updateRace(race.id, {
       name: name.trim(),
       location: location.trim(),
       description: description.trim() === "" ? null : description.trim(),
@@ -97,33 +103,25 @@ function NewRaceForm({ onCreated }: { onCreated: (race: Race) => void }) {
       registration_deadline: registrationDeadline.trim() === "" ? null : registrationDeadline,
       race_categories: Array.from(raceCategories),
       competitiveness_level: competitivenessLevel,
-      created_by: currentUserId,
     });
-    onCreated(created);
+    notifyAll("Race updated", `${name.trim()} was updated by a coach.`, { raceId: race.id });
+    onDone();
   }
 
   return (
-    <div className="flex flex-col gap-3 overflow-y-auto border-b border-slate-100 p-4 dark:border-white/10">
+    <div className="flex flex-col gap-3 p-4">
       <div>
         <label className={labelClassName}>Race name</label>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className={inputClassName}
-          placeholder="Summer Dragon Boat Regatta"
-        />
+        <input value={name} onChange={(e) => setName(e.target.value)} className={inputClassName} />
       </div>
-
       <div>
         <label className={labelClassName}>Location</label>
         <input
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           className={inputClassName}
-          placeholder="Lake Union"
         />
       </div>
-
       <div>
         <label className={labelClassName}>Description</label>
         <textarea
@@ -133,7 +131,6 @@ function NewRaceForm({ onCreated }: { onCreated: (race: Race) => void }) {
           className={inputClassName}
         />
       </div>
-
       <div className="grid grid-cols-2 gap-2">
         <div>
           <label className={labelClassName}>Race date</label>
@@ -154,7 +151,6 @@ function NewRaceForm({ onCreated }: { onCreated: (race: Race) => void }) {
           />
         </div>
       </div>
-
       <div className="grid grid-cols-2 gap-2">
         <div>
           <label className={labelClassName}>Discipline</label>
@@ -185,7 +181,6 @@ function NewRaceForm({ onCreated }: { onCreated: (race: Race) => void }) {
           </select>
         </div>
       </div>
-
       <div className="flex flex-col gap-2.5">
         <label className={labelClassName}>Race categories</label>
         <div>
@@ -237,89 +232,105 @@ function NewRaceForm({ onCreated }: { onCreated: (race: Race) => void }) {
           </div>
         </div>
       </div>
-
       <button
-        onClick={handleCreate}
-        disabled={!canSubmit}
+        onClick={handleSave}
+        disabled={!canSave}
         className="mt-1 flex min-h-11 items-center justify-center gap-1.5 rounded-2xl bg-green-700 py-2 text-sm font-bold uppercase tracking-wide text-white shadow-cta transition-all hover:bg-green-800 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 disabled:opacity-40 dark:focus-visible:ring-offset-pitch-900"
       >
-        <Plus size={15} /> Create Race
+        Save & Notify Crew
       </button>
     </div>
   );
 }
 
-export function RaceManager() {
-  const { races } = useAppData();
-  const [isCreating, setIsCreating] = useState(false);
+export function RaceDetail({ raceId }: { raceId: string }) {
+  const { races, role } = useAppData();
+  const [isEditing, setIsEditing] = useState(false);
 
-  const sorted = [...races].sort((a, b) => a.race_date.localeCompare(b.race_date));
+  const race = races.find((r) => r.id === raceId);
+
+  if (!race) {
+    return (
+      <div className="rounded-3xl border border-dashed border-slate-300 p-8 text-center text-sm font-semibold text-slate-600 dark:border-white/15 dark:text-slate-300">
+        Race not found.{" "}
+        <Link href="/" className="font-bold text-green-700 dark:text-green-400">
+          Back home
+        </Link>
+      </div>
+    );
+  }
 
   return (
-    <Card>
-      <CardHeader
-        title="Race Management"
-        subtitle={`${races.length} on the calendar`}
-        icon={<Trophy size={16} />}
-        action={
+    <div className="mx-auto flex max-w-3xl flex-col gap-4">
+      <div className="flex items-center gap-2">
+        <Link
+          href="/"
+          className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200/70 text-slate-700 shadow-soft transition-all hover:bg-slate-100 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/5"
+        >
+          <ArrowLeft size={15} />
+        </Link>
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate font-display text-xl font-bold uppercase tracking-wide text-slate-900 dark:text-white">
+            {race.name}
+          </h1>
+        </div>
+        {role === "coach" && (
           <button
             type="button"
-            onClick={() => setIsCreating((v) => !v)}
+            onClick={() => setIsEditing((v) => !v)}
             className="flex items-center gap-1 rounded-full border border-slate-200/70 px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700 shadow-soft transition-colors hover:border-green-700 hover:text-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 dark:border-white/10 dark:text-slate-300"
           >
-            {isCreating ? <X size={13} /> : <Plus size={13} />}
-            {isCreating ? "Cancel" : "New Race"}
+            {isEditing ? <X size={13} /> : <Pencil size={13} />}
+            {isEditing ? "Cancel" : "Edit"}
           </button>
-        }
-      />
-      {isCreating ? (
-        <NewRaceForm onCreated={() => setIsCreating(false)} />
-      ) : sorted.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 p-8 text-center">
-          <Trophy size={28} className="text-slate-300 dark:text-white/20" />
-          <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">
-            No races on the calendar yet.
-          </p>
-        </div>
-      ) : (
-        <ul className="divide-y divide-slate-100 dark:divide-white/10">
-          {sorted.map((race) => (
-            <li key={race.id}>
-              <Link
-                href={`/races/${race.id}`}
-                className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500 dark:hover:bg-white/5"
-              >
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
-                    {race.name}
-                  </p>
-                  <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
-                    {formatRaceDate(race.race_date)} · {race.location}
-                  </p>
-                  {race.race_categories.length > 0 && (
-                    <div className="mt-1 flex flex-wrap gap-1">
-                      {race.race_categories.map((tag) => (
-                        <span
-                          key={tag}
-                          className="rounded-full border border-slate-200/70 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:border-white/10 dark:text-slate-300"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="flex shrink-0 flex-col items-end gap-1">
-                  <DisciplineBadge discipline={race.discipline} />
-                  <span className="text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-                    {race.competitiveness_level}
+        )}
+      </div>
+
+      <Card>
+        <CardHeader title="Details" icon={<Trophy size={16} />} />
+        {isEditing ? (
+          <EditForm race={race} onDone={() => setIsEditing(false)} />
+        ) : (
+          <div className="flex flex-col gap-3 p-4">
+            <div className="flex items-center gap-2">
+              <DisciplineBadge discipline={race.discipline} />
+              <span className="rounded-full border border-slate-200/70 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:border-white/10 dark:text-slate-300">
+                {race.competitiveness_level}
+              </span>
+            </div>
+            <p className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+              <Calendar size={14} className="text-slate-400" />
+              {formatRaceDate(race.race_date)}
+              {race.registration_deadline &&
+                ` · Registration by ${formatRaceDate(race.registration_deadline)}`}
+            </p>
+            {race.location && (
+              <p className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                <MapPin size={14} className="text-slate-400" />
+                {race.location}
+              </p>
+            )}
+            {race.race_categories.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {race.race_categories.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full border border-slate-200/70 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:border-white/10 dark:text-slate-300"
+                  >
+                    {tag}
                   </span>
-                </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-    </Card>
+                ))}
+              </div>
+            )}
+            {race.description && (
+              <p className="text-sm text-slate-600 dark:text-slate-300">{race.description}</p>
+            )}
+          </div>
+        )}
+      </Card>
+
+      <LineupsSection raceId={race.id} defaultTitle={race.name} />
+      <CommentsSection raceId={race.id} />
+    </div>
   );
 }
