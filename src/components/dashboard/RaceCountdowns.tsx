@@ -1,6 +1,6 @@
 "use client";
 
-import { Flag, MapPin } from "lucide-react";
+import { Calendar, Flag, MapPin } from "lucide-react";
 
 import { useAppData } from "@/hooks/app-data";
 import { useCountdown } from "@/hooks/use-countdown";
@@ -29,6 +29,14 @@ function RaceRow({ race }: { race: import("@/types").Race }) {
   const commitment = raceCommitments.find(
     (c) => c.race_id === race.id && c.paddler_id === currentUserId
   );
+  const goingCount = raceCommitments.filter(
+    (c) => c.race_id === race.id && c.status === "Attending"
+  ).length;
+  const raceDateLabel = new Date(`${race.race_date}T00:00:00`).toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
 
   return (
     <li className="px-4 py-3">
@@ -57,19 +65,34 @@ function RaceRow({ race }: { race: import("@/types").Race }) {
         )}
       </div>
 
-      <div className="mt-3 flex items-center gap-3">
+      <p className="mt-3 flex items-center gap-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+        <Calendar size={11} /> {raceDateLabel}
+      </p>
+
+      <div className="mt-1.5 flex flex-wrap items-stretch gap-3">
         <div className="flex items-center gap-1.5">
           <CountdownUnit value={countdown.days} label="days" />
-          <CountdownUnit value={countdown.hours} label="hrs" />
         </div>
 
-        <div className="flex flex-1 flex-col gap-1">
+        <div className="flex shrink-0 flex-col items-center justify-center gap-0.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 dark:border-white/10 dark:bg-white/5">
+          <span
+            className="font-display text-lg font-bold tabular-nums text-slate-900 dark:text-white"
+            suppressHydrationWarning
+          >
+            {goingCount}
+          </span>
+          <span className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+            going
+          </span>
+        </div>
+
+        <div className="flex min-w-[8rem] flex-1 gap-1.5">
           {(["Attending", "Unconfirmed", "Absent"] as const).map((status) => (
             <button
               key={status}
               onClick={() => updateRaceCommitment(race.id, currentUserId, { status })}
               className={cn(
-                "rounded-lg border py-1 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
+                "flex flex-1 items-center justify-center rounded-lg border px-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
                 commitment?.status === status
                   ? status === "Attending"
                     ? "border-emerald-500 bg-emerald-500 text-white"
@@ -95,7 +118,7 @@ export function RaceCountdowns() {
   return (
     <Card>
       <CardHeader title="Race Tracking" subtitle={`${upcoming.length} upcoming`} icon={<Flag size={16} />} />
-      <ul className="divide-y divide-slate-100 dark:divide-white/10">
+      <ul className="max-h-64 divide-y divide-slate-100 overflow-y-auto dark:divide-white/10">
         {upcoming.map((race) => (
           <RaceRow key={race.id} race={race} />
         ))}

@@ -13,7 +13,12 @@ import {
 import { fetchAttendance, upsertAttendance } from "@/lib/api/attendance";
 import { updateLineupSeating as apiUpdateLineupSeating, createLineup as apiCreateLineup, fetchLineups } from "@/lib/api/lineups";
 import { fetchProfiles, updateProfile as apiUpdateProfile } from "@/lib/api/profiles";
-import { fetchRaceCommitments, fetchRaces, upsertRaceCommitment } from "@/lib/api/races";
+import {
+  createRace as apiCreateRace,
+  fetchRaceCommitments,
+  fetchRaces,
+  upsertRaceCommitment,
+} from "@/lib/api/races";
 import { createSession as apiCreateSession, fetchSessions, updateSession as apiUpdateSession } from "@/lib/api/sessions";
 import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import type { Session as SupabaseSession } from "@supabase/supabase-js";
@@ -59,6 +64,7 @@ interface AppDataValue {
   updateProfile: (id: string, patch: Partial<Profile>) => void;
   updateSession: (id: string, patch: Partial<Session>) => void;
   createSession: (session: Omit<Session, "id" | "created_at" | "updated_at">) => Session;
+  createRace: (race: Omit<Race, "id" | "created_at" | "updated_at">) => Race;
   updateRaceCommitment: (
     raceId: string,
     paddlerId: string,
@@ -229,6 +235,25 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  const createRace = useCallback(
+    (race: Omit<Race, "id" | "created_at" | "updated_at">) => {
+      const newRace: Race = {
+        ...race,
+        id: `race-${Date.now()}-${crypto.randomUUID()}`,
+        created_at: nowIso(),
+        updated_at: nowIso(),
+      };
+      setRaces((prev) => [...prev, newRace]);
+      if (isSupabaseConfigured) {
+        apiCreateRace(race).catch((err) =>
+          console.error("Failed to sync race to Supabase:", err)
+        );
+      }
+      return newRace;
+    },
+    []
+  );
+
   const updateRaceCommitment = useCallback(
     (
       raceId: string,
@@ -330,6 +355,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     updateProfile,
     updateSession,
     createSession,
+    createRace,
     updateRaceCommitment,
     createLineup,
     saveLineupSeating,

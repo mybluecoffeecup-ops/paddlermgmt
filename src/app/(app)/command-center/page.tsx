@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useAppData } from "@/hooks/app-data";
 import { FilterSidebar } from "@/components/command-center/FilterSidebar";
 import { MetricsSummary } from "@/components/command-center/MetricsSummary";
+import { RaceManager } from "@/components/command-center/RaceManager";
 import { SessionManager } from "@/components/command-center/SessionManager";
 import { RosterTable } from "@/components/command-center/RosterTable";
 import type { Discipline } from "@/types";
@@ -67,16 +68,19 @@ export default function CommandCenterPage() {
 
       <MetricsSummary session={selectedSession} rosterProfiles={filteredProfiles} />
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[15rem_22rem_1fr] xl:items-start">
+      <SessionManager
+        selectedSessionId={selectedSessionId}
+        onSelectSession={setSelectedSessionId}
+      />
+
+      <RaceManager />
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[15rem_1fr] xl:items-start">
         <FilterSidebar
           disciplines={disciplines}
           onToggleDiscipline={toggleDiscipline}
           crewTags={crewTags}
           onToggleCrewTag={toggleCrewTag}
-        />
-        <SessionManager
-          selectedSessionId={selectedSessionId}
-          onSelectSession={setSelectedSessionId}
         />
         <RosterTable sessionId={selectedSessionId} profiles={filteredProfiles} />
       </div>

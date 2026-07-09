@@ -13,20 +13,33 @@ export type AgeRange = "Under 40" | "40-50" | "50-60" | "60+";
 export const ALL_AGE_RANGES: AgeRange[] = ["Under 40", "40-50", "50-60", "60+"];
 
 export type CrewTag =
-  | "Premier Mixed"
-  | "Women"
-  | "Men"
+  | "Men's"
+  | "Women's"
+  | "Mixed"
+  | "Opens"
   | "Masters"
-  | "Youth"
+  | "Masters 50"
+  | "Masters 60"
+  | "Masters 70"
+  | "Premier Mixed"
   | "Novice";
 
-export const ALL_CREW_TAGS: CrewTag[] = [
-  "Premier Mixed",
-  "Women",
-  "Men",
+export const CREW_TAG_GENDER_OPTIONS: CrewTag[] = ["Men's", "Women's", "Mixed"];
+
+export const CREW_TAG_AGE_RANGE_OPTIONS: CrewTag[] = [
+  "Opens",
   "Masters",
-  "Youth",
-  "Novice",
+  "Masters 50",
+  "Masters 60",
+  "Masters 70",
+];
+
+export const CREW_TAG_OTHER_OPTIONS: CrewTag[] = ["Premier Mixed", "Novice"];
+
+export const ALL_CREW_TAGS: CrewTag[] = [
+  ...CREW_TAG_GENDER_OPTIONS,
+  ...CREW_TAG_AGE_RANGE_OPTIONS,
+  ...CREW_TAG_OTHER_OPTIONS,
 ];
 
 export interface Benchmarks {
@@ -79,6 +92,13 @@ export const SESSION_TYPE_OPTIONS: SessionType[] = [
   "Race",
 ];
 
+export type CompetitivenessLevel = "Target Race" | "Participation/Experience Race";
+
+export const ALL_COMPETITIVENESS_LEVELS: CompetitivenessLevel[] = [
+  "Target Race",
+  "Participation/Experience Race",
+];
+
 export interface Attendance {
   id: string;
   session_id: string;
@@ -97,6 +117,8 @@ export interface Race {
   discipline: Discipline;
   race_date: string; // YYYY-MM-DD
   registration_deadline: string | null;
+  race_categories: string[];
+  competitiveness_level: CompetitivenessLevel;
   created_by: string | null;
   created_at: string;
   updated_at: string;

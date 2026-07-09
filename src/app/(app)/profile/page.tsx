@@ -8,8 +8,10 @@ import { Card, CardHeader } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
 import {
   ALL_AGE_RANGES,
-  ALL_CREW_TAGS,
   ALL_ELIGIBILITY_STATUSES,
+  CREW_TAG_AGE_RANGE_OPTIONS,
+  CREW_TAG_GENDER_OPTIONS,
+  CREW_TAG_OTHER_OPTIONS,
   type AgeRange,
   type Discipline,
   type EligibilityStatus,
@@ -254,18 +256,55 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div>
+          <div className="flex flex-col gap-3">
             <label className={labelClassName}>Crew categories</label>
-            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
-              {ALL_CREW_TAGS.map((tag) => (
-                <Chip
-                  key={tag}
-                  active={draft.crew_tags.includes(tag)}
-                  onClick={() => toggleCrewTag(tag)}
-                >
-                  {tag}
-                </Chip>
-              ))}
+            <div>
+              <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                Gender
+              </p>
+              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+                {CREW_TAG_GENDER_OPTIONS.map((tag) => (
+                  <Chip
+                    key={tag}
+                    active={draft.crew_tags.includes(tag)}
+                    onClick={() => toggleCrewTag(tag)}
+                  >
+                    {tag}
+                  </Chip>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                Age Range
+              </p>
+              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+                {CREW_TAG_AGE_RANGE_OPTIONS.map((tag) => (
+                  <Chip
+                    key={tag}
+                    active={draft.crew_tags.includes(tag)}
+                    onClick={() => toggleCrewTag(tag)}
+                  >
+                    {tag}
+                  </Chip>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                Other
+              </p>
+              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+                {CREW_TAG_OTHER_OPTIONS.map((tag) => (
+                  <Chip
+                    key={tag}
+                    active={draft.crew_tags.includes(tag)}
+                    onClick={() => toggleCrewTag(tag)}
+                  >
+                    {tag}
+                  </Chip>
+                ))}
+              </div>
             </div>
           </div>
 

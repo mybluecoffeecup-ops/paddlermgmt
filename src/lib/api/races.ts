@@ -12,6 +12,16 @@ export async function fetchRaces(): Promise<Race[] | null> {
   return data as Race[];
 }
 
+export async function createRace(
+  race: Omit<Race, "id" | "created_at" | "updated_at">
+): Promise<Race | null> {
+  const supabase = getSupabaseClient();
+  if (!supabase) return null;
+  const { data, error } = await supabase.from("races").insert(race).select().single();
+  if (error) throw error;
+  return data as Race;
+}
+
 export async function fetchRaceCommitments(): Promise<RaceCommitment[] | null> {
   const supabase = getSupabaseClient();
   if (!supabase) return null;

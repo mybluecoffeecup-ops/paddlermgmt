@@ -254,7 +254,7 @@ export function SessionManager({
   const selected: Session | undefined = sorted.find((s) => s.id === selectedSessionId);
 
   return (
-    <Card className="flex h-full flex-col overflow-hidden">
+    <Card className="flex flex-col overflow-hidden">
       <CardHeader
         title="Session Manager"
         subtitle={`${sessions.length} sessions`}
