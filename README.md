@@ -11,9 +11,10 @@ The live link above serves [`prototype.html`](prototype.html), a standalone, sin
 ## Features
 
 - **Paddler dashboard** (`/`; mirrored in the "Paddler Home" tab in `prototype.html`) — a profile summary card (weight, preferred side for DB/Both paddlers, Pacer/OC Steer/DB Steer/Drummer role badges), quick Going/Not Going RSVP to a scrollable list of upcoming sessions, and a scrollable Race Tracking card with live per-race countdowns, RSVP/payment status, and a lime-highlighted "going" count of attending crewmates, plus a private "Coaching Feedback Corner" for cues from coaching staff. Works identically for coaches, since a coach is also a full paddler in the data model
+- **Session & race detail pages** (`/sessions/[sessionId]`, `/races/[raceId]`) — tap any session or race row anywhere in the app to open its full detail view: date/time, location, linked lineups, and a comment thread open to any signed-in paddler. Coaches get an inline "Edit" toggle to update the details and save; saving fires an in-app notification to the whole crew, surfaced via a bell icon (with unread badge) in the header
 - **Profile page** (`/profile`) — self-service editing of name, weight, discipline, preferred side, eligibility (Citizen/PR/Other), age range, boat roles (Pacer, Drummer, OC Steer, DB Steer), and crew categories (grouped into Gender, Age Range, and Other), reachable via the header avatar
-- **Coach/Captain command center** (`/command-center`) — a session manager for browsing/creating sessions (including a "repeat weekly" option) and broadcasting markdown workout/training logs; a race management panel for adding races to the calendar (date, location, discipline, competitiveness level, and Gender/Age Range/Other category tags) that immediately appear on paddlers' dashboards; a metrics summary (headcount vs. boat capacity, total attending weight, response rate, discipline); and a collapsible Segment Roster filter (discipline plus Gender/Age Range/Other category tags) paired with the roster table. Restricted to coaches client-side
-- **Lineup builder** (`/lineups/[lineupId]`; standalone "Lineup Tool" tab in `prototype.html`) — drag-and-drop seat assignment across boat layouts (DB12, DB22, V6), including dedicated Drummer/Steer seats on dragon boats, with a live left/right (or bow/stern) weight-balance telemetry bar. Restricted to coaches client-side
+- **Coach/Captain command center** (`/command-center`) — a session manager for browsing/creating sessions (including a "repeat weekly" option) and broadcasting markdown workout/training logs; a race management panel for adding races to the calendar (date, location, discipline, competitiveness level, and Gender/Age Range/Other category tags) that immediately appear on paddlers' dashboards, with each race row tapping through to its detail page; a metrics summary (headcount vs. boat capacity, total attending weight, response rate, discipline); and a collapsible Segment Roster filter (discipline plus Gender/Age Range/Other category tags) paired with the roster table. Restricted to coaches client-side
+- **Lineup builder** (`/lineups`, `/lineups/[lineupId]`; standalone "Lineup Tool" tab in `prototype.html`) — drag-and-drop seat assignment across boat layouts (DB12, DB22, V6), including dedicated Drummer/Steer seats on dragon boats, with a live left/right (or bow/stern) weight-balance telemetry bar. Lineups can be built against a session (bench sourced from session attendance) or a race (bench sourced from race commitments) via a Session/Race toggle on lineup creation. Restricted to coaches client-side
 - **Auth** — real Supabase Auth (email/password) once a Supabase project is configured: `/login` and `/signup`, route protection via `src/proxy.ts`, and a `profiles` row auto-created per signup. Paddler vs. Coach view is derived from `profiles.is_coach`; Command Center and Lineups are gated client-side via `RequireCoach` since a coach is also a paddler and `/`/`/profile` stay open to both roles. Without Supabase configured, the app falls back to a Paddler/Coach UI toggle over mock data (no login required) for local development
 
 ## Running locally
@@ -31,26 +32,29 @@ npm run lint     # ESLint
 npx tsc --noEmit # type-check only
 ```
 
-By default the app runs entirely on mock data from `src/lib/mock-data.ts` (a 30-paddler roster) — no environment setup required, and `/login`/`/signup` are bypassed. To connect a real Supabase project, copy `.env.local.example` to `.env.local`, fill in your project's URL and anon key (plus `NEXT_PUBLIC_SITE_URL` for email-confirmation redirects), and apply the migrations in `supabase/migrations/` in order (`0001_init.sql` through `0006_crew_tags_gender_age_categories.sql`). To switch an already-configured project back to mock mode for local UI work, comment out the two Supabase env vars in `.env.local` and restart the dev server.
+By default the app runs entirely on mock data from `src/lib/mock-data.ts` (a 30-paddler roster) — no environment setup required, and `/login`/`/signup` are bypassed. To connect a real Supabase project, copy `.env.local.example` to `.env.local`, fill in your project's URL and anon key (plus `NEXT_PUBLIC_SITE_URL` for email-confirmation redirects), and apply the migrations in `supabase/migrations/` in order (`0001_init.sql` through `0008_comments_and_notifications.sql`). To switch an already-configured project back to mock mode for local UI work, comment out the two Supabase env vars in `.env.local` and restart the dev server.
 
 ## Project structure
 
 ```
 src/
   app/
-    (app)/                # routes wrapped in AppDataProvider + AppShell: /, /profile, /command-center, /lineups, /lineups/[lineupId]
+    (app)/                # routes wrapped in AppDataProvider + AppShell: /, /profile, /command-center,
+                           # /lineups, /lineups/[lineupId], /sessions/[sessionId], /races/[raceId]
     login/, signup/       # auth pages (server actions, no AppShell chrome)
     auth/callback/        # exchanges Supabase email-confirmation code for a session
   components/
     auth/                 # RequireCoach client-side route guard
     dashboard/            # paddler home dashboard widgets
     command-center/        # coach roster, filters, session manager
-    lineup/               # drag-and-drop boat editor, telemetry, seat/bench UI
-    nav/                  # AppShell (role badge/sign-out or demo toggle, navigation)
+    sessions/, races/     # SessionDetail / RaceDetail — tap-through detail views with coach editing
+    shared/                # CommentsSection, LineupsSection — reused by both detail views
+    lineup/               # drag-and-drop boat editor, telemetry, seat/bench UI (session- or race-linked)
+    nav/                  # AppShell (role badge/sign-out or demo toggle, navigation), NotificationBell
     ui/                   # shared primitives
   hooks/app-data.tsx      # single data-fetching context consumed by all routes
   lib/
-    api/                  # Supabase CRUD calls per table
+    api/                  # Supabase CRUD calls per table (incl. comments, notifications)
     auth-actions.ts       # login/signup/logout server actions
     boat-config.ts        # seat layouts + balance-group logic for DB12/DB22/V6
     mock-data.ts          # seed data used when Supabase isn't configured
