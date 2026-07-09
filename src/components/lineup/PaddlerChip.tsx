@@ -39,7 +39,7 @@ export function PaddlerChip({
         "touch-none select-none rounded-2xl border border-slate-200/70 border-l-4 bg-white px-2.5 py-2 shadow-soft transition-all active:scale-[1.02] active:shadow-soft-lg dark:border-white/10 dark:bg-pitch-900/70",
         PADDLE_SIDE_COLORS[paddler.preferred_side].border,
         isDragging && "opacity-40",
-        mismatch && "ring-2 ring-gold-500",
+        mismatch && "ring-4 ring-gold-500 bg-gold-100 dark:bg-gold-500/20 animate-shake",
         compact ? "cursor-grab" : "cursor-grab"
       )}
     >

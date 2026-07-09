@@ -1,7 +1,8 @@
 import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return clsx(inputs);
+  return twMerge(clsx(inputs));
 }
 
 // Locale is pinned explicitly (rather than left as `undefined`) so the

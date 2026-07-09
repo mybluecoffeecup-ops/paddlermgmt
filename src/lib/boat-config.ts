@@ -78,19 +78,20 @@ export interface BalanceGroups {
 }
 
 /**
- * Splits paddling (non-crew-role) seats into two comparison groups for the
- * weight-balance telemetry widget: Left vs Right for dragon boats, and
- * Bow vs Stern for the single-file outrigger six.
+ * Splits seats into two comparison groups for the weight-balance telemetry
+ * widget: Left vs Right for dragon boats, and Odd vs Even seat number for
+ * the single-file outrigger six (paddlers alternate paddling sides by seat
+ * position, and the steersperson — seat 6 — is included since their weight
+ * also affects trim).
  */
 export function getBalanceGroups(layout: BoatLayout): BalanceGroups {
   if (layout.boat === "V6") {
-    const paddlingSeats = layout.seats.filter((s) => !s.isCrewRole);
-    const mid = Math.ceil(paddlingSeats.length / 2);
+    const isOdd = (id: string) => Number(id) % 2 === 1;
     return {
-      labelA: "Bow",
-      labelB: "Stern",
-      seatIdsA: paddlingSeats.slice(0, mid).map((s) => s.id),
-      seatIdsB: paddlingSeats.slice(mid).map((s) => s.id),
+      labelA: "Odd",
+      labelB: "Even",
+      seatIdsA: layout.seats.filter((s) => isOdd(s.id)).map((s) => s.id),
+      seatIdsB: layout.seats.filter((s) => !isOdd(s.id)).map((s) => s.id),
     };
   }
   return {

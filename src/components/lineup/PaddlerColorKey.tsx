@@ -1,5 +1,7 @@
 "use client";
 
+import { Anchor, Compass, Mic2 } from "lucide-react";
+
 import { PADDLE_SIDE_COLORS } from "@/lib/paddle-side-colors";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +23,18 @@ export function PaddlerColorKey() {
         <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
           Side mismatch
         </span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <Anchor size={12} className="text-slate-600 dark:text-slate-300" />
+        <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">Pacer</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <Compass size={12} className="text-slate-600 dark:text-slate-300" />
+        <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">Steer</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <Mic2 size={12} className="text-slate-600 dark:text-slate-300" />
+        <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">Drummer</span>
       </div>
     </div>
   );

@@ -131,6 +131,30 @@ body {
     0 4px 12px rgba(8, 38, 24, 0.08);
 }
 
+@keyframes shake {
+  10%,
+  90% {
+    transform: translateX(-1px);
+  }
+  20%,
+  80% {
+    transform: translateX(2px);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translateX(-3px);
+  }
+  40%,
+  60% {
+    transform: translateX(3px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
