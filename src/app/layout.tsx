@@ -23,7 +23,7 @@ const barlowCondensed = Barlow_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: "Paddler — Crew Management",
+  title: "PADDLES UP — Paddle Sports Crew Management",
   description: "Mobile & tablet crew management for dragon boat and outrigger teams.",
   manifest: "/manifest.json",
 };

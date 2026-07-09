@@ -3,15 +3,15 @@
 import { useMemo, useState } from "react";
 
 import { useAppData } from "@/hooks/app-data";
+import { RequireCoach } from "@/components/auth/RequireCoach";
 import { FilterSidebar } from "@/components/command-center/FilterSidebar";
 import { MetricsSummary } from "@/components/command-center/MetricsSummary";
-import { RaceManager } from "@/components/command-center/RaceManager";
 import { SessionManager } from "@/components/command-center/SessionManager";
 import { RosterTable } from "@/components/command-center/RosterTable";
 import { WorkoutProgramPanel } from "@/components/command-center/WorkoutProgramPanel";
 import type { Discipline } from "@/types";
 
-export default function CommandCenterPage() {
+export default function SessionsPage() {
   const { profiles, sessions } = useAppData();
   const [disciplines, setDisciplines] = useState<Set<Discipline>>(new Set());
   const [crewTags, setCrewTags] = useState<Set<string>>(new Set());
@@ -57,36 +57,36 @@ export default function CommandCenterPage() {
   const selectedSession = sessions.find((s) => s.id === selectedSessionId);
 
   return (
-    <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-slate-900 dark:text-white">
-          Command Center
-        </h1>
-        <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">
-          Roster segmentation, session broadcasts, and readiness at a glance.
-        </p>
-      </div>
+    <RequireCoach>
+      <div className="flex flex-col gap-4">
+        <div>
+          <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-slate-900 dark:text-white">
+            Session Mgmt
+          </h1>
+          <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">
+            Roster segmentation, session broadcasts, and readiness at a glance.
+          </p>
+        </div>
 
-      <MetricsSummary session={selectedSession} rosterProfiles={filteredProfiles} />
+        <MetricsSummary session={selectedSession} rosterProfiles={filteredProfiles} />
 
-      <SessionManager
-        selectedSessionId={selectedSessionId}
-        onSelectSession={setSelectedSessionId}
-      />
-
-      <RaceManager />
-
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[15rem_1fr] xl:items-start">
-        <FilterSidebar
-          disciplines={disciplines}
-          onToggleDiscipline={toggleDiscipline}
-          crewTags={crewTags}
-          onToggleCrewTag={toggleCrewTag}
+        <SessionManager
+          selectedSessionId={selectedSessionId}
+          onSelectSession={setSelectedSessionId}
         />
-        <RosterTable sessionId={selectedSessionId} profiles={filteredProfiles} />
-      </div>
 
-      <WorkoutProgramPanel />
-    </div>
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-[15rem_1fr] xl:items-start">
+          <FilterSidebar
+            disciplines={disciplines}
+            onToggleDiscipline={toggleDiscipline}
+            crewTags={crewTags}
+            onToggleCrewTag={toggleCrewTag}
+          />
+          <RosterTable sessionId={selectedSessionId} profiles={filteredProfiles} />
+        </div>
+
+        <WorkoutProgramPanel />
+      </div>
+    </RequireCoach>
   );
 }

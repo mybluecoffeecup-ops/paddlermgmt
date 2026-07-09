@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { Anchor } from "lucide-react";
 
 import { signup } from "@/lib/auth-actions";
 import { Card } from "@/components/ui/Card";
+import { BrandMark } from "@/components/nav/BrandMark";
 
 export default async function SignupPage({
   searchParams,
@@ -14,18 +14,8 @@ export default async function SignupPage({
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <Card className="w-full max-w-sm p-6">
-        <div className="mb-6 flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gold-500 text-ink shadow-[0_0_20px_rgba(253,189,28,0.35)]">
-            <Anchor size={18} strokeWidth={2.5} />
-          </div>
-          <div className="leading-tight">
-            <p className="font-display text-base font-bold uppercase tracking-wide text-slate-900 dark:text-slate-100">
-              Paddler
-            </p>
-            <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
-              Crew Management
-            </p>
-          </div>
+        <div className="mb-6">
+          <BrandMark />
         </div>
 
         <h1 className="mb-4 font-display text-xl font-bold uppercase tracking-wide text-slate-900 dark:text-slate-100">

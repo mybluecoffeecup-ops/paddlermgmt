@@ -2,17 +2,39 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutGrid, LogOut, User, Users, Waves, Anchor } from "lucide-react";
+import { LayoutGrid, LogOut, User, Users, Waves, Flag, Info, ShoppingBag } from "lucide-react";
 
 import { useAppData } from "@/hooks/app-data";
+import { BrandMark } from "@/components/nav/BrandMark";
 import { NotificationBell } from "@/components/nav/NotificationBell";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-  { href: "/", label: "Home", icon: Waves },
-  { href: "/command-center", label: "Command Center", icon: Users },
-  { href: "/lineups", label: "Lineups", icon: LayoutGrid },
+  { href: "/", label: "Home", mobileLabel: "Home", icon: Waves, coachOnly: false },
+  {
+    href: "/sessions",
+    label: "Session Mgmt",
+    mobileLabel: "Sessions",
+    icon: Users,
+    coachOnly: true,
+  },
+  { href: "/races", label: "Race Mgmt", mobileLabel: "Races", icon: Flag, coachOnly: false },
+  {
+    href: "/lineups",
+    label: "Lineups",
+    mobileLabel: "Lineups",
+    icon: LayoutGrid,
+    coachOnly: true,
+  },
+  { href: "/info", label: "Info", mobileLabel: "Info", icon: Info, coachOnly: false },
+  {
+    href: "/orders",
+    label: "Orders",
+    mobileLabel: "Orders",
+    icon: ShoppingBag,
+    coachOnly: false,
+  },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -22,7 +44,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const resolved = !loading && currentUser !== undefined;
   const visibleNavItems = NAV_ITEMS.filter(
-    (item) => item.href === "/" || !resolved || role === "coach"
+    (item) => !item.coachOnly || !resolved || role === "coach"
   );
 
   const handleSignOut = async () => {
@@ -35,16 +57,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <header className="sticky top-0 z-40 bg-pitch-900/85 shadow-soft backdrop-blur-md">
         <div className="mx-auto grid max-w-[1400px] grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 py-3">
-          <div className="flex items-center gap-2 justify-self-start">
-            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gold-500 text-ink shadow-[0_0_20px_rgba(253,189,28,0.35)]">
-              <Anchor size={18} strokeWidth={2.5} />
-            </div>
-            <div className="leading-tight">
-              <p className="font-display text-base font-bold uppercase tracking-wide text-white">
-                Paddler
-              </p>
-              <p className="text-[11px] font-semibold text-slate-300">Crew Management</p>
-            </div>
+          <div className="justify-self-start">
+            <BrandMark variant="header" />
           </div>
 
           <nav className="hidden items-center gap-1 justify-self-center md:flex">
@@ -153,7 +167,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 )}
               >
                 <item.icon size={20} strokeWidth={active ? 2.5 : 2} />
-                {item.label === "Command Center" ? "Coach" : item.label}
+                {item.mobileLabel}
               </Link>
             );
           })}

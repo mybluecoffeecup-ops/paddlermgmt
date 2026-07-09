@@ -1,11 +1,11 @@
 {
-  "name": "Paddler — Crew Management",
-  "short_name": "Paddler",
+  "name": "PADDLES UP — Paddle Sports Crew Management",
+  "short_name": "PADDLES UP",
   "description": "Mobile & tablet crew management for dragon boat and outrigger teams.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f4f8fa",
-  "theme_color": "#0f766e",
+  "theme_color": "#082618",
   "icons": [
     { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }
   ]
