@@ -1,8 +1,22 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+import type { SeatingConfiguration } from "@/types";
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+// A fresh object is created on every seating edit even when the net content
+// is unchanged (e.g. toggling a seat and toggling it back), so dirty-state
+// checks need a content comparison rather than reference/JSON equality —
+// `{}` and `{ seat: null }` must compare equal.
+export function shallowEqualSeating(a: SeatingConfiguration, b: SeatingConfiguration): boolean {
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+  for (const key of keys) {
+    if ((a[key] ?? null) !== (b[key] ?? null)) return false;
+  }
+  return true;
 }
 
 // Locale is pinned explicitly (rather than left as `undefined`) so the

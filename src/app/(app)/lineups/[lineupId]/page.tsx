@@ -6,5 +6,5 @@ export default async function LineupEditorPage({
   params: Promise<{ lineupId: string }>;
 }) {
   const { lineupId } = await params;
-  return <LineupEditor lineupId={lineupId} />;
+  return <LineupEditor key={lineupId} lineupId={lineupId} />;
 }
