@@ -35,7 +35,7 @@ npm run lint     # ESLint
 npx tsc --noEmit # type-check only
 ```
 
-By default the app runs entirely on mock data from `src/lib/mock-data.ts` (a 30-paddler roster) — no environment setup required, and `/login`/`/signup` are bypassed. To connect a real Supabase project, copy `.env.local.example` to `.env.local`, fill in your project's URL and anon key (plus `NEXT_PUBLIC_SITE_URL` for email-confirmation redirects), and apply the migrations in `supabase/migrations/` in order (`0001_init.sql` through `0011_calendar_events_seed.sql`). To switch an already-configured project back to mock mode for local UI work, comment out the two Supabase env vars in `.env.local` and restart the dev server.
+By default the app runs entirely on mock data from `src/lib/mock-data.ts` (a 30-paddler roster) — no environment setup required, and `/login`/`/signup` are bypassed. To connect a real Supabase project, copy `.env.local.example` to `.env.local`, fill in your project's URL and anon key (plus `NEXT_PUBLIC_SITE_URL` for email-confirmation redirects), and apply the migrations in `supabase/migrations/` in order (`0001_init.sql` through `0012_attendance_status_going_maybe_not_going.sql`). To switch an already-configured project back to mock mode for local UI work, comment out the two Supabase env vars in `.env.local` and restart the dev server.
 
 ## Project structure
 
