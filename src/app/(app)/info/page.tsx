@@ -1,6 +1,6 @@
 import { SocialsCard } from "@/components/info/SocialsCard";
 import { SponsorsCard } from "@/components/info/SponsorsCard";
-import { WorkInProgress } from "@/components/ui/WorkInProgress";
+import { TeamInfoCard } from "@/components/info/TeamInfoCard";
 
 export default function InfoPage() {
   return (
@@ -23,10 +23,7 @@ export default function InfoPage() {
         </div>
       </div>
 
-      <WorkInProgress
-        title="Team Info"
-        description="Team information and a reference document library are coming here."
-      />
+      <TeamInfoCard />
     </div>
   );
 }

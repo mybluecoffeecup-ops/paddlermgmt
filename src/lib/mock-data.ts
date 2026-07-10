@@ -8,6 +8,7 @@ import type {
   Race,
   RaceCommitment,
   Session,
+  TeamDocument,
   WorkoutProgram,
 } from "@/types";
 import { ALL_CREW_TAGS } from "@/types";
@@ -1178,5 +1179,27 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     read_by: [],
     created_by: CURRENT_COACH_ID,
     created_at: now,
+  },
+];
+
+export const MOCK_TEAM_DOCUMENTS: TeamDocument[] = [
+  {
+    id: "team-document-1",
+    title: "New Paddler Information Pack",
+    url: "https://docs.google.com/presentation/d/1Z-rrJeNzbOjA-FCprRpWgu0NnRZ0q3__raPd94zENxI/mobilepresent?slide=id.g185bf2e7432_0_178",
+    description:
+      "New to the team? Or just didn't read when you joined? Here's a comprehensive guide to the team, our trainings and other important details.",
+    created_by: CURRENT_COACH_ID,
+    created_at: now,
+    updated_at: now,
+  },
+  {
+    id: "team-document-2",
+    title: "Sponsorship Details",
+    url: "https://docs.google.com/presentation/d/1YSbALg-HtkOeB2ExyRfpsXRslTBzwBmByoNelP7vmj4/edit?slide=id.g2fa85e52cc4_0_1#slide=id.g2fa85e52cc4_0_1",
+    description: "Even more information on our sponsors!",
+    created_by: CURRENT_COACH_ID,
+    created_at: now,
+    updated_at: now,
   },
 ];

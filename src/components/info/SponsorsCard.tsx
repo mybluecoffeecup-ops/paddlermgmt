@@ -18,20 +18,20 @@ export function SponsorsCard() {
         subtitle="Member perks & discounts"
         icon={<Handshake size={16} />}
       />
-      <div className="grid grid-cols-2 gap-2 p-3 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-2 p-3 sm:grid-cols-3 lg:grid-cols-[repeat(auto-fit,minmax(104px,140px))]">
         {SPONSORS.map((sponsor) => (
           <button
             key={sponsor.slug}
             type="button"
             onClick={() => setSelected(sponsor)}
-            className="flex items-center gap-2 rounded-xl border border-slate-200/70 p-2 text-left transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 hover:border-green-700 dark:border-white/10"
+            className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-200/70 p-3 text-center transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 hover:border-green-700 dark:border-white/10"
           >
-            <SponsorLogo name={sponsor.name} logoSrc={sponsor.logoSrc} className="h-8 w-8 text-[10px]" />
-            <span className="min-w-0">
-              <p className="truncate text-[11px] font-bold text-slate-900 dark:text-slate-100">
+            <SponsorLogo name={sponsor.name} logoSrc={sponsor.logoSrc} className="h-10 w-10 text-xs" />
+            <span className="w-full min-w-0">
+              <p className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">
                 {sponsor.name}
               </p>
-              <p className="truncate text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+              <p className="truncate text-xs font-semibold text-slate-600 dark:text-slate-300">
                 {sponsor.summary}
               </p>
             </span>

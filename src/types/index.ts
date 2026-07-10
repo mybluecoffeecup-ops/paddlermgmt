@@ -215,3 +215,19 @@ export interface Notification {
   created_by: string | null;
   created_at: string;
 }
+
+/**
+ * A link to an external web document (Google Doc/Slides/Form/Sheet, or any
+ * other URL) surfaced in the "Team Info" panel. Deliberately link-only —
+ * no file storage/upload — so this is just a title/url/description, not a
+ * file record.
+ */
+export interface TeamDocument {
+  id: string;
+  title: string;
+  url: string;
+  description: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}

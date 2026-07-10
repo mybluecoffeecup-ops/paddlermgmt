@@ -38,6 +38,12 @@ import {
   upsertRaceCommitment,
 } from "@/lib/api/races";
 import { createSession as apiCreateSession, fetchSessions, updateSession as apiUpdateSession } from "@/lib/api/sessions";
+import {
+  createTeamDocument as apiCreateTeamDocument,
+  deleteTeamDocument as apiDeleteTeamDocument,
+  fetchTeamDocuments,
+  updateTeamDocument as apiUpdateTeamDocument,
+} from "@/lib/api/team-documents";
 import { fetchWorkoutProgram, upsertWorkoutProgram as apiUpsertWorkoutProgram } from "@/lib/api/workout-program";
 import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import type { Session as SupabaseSession } from "@supabase/supabase-js";
@@ -53,6 +59,7 @@ import {
   MOCK_RACES,
   MOCK_RACE_COMMITMENTS,
   MOCK_SESSIONS,
+  MOCK_TEAM_DOCUMENTS,
   MOCK_WORKOUT_PROGRAM,
 } from "@/lib/mock-data";
 import type {
@@ -68,6 +75,7 @@ import type {
   RaceCommitment,
   SeatingConfiguration,
   Session,
+  TeamDocument,
   WorkoutProgram,
 } from "@/types";
 
@@ -83,6 +91,7 @@ interface AppDataValue {
   lineups: Lineup[];
   comments: Comment[];
   notifications: Notification[];
+  teamDocuments: TeamDocument[];
   workoutProgram: WorkoutProgram | null;
   loading: boolean;
   usingLiveBackend: boolean;
@@ -116,6 +125,11 @@ interface AppDataValue {
   commentsFor: (params: { sessionId?: string; raceId?: string }) => Comment[];
   createComment: (comment: Omit<Comment, "id" | "created_at">) => void;
   deleteComment: (id: string) => void;
+  createTeamDocument: (
+    document: Omit<TeamDocument, "id" | "created_at" | "updated_at">
+  ) => TeamDocument;
+  updateTeamDocument: (id: string, patch: Partial<TeamDocument>) => void;
+  deleteTeamDocument: (id: string) => void;
   notifyAll: (
     title: string,
     body: string,
@@ -141,6 +155,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [lineups, setLineups] = useState<Lineup[]>(MOCK_LINEUPS);
   const [comments, setComments] = useState<Comment[]>(MOCK_COMMENTS);
   const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
+  const [teamDocuments, setTeamDocuments] = useState<TeamDocument[]>(MOCK_TEAM_DOCUMENTS);
   const [workoutProgram, setWorkoutProgram] = useState<WorkoutProgram | null>(
     MOCK_WORKOUT_PROGRAM
   );
@@ -153,7 +168,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     (async () => {
       try {
-        const [p, s, a, r, rc, ce, l, cm, n, wp] = await Promise.all([
+        const [p, s, a, r, rc, ce, l, cm, n, wp, td] = await Promise.all([
           fetchProfiles(),
           fetchSessions(),
           fetchAttendance(),
@@ -164,6 +179,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           fetchComments(),
           fetchNotifications(),
           fetchWorkoutProgram(),
+          fetchTeamDocuments(),
         ]);
         if (cancelled) return;
         if (p) setProfiles(p);
@@ -176,6 +192,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         if (cm) setComments(cm);
         if (n) setNotifications(n);
         if (wp) setWorkoutProgram(wp);
+        if (td) setTeamDocuments(td);
       } catch (err) {
         console.error("Failed to load live Supabase data, staying on mock state:", err);
       } finally {
@@ -505,6 +522,45 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const createTeamDocument = useCallback(
+    (document: Omit<TeamDocument, "id" | "created_at" | "updated_at">) => {
+      const newDocument: TeamDocument = {
+        ...document,
+        id: `team-document-${Date.now()}-${crypto.randomUUID()}`,
+        created_at: nowIso(),
+        updated_at: nowIso(),
+      };
+      setTeamDocuments((prev) => [...prev, newDocument]);
+      if (isSupabaseConfigured) {
+        apiCreateTeamDocument(document).catch((err) =>
+          console.error("Failed to sync team document to Supabase:", err)
+        );
+      }
+      return newDocument;
+    },
+    []
+  );
+
+  const updateTeamDocument = useCallback((id: string, patch: Partial<TeamDocument>) => {
+    setTeamDocuments((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, ...patch, updated_at: nowIso() } : d))
+    );
+    if (isSupabaseConfigured) {
+      apiUpdateTeamDocument(id, patch).catch((err) =>
+        console.error("Failed to sync team document to Supabase:", err)
+      );
+    }
+  }, []);
+
+  const deleteTeamDocument = useCallback((id: string) => {
+    setTeamDocuments((prev) => prev.filter((d) => d.id !== id));
+    if (isSupabaseConfigured) {
+      apiDeleteTeamDocument(id).catch((err) =>
+        console.error("Failed to sync team document deletion to Supabase:", err)
+      );
+    }
+  }, []);
+
   const notifyAll = useCallback(
     (title: string, body: string, target: { sessionId?: string; raceId?: string }) => {
       const notification: Omit<Notification, "id" | "created_at" | "read_by"> = {
@@ -575,6 +631,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     lineups,
     comments,
     notifications,
+    teamDocuments,
     workoutProgram,
     loading,
     usingLiveBackend: isSupabaseConfigured,
@@ -600,6 +657,9 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     commentsFor,
     createComment,
     deleteComment,
+    createTeamDocument,
+    updateTeamDocument,
+    deleteTeamDocument,
     notifyAll,
     markNotificationRead,
     updateWorkoutProgram,
