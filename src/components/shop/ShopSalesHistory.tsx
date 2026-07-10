@@ -37,7 +37,7 @@ export function ShopSalesHistory() {
           No accepted orders yet.
         </p>
       ) : (
-        <ul className="divide-y divide-slate-100 dark:divide-white/10">
+        <ul className="max-h-44 divide-y divide-slate-100 overflow-y-auto dark:divide-white/10">
           {rows.map((row) => (
             <li
               key={`${row.styleName}::${row.size}`}

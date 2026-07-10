@@ -12,6 +12,7 @@ import { MyOrders } from "@/components/shop/MyOrders";
 import { ShopStyleManager } from "@/components/shop/ShopStyleManager";
 import { ShopSizeChartManager } from "@/components/shop/ShopSizeChartManager";
 import { ShopOrderQueue } from "@/components/shop/ShopOrderQueue";
+import { ShopCurrentStock } from "@/components/shop/ShopCurrentStock";
 import { ShopSalesHistory } from "@/components/shop/ShopSalesHistory";
 import { cn } from "@/lib/utils";
 import type { ShopStyle } from "@/types";
@@ -29,7 +30,7 @@ export default function OrdersPage() {
   const cart = useShopCart();
 
   // Render-time state adjustment: if the demo role toggle flips back to
-  // paddler while "Coach Tools" is open, don't leave the tab stuck on
+  // paddler while "Admin Tools" is open, don't leave the tab stuck on
   // content the paddler shouldn't see.
   if (tab === "coach" && !isCoach) {
     setTab("shop");
@@ -38,7 +39,7 @@ export default function OrdersPage() {
   const tabs: { id: Tab; label: string }[] = [
     { id: "shop", label: "Shop" },
     { id: "my-orders", label: "My Orders" },
-    ...(isCoach ? [{ id: "coach" as const, label: "Coach Tools" }] : []),
+    ...(isCoach ? [{ id: "coach" as const, label: "Admin Tools" }] : []),
   ];
 
   return (
@@ -91,9 +92,14 @@ export default function OrdersPage() {
       {tab === "my-orders" && <MyOrders />}
       {tab === "coach" && isCoach && (
         <div className="flex flex-col gap-4">
-          <ShopStyleManager />
-          <ShopSizeChartManager />
-          <ShopOrderQueue />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:items-start">
+            <ShopOrderQueue />
+            <ShopCurrentStock />
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:items-start">
+            <ShopStyleManager />
+            <ShopSizeChartManager />
+          </div>
           <ShopSalesHistory />
         </div>
       )}

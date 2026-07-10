@@ -65,7 +65,7 @@ export function ShopOrderQueue() {
           No orders here.
         </p>
       ) : (
-        <ul className="divide-y divide-slate-100 dark:divide-white/10">
+        <ul className="max-h-[22rem] divide-y divide-slate-100 overflow-y-auto dark:divide-white/10">
           {filtered.map((order) => {
             const items = shopOrderItemsFor(order.id);
             const paddler = profiles.find((p) => p.id === order.paddler_id);

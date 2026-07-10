@@ -14,12 +14,20 @@ const labelClassName =
 function NewChartForm({ onDone }: { onDone: () => void }) {
   const { createShopSizeChart } = useAppData();
   const [name, setName] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const canSubmit = name.trim() !== "" && imageUrl.trim() !== "";
+  const [imageDataUrl, setImageDataUrl] = useState("");
+  const canSubmit = name.trim() !== "" && imageDataUrl !== "";
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setImageDataUrl(reader.result as string);
+    reader.readAsDataURL(file);
+  }
 
   function handleCreate() {
     if (!canSubmit) return;
-    createShopSizeChart({ name: name.trim(), image_url: imageUrl.trim() });
+    createShopSizeChart({ name: name.trim(), image_url: imageDataUrl });
     onDone();
   }
 
@@ -35,14 +43,21 @@ function NewChartForm({ onDone }: { onDone: () => void }) {
         />
       </div>
       <div>
-        <label className={labelClassName}>Image URL</label>
+        <label className={labelClassName}>Upload chart image</label>
         <input
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-          className={inputClassName}
-          placeholder="https://..."
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="w-full text-sm font-semibold text-slate-700 file:mr-3 file:rounded-full file:border-0 file:bg-green-700 file:px-3 file:py-2 file:text-xs file:font-bold file:uppercase file:tracking-wide file:text-white dark:text-slate-200"
         />
       </div>
+      {imageDataUrl && (
+        <img
+          src={imageDataUrl}
+          alt="Selected chart preview"
+          className="max-h-48 w-full rounded-xl border border-slate-200/70 object-contain dark:border-white/10"
+        />
+      )}
       <button
         onClick={handleCreate}
         disabled={!canSubmit}
@@ -57,6 +72,7 @@ function NewChartForm({ onDone }: { onDone: () => void }) {
 export function ShopSizeChartManager() {
   const { shopSizeCharts } = useAppData();
   const [isCreating, setIsCreating] = useState(false);
+  const [expandedChartId, setExpandedChartId] = useState<string | null>(null);
 
   return (
     <Card>
@@ -78,13 +94,27 @@ export function ShopSizeChartManager() {
       {isCreating ? (
         <NewChartForm onDone={() => setIsCreating(false)} />
       ) : (
-        <ul className="divide-y divide-slate-100 dark:divide-white/10">
+        <ul className="max-h-44 divide-y divide-slate-100 overflow-y-auto dark:divide-white/10">
           {shopSizeCharts.map((chart) => (
-            <li
-              key={chart.id}
-              className="px-4 py-2.5 text-sm font-semibold text-slate-800 dark:text-slate-100"
-            >
-              {chart.name}
+            <li key={chart.id}>
+              <button
+                type="button"
+                onClick={() =>
+                  setExpandedChartId((id) => (id === chart.id ? null : chart.id))
+                }
+                className="w-full px-4 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-white/5"
+              >
+                {chart.name}
+              </button>
+              {expandedChartId === chart.id && (
+                <div className="border-t border-slate-100 bg-slate-50/60 p-4 dark:border-white/10 dark:bg-white/5">
+                  <img
+                    src={chart.image_url}
+                    alt={chart.name}
+                    className="max-h-64 w-full rounded-xl border border-slate-200/70 object-contain dark:border-white/10"
+                  />
+                </div>
+              )}
             </li>
           ))}
           {shopSizeCharts.length === 0 && (

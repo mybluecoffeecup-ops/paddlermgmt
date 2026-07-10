@@ -208,7 +208,7 @@ export function ShopStyleManager() {
           No styles yet.
         </p>
       ) : (
-        <ul className="divide-y divide-slate-100 dark:divide-white/10">
+        <ul className="max-h-72 divide-y divide-slate-100 overflow-y-auto dark:divide-white/10">
           {shopStyles.map((style) => (
             <li key={style.id}>
               <div className="flex items-center justify-between gap-2 px-4 py-3">
