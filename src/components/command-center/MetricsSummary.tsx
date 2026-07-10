@@ -63,8 +63,8 @@ export function MetricsSummary({
 
   const rosterIds = new Set(rosterProfiles.map((p) => p.id));
   const sessionAttendance = attendanceFor(session.id).filter((a) => rosterIds.has(a.paddler_id));
-  const attending = sessionAttendance.filter((a) => a.status === "Attending");
-  const responded = sessionAttendance.filter((a) => a.status !== "Unconfirmed");
+  const attending = sessionAttendance.filter((a) => a.status === "Going");
+  const responded = sessionAttendance.filter((a) => a.status !== "Maybe");
 
   const totalWeight = attending.reduce((sum, a) => {
     const profile = rosterProfiles.find((p) => p.id === a.paddler_id);

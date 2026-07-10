@@ -8,12 +8,6 @@ import { useCountdown } from "@/hooks/use-countdown";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
 
-const STATUS_LABELS: Record<"Attending" | "Unconfirmed" | "Absent", string> = {
-  Attending: "Going",
-  Unconfirmed: "Maybe",
-  Absent: "Not Going",
-};
-
 function CountdownUnit({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center rounded-2xl border border-slate-200/70 bg-white px-3 py-2 shadow-soft dark:border-white/10 dark:bg-pitch-900/70">
@@ -37,7 +31,7 @@ function RaceRow({ race }: { race: import("@/types").Race }) {
     (c) => c.race_id === race.id && c.paddler_id === currentUserId
   );
   const goingCount = raceCommitments.filter(
-    (c) => c.race_id === race.id && c.status === "Attending"
+    (c) => c.race_id === race.id && c.status === "Going"
   ).length;
   const raceDateLabel = new Date(`${race.race_date}T00:00:00`).toLocaleDateString("en-US", {
     weekday: "short",
@@ -97,22 +91,22 @@ function RaceRow({ race }: { race: import("@/types").Race }) {
         </div>
 
         <div className="flex min-w-[8rem] flex-1 gap-1.5">
-          {(["Attending", "Unconfirmed", "Absent"] as const).map((status) => (
+          {(["Going", "Maybe", "Not Going"] as const).map((status) => (
             <button
               key={status}
               onClick={() => updateRaceCommitment(race.id, currentUserId, { status })}
               className={cn(
                 "flex min-h-11 flex-1 items-center justify-center rounded-2xl border px-2 text-xs font-bold uppercase tracking-wide transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500",
                 commitment?.status === status
-                  ? status === "Attending"
+                  ? status === "Going"
                     ? "border-green-700 bg-green-700 text-white shadow-soft"
-                    : status === "Absent"
+                    : status === "Not Going"
                       ? "border-redcard-700 bg-redcard-700 text-white shadow-soft"
                       : "border-ink bg-ink text-white shadow-soft dark:border-white dark:bg-white dark:text-ink"
                   : "border-slate-200/70 text-slate-600 dark:border-white/15 dark:text-slate-300"
               )}
             >
-              {STATUS_LABELS[status]}
+              {status}
             </button>
           ))}
         </div>

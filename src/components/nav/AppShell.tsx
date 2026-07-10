@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutGrid, LogOut, User, Users, Waves, Flag, Info, ShoppingBag } from "lucide-react";
+import { LayoutGrid, LogOut, User, Users, Waves, CalendarDays, Info, ShoppingBag } from "lucide-react";
 
 import { useAppData } from "@/hooks/app-data";
 import { BrandMark } from "@/components/nav/BrandMark";
@@ -19,7 +19,13 @@ const NAV_ITEMS = [
     icon: Users,
     coachOnly: true,
   },
-  { href: "/races", label: "Race Mgmt", mobileLabel: "Races", icon: Flag, coachOnly: false },
+  {
+    href: "/calendar",
+    label: "Calendar",
+    mobileLabel: "Calendar",
+    icon: CalendarDays,
+    coachOnly: false,
+  },
   {
     href: "/lineups",
     label: "Lineups",

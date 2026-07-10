@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import type { AttendanceStatus, Discipline } from "@/types";
+import type { AttendanceStatus, CalendarEventCategory, Discipline } from "@/types";
 
 export function Badge({
   className,
@@ -27,10 +27,9 @@ export function Badge({
 // light wash in light mode; dark mode swaps to white text since the same
 // translucent wash reads much darker over the dark Pitch surface.
 const STATUS_STYLES: Record<AttendanceStatus, string> = {
-  Attending: "bg-green-500/15 text-green-800 dark:bg-green-400/20 dark:text-white",
-  Unconfirmed: "border border-slate-300 text-slate-700 dark:border-white/30 dark:text-white",
-  Absent: "bg-redcard-500/15 text-redcard-700 dark:bg-redcard-500/25 dark:text-white",
-  Waitlist: "bg-gold-500/20 text-gold-900 dark:bg-gold-400/25 dark:text-white",
+  Going: "bg-green-500/15 text-green-800 dark:bg-green-400/20 dark:text-white",
+  Maybe: "border border-slate-300 text-slate-700 dark:border-white/30 dark:text-white",
+  "Not Going": "bg-redcard-500/15 text-redcard-700 dark:bg-redcard-500/25 dark:text-white",
 };
 
 export function AttendanceBadge({ status }: { status: AttendanceStatus }) {
@@ -45,4 +44,31 @@ const DISCIPLINE_STYLES: Record<Discipline, string> = {
 
 export function DisciplineBadge({ discipline }: { discipline: Discipline }) {
   return <Badge className={DISCIPLINE_STYLES[discipline]}>{discipline}</Badge>;
+}
+
+// Shared with CalendarYearNav's event dots, so the two stay in sync — a
+// category's color means the same thing whether it's a dot in the mini-grid
+// nav or a badge in the month agenda.
+export const CALENDAR_CATEGORY_STYLES: Record<CalendarEventCategory, string> = {
+  Race: "bg-green-500/15 text-green-800 dark:bg-green-400/20 dark:text-white",
+  Training: "bg-pitch-900/10 text-pitch-900 dark:bg-white/10 dark:text-white",
+  Social: "bg-gold-500/20 text-gold-900 dark:bg-gold-400/25 dark:text-white",
+  Deadline: "bg-gold-500/20 text-gold-900 dark:bg-gold-400/25 dark:text-white",
+  Meeting: "border border-slate-300 text-slate-700 dark:border-white/30 dark:text-white",
+  Holiday: "border border-slate-300 text-slate-700 dark:border-white/30 dark:text-white",
+  Other: "border border-slate-300 text-slate-700 dark:border-white/30 dark:text-white",
+};
+
+export const CALENDAR_CATEGORY_DOT_STYLES: Record<CalendarEventCategory, string> = {
+  Race: "bg-green-600 dark:bg-green-400",
+  Training: "bg-pitch-900 dark:bg-white",
+  Social: "bg-gold-500",
+  Deadline: "bg-gold-500",
+  Meeting: "bg-slate-400 dark:bg-white/50",
+  Holiday: "bg-slate-400 dark:bg-white/50",
+  Other: "bg-slate-400 dark:bg-white/50",
+};
+
+export function CalendarCategoryBadge({ category }: { category: CalendarEventCategory }) {
+  return <Badge className={CALENDAR_CATEGORY_STYLES[category]}>{category}</Badge>;
 }

@@ -59,13 +59,13 @@ export function LineupEditor({ lineupId }: { lineupId: string }) {
   const attendingProfiles = useMemo(() => {
     if (session) {
       const ids = attendanceFor(session.id)
-        .filter((a) => a.status === "Attending")
+        .filter((a) => a.status === "Going")
         .map((a) => a.paddler_id);
       return ids.map((id) => profileById.get(id)).filter((p): p is Profile => Boolean(p));
     }
     if (race) {
       const ids = raceCommitments
-        .filter((c) => c.race_id === race.id && c.status === "Attending")
+        .filter((c) => c.race_id === race.id && c.status === "Going")
         .map((c) => c.paddler_id);
       return ids.map((id) => profileById.get(id)).filter((p): p is Profile => Boolean(p));
     }

@@ -43,26 +43,26 @@ export function UpcomingSessions() {
               </Link>
               <div className="flex shrink-0 items-center gap-1.5">
                 <button
-                  onClick={() => rsvpToSession(session.id, "Attending")}
+                  onClick={() => rsvpToSession(session.id, "Going")}
                   className={cn(
                     "flex h-11 w-11 items-center justify-center rounded-full border transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500",
-                    status === "Attending"
+                    status === "Going"
                       ? "border-green-700 bg-green-700 text-white shadow-soft"
                       : "border-slate-200/70 text-slate-600 hover:border-green-700 hover:text-green-700 dark:border-white/15"
                   )}
-                  aria-label="RSVP Attending"
+                  aria-label="RSVP Going"
                 >
                   <Check size={16} strokeWidth={3} />
                 </button>
                 <button
-                  onClick={() => rsvpToSession(session.id, "Absent")}
+                  onClick={() => rsvpToSession(session.id, "Not Going")}
                   className={cn(
                     "flex h-11 w-11 items-center justify-center rounded-full border transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500",
-                    status === "Absent"
+                    status === "Not Going"
                       ? "border-redcard-700 bg-redcard-700 text-white shadow-soft"
                       : "border-slate-200/70 text-slate-600 hover:border-redcard-700 hover:text-redcard-700 dark:border-white/15"
                   )}
-                  aria-label="RSVP Absent"
+                  aria-label="RSVP Not Going"
                 >
                   <X size={16} strokeWidth={3} />
                 </button>

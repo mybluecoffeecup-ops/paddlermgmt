@@ -33,10 +33,10 @@ export function ProfileSummaryCard() {
   }
 
   const upcomingAttending = attendance.filter(
-    (a) => a.paddler_id === currentUserId && a.status === "Attending"
+    (a) => a.paddler_id === currentUserId && a.status === "Going"
   ).length;
   const upcomingUnconfirmed = attendance.filter(
-    (a) => a.paddler_id === currentUserId && a.status === "Unconfirmed"
+    (a) => a.paddler_id === currentUserId && a.status === "Maybe"
   ).length;
 
   function startEdit() {
@@ -141,7 +141,7 @@ export function ProfileSummaryCard() {
             {upcomingAttending}
           </span>
           <span className="text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-            Attending
+            Going
           </span>
         </div>
         <div className="flex flex-col items-center justify-center gap-1 px-2 py-4">

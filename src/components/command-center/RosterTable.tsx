@@ -14,7 +14,7 @@ const SIDE_DOT: Record<string, string> = {
   Ambi: "bg-violet-500",
 };
 
-const STATUS_CYCLE: AttendanceStatus[] = ["Unconfirmed", "Attending", "Absent", "Waitlist"];
+const STATUS_CYCLE: AttendanceStatus[] = ["Maybe", "Going", "Not Going"];
 
 export function RosterTable({
   sessionId,
@@ -45,7 +45,7 @@ export function RosterTable({
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-white/5">
             {profiles.map((p) => {
-              const status = sessionId ? attendanceStatusFor(sessionId, p.id) : "Unconfirmed";
+              const status = sessionId ? attendanceStatusFor(sessionId, p.id) : "Maybe";
               return (
                 <tr key={p.id} className="hover:bg-slate-50/70 dark:hover:bg-white/[0.03]">
                   <td className="px-4 py-2 font-semibold text-slate-800 dark:text-slate-100">

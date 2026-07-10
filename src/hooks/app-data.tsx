@@ -11,6 +11,11 @@ import {
 } from "react";
 
 import { fetchAttendance, upsertAttendance } from "@/lib/api/attendance";
+import {
+  createCalendarEvent as apiCreateCalendarEvent,
+  fetchCalendarEvents,
+  updateCalendarEvent as apiUpdateCalendarEvent,
+} from "@/lib/api/calendar-events";
 import { createComment as apiCreateComment, deleteComment as apiDeleteComment, fetchComments } from "@/lib/api/comments";
 import {
   createLineup as apiCreateLineup,
@@ -40,6 +45,7 @@ import {
   CURRENT_COACH_ID,
   CURRENT_USER_ID,
   MOCK_ATTENDANCE,
+  MOCK_CALENDAR_EVENTS,
   MOCK_COMMENTS,
   MOCK_LINEUPS,
   MOCK_NOTIFICATIONS,
@@ -53,6 +59,7 @@ import type {
   Attendance,
   AttendanceStatus,
   BoatType,
+  CalendarEvent,
   Comment,
   Lineup,
   Notification,
@@ -72,6 +79,7 @@ interface AppDataValue {
   attendance: Attendance[];
   races: Race[];
   raceCommitments: RaceCommitment[];
+  calendarEvents: CalendarEvent[];
   lineups: Lineup[];
   comments: Comment[];
   notifications: Notification[];
@@ -90,6 +98,10 @@ interface AppDataValue {
   createSession: (session: Omit<Session, "id" | "created_at" | "updated_at">) => Session;
   createRace: (race: Omit<Race, "id" | "created_at" | "updated_at">) => Race;
   updateRace: (id: string, patch: Partial<Race>) => void;
+  createCalendarEvent: (
+    event: Omit<CalendarEvent, "id" | "created_at" | "updated_at">
+  ) => CalendarEvent;
+  updateCalendarEvent: (id: string, patch: Partial<CalendarEvent>) => void;
   updateRaceCommitment: (
     raceId: string,
     paddlerId: string,
@@ -125,6 +137,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [attendance, setAttendance] = useState<Attendance[]>(MOCK_ATTENDANCE);
   const [races, setRaces] = useState<Race[]>(MOCK_RACES);
   const [raceCommitments, setRaceCommitments] = useState<RaceCommitment[]>(MOCK_RACE_COMMITMENTS);
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(MOCK_CALENDAR_EVENTS);
   const [lineups, setLineups] = useState<Lineup[]>(MOCK_LINEUPS);
   const [comments, setComments] = useState<Comment[]>(MOCK_COMMENTS);
   const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
@@ -140,12 +153,13 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     (async () => {
       try {
-        const [p, s, a, r, rc, l, cm, n, wp] = await Promise.all([
+        const [p, s, a, r, rc, ce, l, cm, n, wp] = await Promise.all([
           fetchProfiles(),
           fetchSessions(),
           fetchAttendance(),
           fetchRaces(),
           fetchRaceCommitments(),
+          fetchCalendarEvents(),
           fetchLineups(),
           fetchComments(),
           fetchNotifications(),
@@ -157,6 +171,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         if (a) setAttendance(a);
         if (r) setRaces(r);
         if (rc) setRaceCommitments(rc);
+        if (ce) setCalendarEvents(ce);
         if (l) setLineups(l);
         if (cm) setComments(cm);
         if (n) setNotifications(n);
@@ -313,6 +328,36 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const createCalendarEvent = useCallback(
+    (event: Omit<CalendarEvent, "id" | "created_at" | "updated_at">) => {
+      const newEvent: CalendarEvent = {
+        ...event,
+        id: `calendar-event-${Date.now()}-${crypto.randomUUID()}`,
+        created_at: nowIso(),
+        updated_at: nowIso(),
+      };
+      setCalendarEvents((prev) => [...prev, newEvent]);
+      if (isSupabaseConfigured) {
+        apiCreateCalendarEvent(event).catch((err) =>
+          console.error("Failed to sync calendar event to Supabase:", err)
+        );
+      }
+      return newEvent;
+    },
+    []
+  );
+
+  const updateCalendarEvent = useCallback((id: string, patch: Partial<CalendarEvent>) => {
+    setCalendarEvents((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, ...patch, updated_at: nowIso() } : e))
+    );
+    if (isSupabaseConfigured) {
+      apiUpdateCalendarEvent(id, patch).catch((err) =>
+        console.error("Failed to sync calendar event to Supabase:", err)
+      );
+    }
+  }, []);
+
   const updateRaceCommitment = useCallback(
     (
       raceId: string,
@@ -334,7 +379,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
             id: `commitment-${raceId}-${paddlerId}`,
             race_id: raceId,
             paddler_id: paddlerId,
-            status: patch.status ?? "Unconfirmed",
+            status: patch.status ?? "Maybe",
             has_paid: patch.has_paid ?? false,
             notes: patch.notes ?? null,
             created_at: nowIso(),
@@ -414,7 +459,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const attendanceStatusFor = useCallback(
     (sessionId: string, paddlerId: string): AttendanceStatus =>
       attendance.find((a) => a.session_id === sessionId && a.paddler_id === paddlerId)
-        ?.status ?? "Unconfirmed",
+        ?.status ?? "Maybe",
     [attendance]
   );
 
@@ -526,6 +571,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     attendance,
     races,
     raceCommitments,
+    calendarEvents,
     lineups,
     comments,
     notifications,
@@ -542,6 +588,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     createSession,
     createRace,
     updateRace,
+    createCalendarEvent,
+    updateCalendarEvent,
     updateRaceCommitment,
     createLineup,
     saveLineupSeating,

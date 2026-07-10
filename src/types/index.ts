@@ -4,7 +4,7 @@
 export type Discipline = "DB" | "OC" | "Both";
 export type PaddleSide = "Left" | "Right" | "Ambi";
 export type BoatType = "DB12" | "DB22" | "V6";
-export type AttendanceStatus = "Unconfirmed" | "Attending" | "Absent" | "Waitlist";
+export type AttendanceStatus = "Going" | "Maybe" | "Not Going";
 
 export type EligibilityStatus = "Citizen" | "PR" | "Other";
 export const ALL_ELIGIBILITY_STATUSES: EligibilityStatus[] = ["Citizen", "PR", "Other"];
@@ -138,6 +138,45 @@ export interface RaceCommitment {
   status: AttendanceStatus;
   has_paid: boolean;
   notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type CalendarEventCategory =
+  | "Race"
+  | "Training"
+  | "Social"
+  | "Meeting"
+  | "Holiday"
+  | "Deadline"
+  | "Other";
+
+export const CALENDAR_EVENT_CATEGORIES: CalendarEventCategory[] = [
+  "Race",
+  "Training",
+  "Social",
+  "Meeting",
+  "Holiday",
+  "Deadline",
+  "Other",
+];
+
+/**
+ * A broader club-calendar entry, distinct from `Race` — most of these are
+ * informational (public holidays, membership deadlines, socials, training
+ * blocks) rather than races the club is fielding a boat/lineup for. Real
+ * races stay in the `Race` table and are merged into the calendar view
+ * alongside these, not represented here.
+ */
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  start_date: string; // YYYY-MM-DD
+  end_date: string; // YYYY-MM-DD, >= start_date
+  category: CalendarEventCategory;
+  discipline: Discipline | null;
+  notes: string | null;
+  created_by: string | null;
   created_at: string;
   updated_at: string;
 }

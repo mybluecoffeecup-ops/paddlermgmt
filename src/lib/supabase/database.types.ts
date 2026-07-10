@@ -30,7 +30,7 @@ export interface Database {
       discipline_type: "DB" | "OC" | "Both";
       paddle_side: "Left" | "Right" | "Ambi";
       boat_type: "DB12" | "DB22" | "V6";
-      attendance_status: "Unconfirmed" | "Attending" | "Absent" | "Waitlist";
+      attendance_status: "Going" | "Maybe" | "Not Going";
       eligibility_status: "Citizen" | "PR" | "Other";
       age_range: "Under 40" | "40-50" | "50-60" | "60+";
       race_competitiveness_level: "Target Race" | "Participation/Experience Race";
