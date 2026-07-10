@@ -11,9 +11,11 @@ import type { Profile } from "@/types";
 export function SeatSlot({
   seat,
   occupant,
+  onOccupantClick,
 }: {
   seat: SeatDefinition;
   occupant: Profile | null;
+  onOccupantClick?: (paddler: Profile) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: seat.id, data: { seat } });
 
@@ -36,7 +38,12 @@ export function SeatSlot({
       )}
     >
       {occupant ? (
-        <PaddlerChip paddler={occupant} compact mismatch={mismatch} />
+        <PaddlerChip
+          paddler={occupant}
+          compact
+          mismatch={mismatch}
+          onClick={() => onOccupantClick?.(occupant)}
+        />
       ) : (
         <div className="flex flex-col items-center justify-center gap-0.5 py-1.5 text-slate-500 dark:text-white/50">
           {seat.id === "drummer" && <Mic2 size={14} />}

@@ -61,8 +61,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <header className="sticky top-0 z-40 bg-pitch-900/85 shadow-soft backdrop-blur-md">
-        <div className="mx-auto grid max-w-[1400px] grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 py-3">
+      <header className="sticky top-0 z-40 bg-pitch-800/95 shadow-soft backdrop-blur-md">
+        <div className="mx-auto grid max-w-[1400px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 px-4 py-3">
           <div className="justify-self-start">
             <BrandMark variant="header" />
           </div>
@@ -159,7 +159,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 bg-pitch-900/85 shadow-soft-lg backdrop-blur-md md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 bg-pitch-800/95 shadow-soft-lg backdrop-blur-md md:hidden">
         <div className="mx-auto flex max-w-[1400px] items-stretch justify-around px-2 py-1.5">
           {visibleNavItems.map((item) => {
             const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);

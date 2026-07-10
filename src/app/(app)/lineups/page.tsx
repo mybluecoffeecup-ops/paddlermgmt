@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { LayoutGrid, Plus } from "lucide-react";
 
 import { useAppData } from "@/hooks/app-data";
+import { RequireCoach } from "@/components/auth/RequireCoach";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { getBoatLayout } from "@/lib/boat-config";
 import { cn, formatSessionDate } from "@/lib/utils";
@@ -96,138 +97,140 @@ export default function LineupsPage() {
   }
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-4">
-      <div>
-        <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-slate-900 dark:text-white">
-          Lineup Generator
-        </h1>
-        <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">
-          Build a seat-by-seat crew for any session or race.
-        </p>
-      </div>
-
-      <Card>
-        <CardHeader title="New Lineup" icon={<Plus size={16} />} />
-        <div className="flex flex-col gap-3 p-4">
-          <div className="flex gap-2">
-            <TargetToggle active={target === "session"} onClick={() => setTarget("session")}>
-              Session
-            </TargetToggle>
-            <TargetToggle active={target === "race"} onClick={() => setTarget("race")}>
-              Race
-            </TargetToggle>
-          </div>
-
-          {target === "session" ? (
-            <div>
-              <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-                Session
-              </label>
-              <select
-                value={sessionId}
-                onChange={(e) => setSessionId(e.target.value)}
-                className="w-full rounded-2xl border border-slate-200/70 bg-white px-3 py-2.5 text-sm text-ink transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:shadow-soft dark:border-white/10 dark:bg-pitch-900/70 dark:text-white"
-              >
-                {sortedSessions.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.title} — {formatSessionDate(s.session_date, s.start_time)}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ) : (
-            <div>
-              <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-                Race
-              </label>
-              <select
-                value={raceId}
-                onChange={(e) => setRaceId(e.target.value)}
-                className="w-full rounded-2xl border border-slate-200/70 bg-white px-3 py-2.5 text-sm text-ink transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:shadow-soft dark:border-white/10 dark:bg-pitch-900/70 dark:text-white"
-              >
-                {sortedRaces.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.name} — {r.race_date}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          <div>
-            <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-              Boat
-            </label>
-            <select
-              value={boat}
-              onChange={(e) => setBoat(e.target.value as BoatType)}
-              className="w-full rounded-2xl border border-slate-200/70 bg-white px-3 py-2.5 text-sm text-ink transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:shadow-soft dark:border-white/10 dark:bg-pitch-900/70 dark:text-white"
-            >
-              {BOAT_OPTIONS.map((b) => (
-                <option key={b.value} value={b.value}>
-                  {b.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-              Title
-            </label>
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Race Sim A Crew"
-              className="w-full rounded-2xl border border-slate-200/70 bg-white px-3 py-2.5 text-sm text-ink transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:shadow-soft dark:border-white/10 dark:bg-pitch-900/70 dark:text-white"
-            />
-          </div>
-
-          <button
-            onClick={handleCreate}
-            disabled={!selectedId}
-            className="mt-1 flex min-h-11 items-center justify-center gap-1.5 rounded-2xl bg-green-700 py-2 text-sm font-bold uppercase tracking-wide text-white shadow-cta transition-all hover:bg-green-800 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 disabled:opacity-40 dark:focus-visible:ring-offset-pitch-900"
-          >
-            <Plus size={15} /> Create Lineup
-          </button>
+    <RequireCoach>
+      <div className="mx-auto flex max-w-3xl flex-col gap-4">
+        <div>
+          <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-slate-900 dark:text-white">
+            Lineup Generator
+          </h1>
+          <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">
+            Build a seat-by-seat crew for any session or race.
+          </p>
         </div>
-      </Card>
 
-      <Card>
-        <CardHeader
-          title="Existing Lineups"
-          subtitle={selectedId ? `${targetLineups.length} for selected ${target}` : undefined}
-          icon={<LayoutGrid size={16} />}
-        />
-        <ul className="divide-y divide-slate-100 dark:divide-white/10">
-          {targetLineups.map((l) => (
-            <li key={l.id}>
-              <button
-                onClick={() => router.push(`/lineups/${l.id}`)}
-                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-white/5"
+        <Card>
+          <CardHeader title="New Lineup" icon={<Plus size={16} />} />
+          <div className="flex flex-col gap-3 p-4">
+            <div className="flex gap-2">
+              <TargetToggle active={target === "session"} onClick={() => setTarget("session")}>
+                Session
+              </TargetToggle>
+              <TargetToggle active={target === "race"} onClick={() => setTarget("race")}>
+                Race
+              </TargetToggle>
+            </div>
+
+            {target === "session" ? (
+              <div>
+                <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+                  Session
+                </label>
+                <select
+                  value={sessionId}
+                  onChange={(e) => setSessionId(e.target.value)}
+                  className="w-full rounded-2xl border border-slate-200/70 bg-white px-3 py-2.5 text-sm text-ink transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:shadow-soft dark:border-white/10 dark:bg-pitch-900/70 dark:text-white"
+                >
+                  {sortedSessions.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.title} — {formatSessionDate(s.session_date, s.start_time)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div>
+                <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+                  Race
+                </label>
+                <select
+                  value={raceId}
+                  onChange={(e) => setRaceId(e.target.value)}
+                  className="w-full rounded-2xl border border-slate-200/70 bg-white px-3 py-2.5 text-sm text-ink transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:shadow-soft dark:border-white/10 dark:bg-pitch-900/70 dark:text-white"
+                >
+                  {sortedRaces.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name} — {r.race_date}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div>
+              <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+                Boat
+              </label>
+              <select
+                value={boat}
+                onChange={(e) => setBoat(e.target.value as BoatType)}
+                className="w-full rounded-2xl border border-slate-200/70 bg-white px-3 py-2.5 text-sm text-ink transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:shadow-soft dark:border-white/10 dark:bg-pitch-900/70 dark:text-white"
               >
-                <div>
-                  <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{l.title}</p>
-                  <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-                    {getBoatLayout(l.boat).name}
-                  </p>
-                </div>
-                <span className="text-xs font-bold text-green-700 dark:text-green-400">
-                  Open →
+                {BOAT_OPTIONS.map((b) => (
+                  <option key={b.value} value={b.value}>
+                    {b.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+                Title
+              </label>
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. Race Sim A Crew"
+                className="w-full rounded-2xl border border-slate-200/70 bg-white px-3 py-2.5 text-sm text-ink transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:shadow-soft dark:border-white/10 dark:bg-pitch-900/70 dark:text-white"
+              />
+            </div>
+
+            <button
+              onClick={handleCreate}
+              disabled={!selectedId}
+              className="mt-1 flex min-h-11 items-center justify-center gap-1.5 rounded-2xl bg-green-700 py-2 text-sm font-bold uppercase tracking-wide text-white shadow-cta transition-all hover:bg-green-800 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 disabled:opacity-40 dark:focus-visible:ring-offset-pitch-900"
+            >
+              <Plus size={15} /> Create Lineup
+            </button>
+          </div>
+        </Card>
+
+        <Card>
+          <CardHeader
+            title="Existing Lineups"
+            subtitle={selectedId ? `${targetLineups.length} for selected ${target}` : undefined}
+            icon={<LayoutGrid size={16} />}
+          />
+          <ul className="divide-y divide-slate-100 dark:divide-white/10">
+            {targetLineups.map((l) => (
+              <li key={l.id}>
+                <button
+                  onClick={() => router.push(`/lineups/${l.id}`)}
+                  className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-white/5"
+                >
+                  <div>
+                    <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{l.title}</p>
+                    <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                      {getBoatLayout(l.boat).name}
+                    </p>
+                  </div>
+                  <span className="text-xs font-bold text-green-700 dark:text-green-400">
+                    Open →
+                  </span>
+                </button>
+              </li>
+            ))}
+            {targetLineups.length === 0 && (
+              <li className="flex flex-col items-center gap-2 px-4 py-8 text-center">
+                <LayoutGrid size={28} className="text-slate-300 dark:text-white/20" />
+                <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">
+                  No lineups yet for this {target}.
                 </span>
-              </button>
-            </li>
-          ))}
-          {targetLineups.length === 0 && (
-            <li className="flex flex-col items-center gap-2 px-4 py-8 text-center">
-              <LayoutGrid size={28} className="text-slate-300 dark:text-white/20" />
-              <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">
-                No lineups yet for this {target}.
-              </span>
-            </li>
-          )}
-        </ul>
-      </Card>
-    </div>
+              </li>
+            )}
+          </ul>
+        </Card>
+      </div>
+    </RequireCoach>
   );
 }

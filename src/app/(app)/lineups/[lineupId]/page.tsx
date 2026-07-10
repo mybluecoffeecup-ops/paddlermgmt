@@ -1,4 +1,4 @@
-import { LineupEditor } from "@/components/lineup/LineupEditor";
+import { LineupDetail } from "@/components/lineup/LineupDetail";
 
 export default async function LineupEditorPage({
   params,
@@ -6,5 +6,5 @@ export default async function LineupEditorPage({
   params: Promise<{ lineupId: string }>;
 }) {
   const { lineupId } = await params;
-  return <LineupEditor key={lineupId} lineupId={lineupId} />;
+  return <LineupDetail key={lineupId} lineupId={lineupId} />;
 }

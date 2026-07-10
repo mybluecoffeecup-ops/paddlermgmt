@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarPlus, Plus, X } from "lucide-react";
+import { CalendarPlus, Pencil, Plus, Trash2, X } from "lucide-react";
 
 import { useAppData } from "@/hooks/app-data";
 import { Card, CardHeader } from "@/components/ui/Card";
@@ -17,30 +17,41 @@ const labelClassName =
 
 const DISCIPLINE_OPTIONS: (Discipline | "")[] = ["", "DB", "OC", "Both"];
 
-function NewEventForm({ onCreated }: { onCreated: (event: CalendarEvent) => void }) {
-  const { createCalendarEvent, currentUserId } = useAppData();
+function EventForm({
+  initial,
+  onDone,
+}: {
+  initial?: CalendarEvent;
+  onDone: (event: CalendarEvent) => void;
+}) {
+  const { createCalendarEvent, updateCalendarEvent, currentUserId } = useAppData();
 
-  const [title, setTitle] = useState("");
-  const [startDate, setStartDate] = useState(() => todayIso());
-  const [endDate, setEndDate] = useState(() => todayIso());
-  const [category, setCategory] = useState<CalendarEventCategory>("Other");
-  const [discipline, setDiscipline] = useState<Discipline | "">("");
-  const [notes, setNotes] = useState("");
+  const [title, setTitle] = useState(initial?.title ?? "");
+  const [startDate, setStartDate] = useState(initial?.start_date ?? todayIso());
+  const [endDate, setEndDate] = useState(initial?.end_date ?? todayIso());
+  const [category, setCategory] = useState<CalendarEventCategory>(initial?.category ?? "Other");
+  const [discipline, setDiscipline] = useState<Discipline | "">(initial?.discipline ?? "");
+  const [notes, setNotes] = useState(initial?.notes ?? "");
 
   const canSubmit = title.trim() !== "" && startDate !== "" && endDate !== "" && endDate >= startDate;
 
-  function handleCreate() {
+  function handleSubmit() {
     if (!canSubmit) return;
-    const created = createCalendarEvent({
+    const patch = {
       title: title.trim(),
       start_date: startDate,
       end_date: endDate,
       category,
       discipline: discipline === "" ? null : discipline,
       notes: notes.trim() === "" ? null : notes.trim(),
-      created_by: currentUserId,
-    });
-    onCreated(created);
+    };
+    if (initial) {
+      updateCalendarEvent(initial.id, patch);
+      onDone({ ...initial, ...patch });
+    } else {
+      const created = createCalendarEvent({ ...patch, created_by: currentUserId });
+      onDone(created);
+    }
   }
 
   return (
@@ -118,19 +129,28 @@ function NewEventForm({ onCreated }: { onCreated: (event: CalendarEvent) => void
       </div>
 
       <button
-        onClick={handleCreate}
+        onClick={handleSubmit}
         disabled={!canSubmit}
         className="mt-1 flex min-h-11 items-center justify-center gap-1.5 rounded-2xl bg-green-700 py-2 text-sm font-bold uppercase tracking-wide text-white shadow-cta transition-all hover:bg-green-800 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 disabled:opacity-40 dark:focus-visible:ring-offset-pitch-900"
       >
-        <Plus size={15} /> Add to Calendar
+        <Plus size={15} /> {initial ? "Save Changes" : "Add to Calendar"}
       </button>
     </div>
   );
 }
 
 export function CalendarEventManager() {
-  const { calendarEvents } = useAppData();
+  const { calendarEvents, deleteCalendarEvent } = useAppData();
   const [isCreating, setIsCreating] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+  const isEditingOrCreating = isCreating || editingEvent !== null;
+
+  function closeForm() {
+    setIsCreating(false);
+    setEditingEvent(null);
+  }
 
   const upcoming = [...calendarEvents]
     .sort((a, b) => a.start_date.localeCompare(b.start_date))
@@ -145,33 +165,76 @@ export function CalendarEventManager() {
         action={
           <button
             type="button"
-            onClick={() => setIsCreating((v) => !v)}
+            onClick={() => {
+              if (isEditingOrCreating) {
+                closeForm();
+              } else {
+                setIsCreating(true);
+              }
+            }}
             className={cn(
               "flex items-center gap-1 rounded-full border border-slate-200/70 px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700 shadow-soft transition-colors hover:border-green-700 hover:text-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 dark:border-white/10 dark:text-slate-300"
             )}
           >
-            {isCreating ? <X size={13} /> : <Plus size={13} />}
-            {isCreating ? "Cancel" : "New Event"}
+            {isEditingOrCreating ? <X size={13} /> : <Plus size={13} />}
+            {isEditingOrCreating ? "Cancel" : "New Event"}
           </button>
         }
       />
-      {isCreating ? (
-        <NewEventForm onCreated={() => setIsCreating(false)} />
+      {isEditingOrCreating ? (
+        <EventForm initial={editingEvent ?? undefined} onDone={closeForm} />
       ) : (
         <ul className="divide-y divide-slate-100 dark:divide-white/10">
-          {upcoming.map((event) => (
-            <li key={event.id} className="flex items-center justify-between gap-2 px-4 py-2.5">
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
-                  {event.title}
-                </p>
-                <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
-                  {formatDateRange(event.start_date, event.end_date)}
-                </p>
-              </div>
-              <CalendarCategoryBadge category={event.category} />
-            </li>
-          ))}
+          {upcoming.map((event) => {
+            const confirmingDelete = confirmDeleteId === event.id;
+            return (
+              <li key={event.id} className="flex items-center gap-2 px-4 py-2.5">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
+                    {event.title}
+                  </p>
+                  <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                    {formatDateRange(event.start_date, event.end_date)}
+                  </p>
+                </div>
+                <CalendarCategoryBadge category={event.category} />
+                <div className="flex shrink-0 items-center gap-1">
+                  <button
+                    type="button"
+                    aria-label={`Edit ${event.title}`}
+                    onClick={() => {
+                      setConfirmDeleteId(null);
+                      setEditingEvent(event);
+                    }}
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 dark:text-slate-300 dark:hover:bg-white/10"
+                  >
+                    <Pencil size={14} />
+                  </button>
+                  {confirmingDelete ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        deleteCalendarEvent(event.id);
+                        setConfirmDeleteId(null);
+                      }}
+                      className="flex h-8 items-center gap-1 rounded-full bg-redcard-500 px-2.5 text-[11px] font-bold uppercase tracking-wide text-white transition-colors hover:bg-redcard-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+                    >
+                      Confirm?
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      aria-label={`Remove ${event.title}`}
+                      onClick={() => setConfirmDeleteId(event.id)}
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-redcard-500/15 hover:text-redcard-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 dark:text-slate-300"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </Card>

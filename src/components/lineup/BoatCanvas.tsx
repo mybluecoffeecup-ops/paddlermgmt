@@ -11,10 +11,12 @@ export function BoatCanvas({
   layout,
   seating,
   profileById,
+  onSeatClick,
 }: {
   layout: BoatLayout;
   seating: SeatingConfiguration;
   profileById: Map<string, Profile>;
+  onSeatClick?: (seatId: string) => void;
 }) {
   const occupantFor = (seatId: string): Profile | null => {
     const paddlerId = seating[seatId];
@@ -39,6 +41,7 @@ export function BoatCanvas({
                 <SeatSlot
                   seat={layout.seats.find((s) => s.id === "drummer")!}
                   occupant={occupantFor("drummer")}
+                  onOccupantClick={() => onSeatClick?.("drummer")}
                 />
               </div>
             </div>
@@ -47,8 +50,16 @@ export function BoatCanvas({
                 <span className="text-center font-display text-sm font-bold tabular-nums text-slate-600 dark:text-slate-300">
                   {row}
                 </span>
-                <SeatSlot seat={layout.seats.find((s) => s.id === `${row}L`)!} occupant={occupantFor(`${row}L`)} />
-                <SeatSlot seat={layout.seats.find((s) => s.id === `${row}R`)!} occupant={occupantFor(`${row}R`)} />
+                <SeatSlot
+                  seat={layout.seats.find((s) => s.id === `${row}L`)!}
+                  occupant={occupantFor(`${row}L`)}
+                  onOccupantClick={() => onSeatClick?.(`${row}L`)}
+                />
+                <SeatSlot
+                  seat={layout.seats.find((s) => s.id === `${row}R`)!}
+                  occupant={occupantFor(`${row}R`)}
+                  onOccupantClick={() => onSeatClick?.(`${row}R`)}
+                />
               </div>
             ))}
             <div className="grid grid-cols-[1.5rem_1fr_1fr] items-center gap-1.5">
@@ -57,6 +68,7 @@ export function BoatCanvas({
                 <SeatSlot
                   seat={layout.seats.find((s) => s.id === "steer")!}
                   occupant={occupantFor("steer")}
+                  onOccupantClick={() => onSeatClick?.("steer")}
                 />
               </div>
             </div>
@@ -64,7 +76,12 @@ export function BoatCanvas({
         ) : (
           <div className="mx-auto flex max-w-xs flex-col gap-1.5">
             {layout.seats.map((seat) => (
-              <SeatSlot key={seat.id} seat={seat} occupant={occupantFor(seat.id)} />
+              <SeatSlot
+                key={seat.id}
+                seat={seat}
+                occupant={occupantFor(seat.id)}
+                onOccupantClick={() => onSeatClick?.(seat.id)}
+              />
             ))}
           </div>
         )}

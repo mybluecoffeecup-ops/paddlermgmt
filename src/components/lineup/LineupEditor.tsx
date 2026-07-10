@@ -150,6 +150,11 @@ export function LineupEditor({ lineupId }: { lineupId: string }) {
     setDraftSeating({ ...seating, [seatId]: paddler.id });
   }
 
+  function handleSeatClick(seatId: string) {
+    if (!seating[seatId]) return;
+    setDraftSeating({ ...seating, [seatId]: null });
+  }
+
   function handleAutoFill() {
     if (benchPaddlers.length === 0) return;
     setDraftSeating(autoFillLineup(benchPaddlers, layout, seating, profileById));
@@ -278,7 +283,12 @@ export function LineupEditor({ lineupId }: { lineupId: string }) {
             <BenchList paddlers={benchPaddlers} onPaddlerClick={handleBenchClick} />
           </div>
           <div className="md:h-[65vh]">
-            <BoatCanvas layout={layout} seating={seating} profileById={profileById} />
+            <BoatCanvas
+              layout={layout}
+              seating={seating}
+              profileById={profileById}
+              onSeatClick={handleSeatClick}
+            />
           </div>
         </div>
       </div>

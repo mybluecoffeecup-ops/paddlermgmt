@@ -13,6 +13,7 @@ import {
 import { fetchAttendance, upsertAttendance } from "@/lib/api/attendance";
 import {
   createCalendarEvent as apiCreateCalendarEvent,
+  deleteCalendarEvent as apiDeleteCalendarEvent,
   fetchCalendarEvents,
   updateCalendarEvent as apiUpdateCalendarEvent,
 } from "@/lib/api/calendar-events";
@@ -145,6 +146,7 @@ interface AppDataValue {
     event: Omit<CalendarEvent, "id" | "created_at" | "updated_at">
   ) => CalendarEvent;
   updateCalendarEvent: (id: string, patch: Partial<CalendarEvent>) => void;
+  deleteCalendarEvent: (id: string) => void;
   updateRaceCommitment: (
     raceId: string,
     paddlerId: string,
@@ -436,6 +438,15 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     if (isSupabaseConfigured) {
       apiUpdateCalendarEvent(id, patch).catch((err) =>
         console.error("Failed to sync calendar event to Supabase:", err)
+      );
+    }
+  }, []);
+
+  const deleteCalendarEvent = useCallback((id: string) => {
+    setCalendarEvents((prev) => prev.filter((e) => e.id !== id));
+    if (isSupabaseConfigured) {
+      apiDeleteCalendarEvent(id).catch((err) =>
+        console.error("Failed to sync calendar event deletion to Supabase:", err)
       );
     }
   }, []);
@@ -1010,6 +1021,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     updateRace,
     createCalendarEvent,
     updateCalendarEvent,
+    deleteCalendarEvent,
     updateRaceCommitment,
     createLineup,
     saveLineupSeating,

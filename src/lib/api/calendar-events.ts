@@ -41,3 +41,11 @@ export async function updateCalendarEvent(
   if (error) throw error;
   return data as CalendarEvent;
 }
+
+export async function deleteCalendarEvent(id: string): Promise<null> {
+  const supabase = getSupabaseClient();
+  if (!supabase) return null;
+  const { error } = await supabase.from("calendar_events").delete().eq("id", id);
+  if (error) throw error;
+  return null;
+}
