@@ -6,14 +6,14 @@ import { FacebookIcon, InstagramIcon, TiktokIcon } from "@/components/ui/SocialI
 const SOCIAL_LINKS = [
   {
     name: "Instagram",
-    handle: "@austchampaddleclub",
-    href: "https://instagram.com/austchampaddleclub",
+    handle: "@austchampaddleclubsg",
+    href: "https://www.instagram.com/austchampaddleclubsg/",
     icon: InstagramIcon,
   },
   {
     name: "Facebook",
-    handle: "Group",
-    href: "https://facebook.com/groups/austchampaddleclub",
+    handle: "@austchampaddleclubsg",
+    href: "https://www.facebook.com/austchampaddleclubsg/",
     icon: FacebookIcon,
   },
   {
