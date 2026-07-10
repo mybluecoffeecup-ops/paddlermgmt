@@ -5,6 +5,9 @@
 create type session_type as enum ('Training', 'Race Simulation', 'Race');
 
 alter table sessions
+  alter column type drop default;
+
+alter table sessions
   alter column type type session_type
   using (
     case type
