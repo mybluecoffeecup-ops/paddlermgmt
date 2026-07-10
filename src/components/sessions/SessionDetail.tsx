@@ -9,6 +9,7 @@ import { Card, CardHeader } from "@/components/ui/Card";
 import { DisciplineBadge } from "@/components/ui/Badge";
 import { CommentsSection } from "@/components/shared/CommentsSection";
 import { LineupsSection } from "@/components/shared/LineupsSection";
+import { SignupsSection } from "@/components/shared/SignupsSection";
 import { formatSessionDate } from "@/lib/utils";
 import { SESSION_TYPE_OPTIONS, type Discipline, type Session, type SessionType } from "@/types";
 
@@ -196,39 +197,40 @@ export function SessionDetail({ sessionId }: { sessionId: string }) {
         )}
       </div>
 
-      <Card>
-        <CardHeader title="Details" icon={<Calendar size={16} />} />
-        {isEditing ? (
-          <EditForm session={session} onDone={() => setIsEditing(false)} />
-        ) : (
-          <div className="flex flex-col gap-3 p-4">
-            <div className="flex items-center gap-2">
-              <DisciplineBadge discipline={session.discipline} />
-              <span className="rounded-full border border-slate-200/70 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:border-white/10 dark:text-slate-300">
-                {session.type}
-              </span>
-            </div>
-            <p className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-              <Clock size={14} className="text-slate-400" />
-              {formatSessionDate(session.session_date, session.start_time)}
-            </p>
-            {session.location && (
+      <div className="flex flex-row items-stretch gap-3 sm:gap-4">
+        <Card className="min-w-0 flex-1">
+          <CardHeader title="Details" icon={<Calendar size={16} />} />
+          {isEditing ? (
+            <EditForm session={session} onDone={() => setIsEditing(false)} />
+          ) : (
+            <div className="flex flex-col gap-3 p-4">
+              <div className="flex items-center gap-2">
+                <DisciplineBadge discipline={session.discipline} />
+                <span className="rounded-full border border-slate-200/70 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:border-white/10 dark:text-slate-300">
+                  {session.type}
+                </span>
+              </div>
               <p className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                <MapPin size={14} className="text-slate-400" />
-                {session.location}
+                <Clock size={14} className="text-slate-400" />
+                {formatSessionDate(session.session_date, session.start_time)}
               </p>
-            )}
-            {session.capacity_limit != null && (
-              <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-                Capacity: {session.capacity_limit}
-              </p>
-            )}
-            {session.description && (
-              <p className="text-sm text-slate-600 dark:text-slate-300">{session.description}</p>
-            )}
-          </div>
-        )}
-      </Card>
+              {session.location && (
+                <p className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  <MapPin size={14} className="text-slate-400" />
+                  {session.location}
+                </p>
+              )}
+              {session.capacity_limit != null && (
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  Capacity: {session.capacity_limit}
+                </p>
+              )}
+            </div>
+          )}
+        </Card>
+
+        <SignupsSection sessionId={session.id} />
+      </div>
 
       <LineupsSection sessionId={session.id} defaultTitle={session.title} />
       <CommentsSection sessionId={session.id} />

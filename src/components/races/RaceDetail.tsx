@@ -9,6 +9,7 @@ import { Card, CardHeader } from "@/components/ui/Card";
 import { DisciplineBadge } from "@/components/ui/Badge";
 import { CommentsSection } from "@/components/shared/CommentsSection";
 import { LineupsSection } from "@/components/shared/LineupsSection";
+import { SignupsSection } from "@/components/shared/SignupsSection";
 import { cn } from "@/lib/utils";
 import {
   ALL_COMPETITIVENESS_LEVELS,
@@ -286,48 +287,49 @@ export function RaceDetail({ raceId }: { raceId: string }) {
         )}
       </div>
 
-      <Card>
-        <CardHeader title="Details" icon={<Trophy size={16} />} />
-        {isEditing ? (
-          <EditForm race={race} onDone={() => setIsEditing(false)} />
-        ) : (
-          <div className="flex flex-col gap-3 p-4">
-            <div className="flex items-center gap-2">
-              <DisciplineBadge discipline={race.discipline} />
-              <span className="rounded-full border border-slate-200/70 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:border-white/10 dark:text-slate-300">
-                {race.competitiveness_level}
-              </span>
-            </div>
-            <p className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-              <Calendar size={14} className="text-slate-400" />
-              {formatRaceDate(race.race_date)}
-              {race.registration_deadline &&
-                ` · Registration by ${formatRaceDate(race.registration_deadline)}`}
-            </p>
-            {race.location && (
-              <p className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                <MapPin size={14} className="text-slate-400" />
-                {race.location}
-              </p>
-            )}
-            {race.race_categories.length > 0 && (
-              <div className="flex flex-wrap gap-1">
-                {race.race_categories.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full border border-slate-200/70 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:border-white/10 dark:text-slate-300"
-                  >
-                    {tag}
-                  </span>
-                ))}
+      <div className="flex flex-row items-stretch gap-3 sm:gap-4">
+        <Card className="min-w-0 flex-1">
+          <CardHeader title="Details" icon={<Trophy size={16} />} />
+          {isEditing ? (
+            <EditForm race={race} onDone={() => setIsEditing(false)} />
+          ) : (
+            <div className="flex flex-col gap-3 p-4">
+              <div className="flex items-center gap-2">
+                <DisciplineBadge discipline={race.discipline} />
+                <span className="rounded-full border border-slate-200/70 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:border-white/10 dark:text-slate-300">
+                  {race.competitiveness_level}
+                </span>
               </div>
-            )}
-            {race.description && (
-              <p className="text-sm text-slate-600 dark:text-slate-300">{race.description}</p>
-            )}
-          </div>
-        )}
-      </Card>
+              <p className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                <Calendar size={14} className="text-slate-400" />
+                {formatRaceDate(race.race_date)}
+                {race.registration_deadline &&
+                  ` · Registration by ${formatRaceDate(race.registration_deadline)}`}
+              </p>
+              {race.location && (
+                <p className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  <MapPin size={14} className="text-slate-400" />
+                  {race.location}
+                </p>
+              )}
+              {race.race_categories.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {race.race_categories.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full border border-slate-200/70 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:border-white/10 dark:text-slate-300"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </Card>
+
+        <SignupsSection raceId={race.id} />
+      </div>
 
       <LineupsSection raceId={race.id} defaultTitle={race.name} />
       <CommentsSection raceId={race.id} />
