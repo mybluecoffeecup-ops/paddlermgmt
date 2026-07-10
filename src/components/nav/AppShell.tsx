@@ -20,6 +20,13 @@ const NAV_ITEMS = [
     coachOnly: true,
   },
   {
+    href: "/lineups",
+    label: "Lineups",
+    mobileLabel: "Lineups",
+    icon: LayoutGrid,
+    coachOnly: true,
+  },
+  {
     href: "/calendar",
     label: "Calendar",
     mobileLabel: "Calendar",
@@ -27,20 +34,13 @@ const NAV_ITEMS = [
     coachOnly: false,
   },
   {
-    href: "/lineups",
-    label: "Lineups",
-    mobileLabel: "Lineups",
-    icon: LayoutGrid,
-    coachOnly: true,
-  },
-  { href: "/info", label: "Info", mobileLabel: "Info", icon: Info, coachOnly: false },
-  {
     href: "/orders",
-    label: "Orders",
-    mobileLabel: "Orders",
+    label: "Shop",
+    mobileLabel: "Shop",
     icon: ShoppingBag,
     coachOnly: false,
   },
+  { href: "/info", label: "Info", mobileLabel: "Info", icon: Info, coachOnly: false },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {

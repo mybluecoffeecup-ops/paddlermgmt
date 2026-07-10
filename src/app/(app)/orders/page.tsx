@@ -46,10 +46,10 @@ export default function OrdersPage() {
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-slate-900 dark:text-white">
-            Orders
+            Shop
           </h1>
           <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">
-            Team gear and apparel orders.
+            Team gear and apparel shop.
           </p>
         </div>
         {tab === "shop" && (
