@@ -36,7 +36,7 @@ export function ShopBrowseGrid({ onSelectStyle }: { onSelectStyle: (style: ShopS
                   <img
                     src={style.image_url}
                     alt={style.name}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover object-left"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-slate-400">

@@ -1213,71 +1213,137 @@ export const MOCK_TEAM_DOCUMENTS: TeamDocument[] = [
 
 export const MOCK_SHOP_SIZE_CHARTS: ShopSizeChart[] = [
   {
-    id: "shop-size-chart-1",
-    name: "Unisex Apparel",
-    image_url: "https://placehold.co/600x800?text=Size+Chart",
+    id: "shop-size-chart-drinking-shirt",
+    name: "Drinking Shirt",
+    image_url: "/shop/size-charts/drinking-shirt.jpg",
+    created_at: now,
+  },
+  {
+    id: "shop-size-chart-rashie",
+    name: "Rashie / Hooded Rashie",
+    image_url: "/shop/size-charts/rashie.jpg",
+    created_at: now,
+  },
+  {
+    id: "shop-size-chart-rashie-slimfit",
+    name: "Rashie Slimfit / Hooded Rashie Slimfit",
+    image_url: "/shop/size-charts/rashie-slimfit.jpg",
+    created_at: now,
+  },
+  {
+    id: "shop-size-chart-singlet",
+    name: "Singlet",
+    image_url: "/shop/size-charts/singlet.jpg",
+    created_at: now,
+  },
+  {
+    id: "shop-size-chart-tshirt",
+    name: "T-Shirt",
+    image_url: "/shop/size-charts/tshirt.jpg",
     created_at: now,
   },
 ];
 
 export const MOCK_SHOP_STYLES: ShopStyle[] = [
   {
-    id: "shop-style-1",
-    name: "Club Hoodie",
-    description: "Heavyweight fleece hoodie with the crew crest, green/gold.",
-    image_url: "https://placehold.co/400x400?text=Club+Hoodie",
+    id: "shop-style-drinking-shirt",
+    name: "Drinking Shirt",
+    description: "Collared social shirt for post-race drinks and club events, crew crest embroidered.",
+    image_url: "/shop/drinking-shirt.jpg",
     active: true,
-    size_chart_id: "shop-size-chart-1",
+    size_chart_id: "shop-size-chart-drinking-shirt",
     created_at: now,
     updated_at: now,
   },
   {
-    id: "shop-style-2",
-    name: "Race Jersey",
-    description: "Moisture-wicking race-day jersey, numbered on request.",
-    image_url: "https://placehold.co/400x400?text=Race+Jersey",
+    id: "shop-style-hooded-rashie",
+    name: "Hooded Rashie",
+    description: "Long-sleeve UV rash guard with hood, built for full-sun water sessions.",
+    image_url: "/shop/hooded-rashie.jpg",
     active: true,
-    size_chart_id: "shop-size-chart-1",
+    size_chart_id: "shop-size-chart-rashie",
     created_at: now,
     updated_at: now,
   },
   {
-    id: "shop-style-3",
-    name: "Training Tee",
-    description: "Lightweight tee for land training and gym sessions.",
-    image_url: "https://placehold.co/400x400?text=Training+Tee",
+    id: "shop-style-hooded-rashie-slimfit",
+    name: "Hooded Rashie Slimfit",
+    description: "Slim-cut version of the hooded rash guard for a closer, race-day fit.",
+    image_url: "/shop/hooded-rashie-slimfit.jpg",
     active: true,
-    size_chart_id: null,
+    size_chart_id: "shop-size-chart-rashie-slimfit",
     created_at: now,
     updated_at: now,
   },
   {
-    id: "shop-style-4",
-    name: "Old Design Cap",
-    description: "Previous season's cap design — no longer sold.",
-    image_url: "https://placehold.co/400x400?text=Old+Cap",
-    active: false,
-    size_chart_id: null,
+    id: "shop-style-rashie",
+    name: "Rashie",
+    description: "Long-sleeve UV rash guard, standard fit for training and racing on the water.",
+    image_url: "/shop/rashie.jpg",
+    active: true,
+    size_chart_id: "shop-size-chart-rashie",
+    created_at: now,
+    updated_at: now,
+  },
+  {
+    id: "shop-style-rashie-slimfit",
+    name: "Rashie Slimfit",
+    description: "Slim-cut long-sleeve rash guard for a closer, race-day fit.",
+    image_url: "/shop/rashie-slimfit.jpg",
+    active: true,
+    size_chart_id: "shop-size-chart-rashie-slimfit",
+    created_at: now,
+    updated_at: now,
+  },
+  {
+    id: "shop-style-singlet",
+    name: "Singlet",
+    description: "Sports singlet for gym and land training, breathable four-way stretch.",
+    image_url: null,
+    active: true,
+    size_chart_id: "shop-size-chart-singlet",
+    created_at: now,
+    updated_at: now,
+  },
+  {
+    id: "shop-style-tshirt",
+    name: "T-Shirt",
+    description: "Everyday club tee for training, socials, and travel days.",
+    image_url: null,
+    active: true,
+    size_chart_id: "shop-size-chart-tshirt",
     created_at: now,
     updated_at: now,
   },
 ];
 
-export const MOCK_SHOP_STYLE_SIZES: ShopStyleSize[] = [
-  { id: "shop-size-1", style_id: "shop-style-1", size: "S", stock_count: 5, created_at: now, updated_at: now },
-  { id: "shop-size-2", style_id: "shop-style-1", size: "M", stock_count: 8, created_at: now, updated_at: now },
-  { id: "shop-size-3", style_id: "shop-style-1", size: "L", stock_count: 6, created_at: now, updated_at: now },
-  { id: "shop-size-4", style_id: "shop-style-1", size: "XL", stock_count: 0, created_at: now, updated_at: now },
-  { id: "shop-size-5", style_id: "shop-style-2", size: "S", stock_count: 3, created_at: now, updated_at: now },
-  { id: "shop-size-6", style_id: "shop-style-2", size: "M", stock_count: 4, created_at: now, updated_at: now },
-  { id: "shop-size-7", style_id: "shop-style-2", size: "L", stock_count: 2, created_at: now, updated_at: now },
-  { id: "shop-size-8", style_id: "shop-style-3", size: "S", stock_count: 10, created_at: now, updated_at: now },
-  { id: "shop-size-9", style_id: "shop-style-3", size: "M", stock_count: 10, created_at: now, updated_at: now },
-  { id: "shop-size-10", style_id: "shop-style-3", size: "L", stock_count: 10, created_at: now, updated_at: now },
-  { id: "shop-size-11", style_id: "shop-style-3", size: "XL", stock_count: 5, created_at: now, updated_at: now },
-  { id: "shop-size-12", style_id: "shop-style-3", size: "XXL", stock_count: 0, created_at: now, updated_at: now },
-  { id: "shop-size-13", style_id: "shop-style-4", size: "One Size", stock_count: 0, created_at: now, updated_at: now },
+const HAZONAS_SIZES_9 = ["3XS", "2XS", "XS", "S", "M", "L", "XL", "2XL", "3XL"];
+const HAZONAS_SIZES_10 = [...HAZONAS_SIZES_9, "4XL"];
+const HAZONAS_SIZES_12 = [...HAZONAS_SIZES_10, "5XL", "6XL"];
+
+// Real Hazonas size runs per garment (see public/shop/size-charts/) — trial
+// stock is flat at 5 per size across the board, not yet tied to real supplier counts.
+const SHOP_STYLE_SIZE_RUNS: { styleId: string; sizes: string[] }[] = [
+  { styleId: "shop-style-drinking-shirt", sizes: HAZONAS_SIZES_9 }, // Collared Jersey chart
+  { styleId: "shop-style-hooded-rashie", sizes: HAZONAS_SIZES_9 }, // Rashguard (Pro) chart
+  { styleId: "shop-style-hooded-rashie-slimfit", sizes: HAZONAS_SIZES_10 }, // Rashguard (Core) chart
+  { styleId: "shop-style-rashie", sizes: HAZONAS_SIZES_9 }, // Rashguard (Pro) chart
+  { styleId: "shop-style-rashie-slimfit", sizes: HAZONAS_SIZES_10 }, // Rashguard (Core) chart
+  { styleId: "shop-style-singlet", sizes: HAZONAS_SIZES_9 }, // Sports Singlet (Core) chart
+  { styleId: "shop-style-tshirt", sizes: HAZONAS_SIZES_12 }, // Sports Jersey chart
 ];
+
+export const MOCK_SHOP_STYLE_SIZES: ShopStyleSize[] = SHOP_STYLE_SIZE_RUNS.flatMap(
+  ({ styleId, sizes }) =>
+    sizes.map((size) => ({
+      id: `shop-size-${styleId}-${size}`,
+      style_id: styleId,
+      size,
+      stock_count: 5,
+      created_at: now,
+      updated_at: now,
+    }))
+);
 
 const SHOP_PADDLER_B = "paddler-5";
 
@@ -1324,50 +1390,50 @@ export const MOCK_SHOP_ORDER_ITEMS: ShopOrderItem[] = [
   {
     id: "shop-order-item-1",
     order_id: "shop-order-1",
-    style_id: "shop-style-1",
+    style_id: "shop-style-drinking-shirt",
     size: "M",
     quantity: 1,
-    style_name_snapshot: "Club Hoodie",
+    style_name_snapshot: "Drinking Shirt",
     size_snapshot: "M",
     created_at: now,
   },
   {
     id: "shop-order-item-2",
     order_id: "shop-order-1",
-    style_id: "shop-style-2",
+    style_id: "shop-style-rashie",
     size: "S",
     quantity: 2,
-    style_name_snapshot: "Race Jersey",
+    style_name_snapshot: "Rashie",
     size_snapshot: "S",
     created_at: now,
   },
   {
     id: "shop-order-item-3",
     order_id: "shop-order-2",
-    style_id: "shop-style-3",
+    style_id: "shop-style-tshirt",
     size: "L",
     quantity: 3,
-    style_name_snapshot: "Training Tee",
+    style_name_snapshot: "T-Shirt",
     size_snapshot: "L",
     created_at: now,
   },
   {
     id: "shop-order-item-4",
     order_id: "shop-order-3",
-    style_id: "shop-style-2",
+    style_id: "shop-style-hooded-rashie",
     size: "L",
     quantity: 1,
-    style_name_snapshot: "Race Jersey",
+    style_name_snapshot: "Hooded Rashie",
     size_snapshot: "L",
     created_at: now,
   },
   {
     id: "shop-order-item-5",
     order_id: "shop-order-4",
-    style_id: "shop-style-1",
+    style_id: "shop-style-singlet",
     size: "S",
     quantity: 1,
-    style_name_snapshot: "Club Hoodie",
+    style_name_snapshot: "Singlet",
     size_snapshot: "S",
     created_at: now,
   },

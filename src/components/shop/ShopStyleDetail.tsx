@@ -118,7 +118,7 @@ export function ShopStyleDetail({
             <img
               src={displayed.image_url}
               alt={displayed.name}
-              className="aspect-square w-full rounded-2xl bg-slate-100 object-cover dark:bg-white/5"
+              className="w-full rounded-2xl bg-slate-100 dark:bg-white/5"
             />
           )}
           {displayed.description && (
