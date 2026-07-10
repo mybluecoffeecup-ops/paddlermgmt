@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import type { AttendanceStatus, CalendarEventCategory, Discipline } from "@/types";
+import type { AttendanceStatus, CalendarEventCategory, Discipline, ShopOrderStatus } from "@/types";
 
 export function Badge({
   className,
@@ -71,4 +71,19 @@ export const CALENDAR_CATEGORY_DOT_STYLES: Record<CalendarEventCategory, string>
 
 export function CalendarCategoryBadge({ category }: { category: CalendarEventCategory }) {
   return <Badge className={CALENDAR_CATEGORY_STYLES[category]}>{category}</Badge>;
+}
+
+const SHOP_ORDER_STATUS_STYLES: Record<ShopOrderStatus, string> = {
+  pending: "bg-gold-500/20 text-gold-900 dark:bg-gold-400/25 dark:text-white",
+  accepted: "bg-green-500/15 text-green-800 dark:bg-green-400/20 dark:text-white",
+  rejected: "bg-redcard-500/15 text-redcard-700 dark:bg-redcard-500/25 dark:text-white",
+  cancelled: "border border-slate-300 text-slate-700 dark:border-white/30 dark:text-white",
+};
+
+export function ShopOrderStatusBadge({ status }: { status: ShopOrderStatus }) {
+  return (
+    <Badge className={SHOP_ORDER_STATUS_STYLES[status]}>
+      {status.charAt(0).toUpperCase() + status.slice(1)}
+    </Badge>
+  );
 }

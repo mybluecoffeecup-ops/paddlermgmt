@@ -22,7 +22,7 @@ export function BrandMark({ variant = "card" }: { variant?: "header" | "card" })
             variant === "header" ? "text-slate-300" : "text-slate-600 dark:text-slate-300"
           )}
         >
-          Paddle Sports Crew Management
+          Crew Mgmt
         </p>
       </div>
     </div>

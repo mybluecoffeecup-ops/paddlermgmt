@@ -14,7 +14,7 @@ const NAV_ITEMS = [
   { href: "/", label: "Home", mobileLabel: "Home", icon: Waves, coachOnly: false },
   {
     href: "/sessions",
-    label: "Session Mgmt",
+    label: "Sessions",
     mobileLabel: "Sessions",
     icon: Users,
     coachOnly: true,

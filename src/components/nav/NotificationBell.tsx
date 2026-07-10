@@ -8,12 +8,15 @@ import { useAppData } from "@/hooks/app-data";
 import { cn, formatRelativeTime } from "@/lib/utils";
 
 export function NotificationBell() {
-  const { notifications, currentUserId, markNotificationRead } = useAppData();
+  const { notifications, currentUserId, role, markNotificationRead } = useAppData();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  const sorted = [...notifications].sort((a, b) => b.created_at.localeCompare(a.created_at));
+  // Mock mode has no server-side RLS to scope 'coach'-audience rows to
+  // coaches only, so this filter has to happen client-side too.
+  const visible = notifications.filter((n) => n.audience === "all" || role === "coach");
+  const sorted = [...visible].sort((a, b) => b.created_at.localeCompare(a.created_at));
   const unreadCount = sorted.filter((n) => !n.read_by.includes(currentUserId)).length;
 
   useEffect(() => {
@@ -32,6 +35,7 @@ export function NotificationBell() {
     setOpen(false);
     if (notification.session_id) router.push(`/sessions/${notification.session_id}`);
     else if (notification.race_id) router.push(`/races/${notification.race_id}`);
+    else if (notification.order_id) router.push("/orders");
   }
 
   return (

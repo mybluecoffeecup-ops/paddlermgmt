@@ -205,10 +205,14 @@ export interface Comment {
   created_at: string;
 }
 
+export type NotificationAudience = "all" | "coach";
+
 export interface Notification {
   id: string;
   session_id: string | null;
   race_id: string | null;
+  order_id: string | null;
+  audience: NotificationAudience;
   title: string;
   body: string;
   read_by: string[];
@@ -230,4 +234,73 @@ export interface TeamDocument {
   created_by: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export type ShopOrderStatus = "pending" | "accepted" | "rejected" | "cancelled";
+export const ALL_SHOP_ORDER_STATUSES: ShopOrderStatus[] = [
+  "pending",
+  "accepted",
+  "rejected",
+  "cancelled",
+];
+
+export interface ShopSizeChart {
+  id: string;
+  name: string;
+  image_url: string;
+  created_at: string;
+}
+
+export interface ShopStyle {
+  id: string;
+  name: string;
+  description: string | null;
+  image_url: string | null;
+  active: boolean;
+  size_chart_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ShopStyleSize {
+  id: string;
+  style_id: string;
+  size: string;
+  stock_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ShopOrder {
+  id: string;
+  paddler_id: string;
+  status: ShopOrderStatus;
+  created_at: string;
+  updated_at: string;
+  decided_at: string | null;
+  decided_by: string | null;
+}
+
+export interface ShopOrderItem {
+  id: string;
+  order_id: string;
+  style_id: string | null;
+  size: string;
+  quantity: number;
+  style_name_snapshot: string;
+  size_snapshot: string;
+  created_at: string;
+}
+
+/**
+ * A client-only cart line — never a DB row until checkout submits it as a
+ * real ShopOrderItem. Denormalizes styleName/imageUrl so the cart still
+ * renders sensibly if a style is deactivated/edited while items sit in it.
+ */
+export interface CartLine {
+  styleId: string;
+  size: string;
+  quantity: number;
+  styleName: string;
+  imageUrl: string | null;
 }

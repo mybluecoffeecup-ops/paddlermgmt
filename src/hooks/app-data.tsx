@@ -39,6 +39,23 @@ import {
 } from "@/lib/api/races";
 import { createSession as apiCreateSession, fetchSessions, updateSession as apiUpdateSession } from "@/lib/api/sessions";
 import {
+  acceptShopOrder as apiAcceptShopOrder,
+  createShopOrder as apiCreateShopOrder,
+  createShopSizeChart as apiCreateShopSizeChart,
+  createShopStyle as apiCreateShopStyle,
+  createShopStyleSize as apiCreateShopStyleSize,
+  deleteShopStyleSize as apiDeleteShopStyleSize,
+  fetchShopOrderItems,
+  fetchShopOrders,
+  fetchShopSizeCharts,
+  fetchShopStyleSizes,
+  fetchShopStyles,
+  replaceShopOrderItems as apiReplaceShopOrderItems,
+  updateShopOrder as apiUpdateShopOrder,
+  updateShopStyle as apiUpdateShopStyle,
+  updateShopStyleSize as apiUpdateShopStyleSize,
+} from "@/lib/api/shop";
+import {
   createTeamDocument as apiCreateTeamDocument,
   deleteTeamDocument as apiDeleteTeamDocument,
   fetchTeamDocuments,
@@ -59,6 +76,11 @@ import {
   MOCK_RACES,
   MOCK_RACE_COMMITMENTS,
   MOCK_SESSIONS,
+  MOCK_SHOP_ORDER_ITEMS,
+  MOCK_SHOP_ORDERS,
+  MOCK_SHOP_SIZE_CHARTS,
+  MOCK_SHOP_STYLE_SIZES,
+  MOCK_SHOP_STYLES,
   MOCK_TEAM_DOCUMENTS,
   MOCK_WORKOUT_PROGRAM,
 } from "@/lib/mock-data";
@@ -67,14 +89,21 @@ import type {
   AttendanceStatus,
   BoatType,
   CalendarEvent,
+  CartLine,
   Comment,
   Lineup,
   Notification,
+  NotificationAudience,
   Profile,
   Race,
   RaceCommitment,
   SeatingConfiguration,
   Session,
+  ShopOrder,
+  ShopOrderItem,
+  ShopSizeChart,
+  ShopStyle,
+  ShopStyleSize,
   TeamDocument,
   WorkoutProgram,
 } from "@/types";
@@ -92,6 +121,11 @@ interface AppDataValue {
   comments: Comment[];
   notifications: Notification[];
   teamDocuments: TeamDocument[];
+  shopStyles: ShopStyle[];
+  shopStyleSizes: ShopStyleSize[];
+  shopSizeCharts: ShopSizeChart[];
+  shopOrders: ShopOrder[];
+  shopOrderItems: ShopOrderItem[];
   workoutProgram: WorkoutProgram | null;
   loading: boolean;
   usingLiveBackend: boolean;
@@ -130,10 +164,26 @@ interface AppDataValue {
   ) => TeamDocument;
   updateTeamDocument: (id: string, patch: Partial<TeamDocument>) => void;
   deleteTeamDocument: (id: string) => void;
+  createShopStyle: (style: Omit<ShopStyle, "id" | "created_at" | "updated_at">) => ShopStyle;
+  updateShopStyle: (id: string, patch: Partial<ShopStyle>) => void;
+  createShopStyleSize: (
+    entry: Omit<ShopStyleSize, "id" | "created_at" | "updated_at">
+  ) => ShopStyleSize;
+  updateShopStyleSize: (id: string, patch: Partial<ShopStyleSize>) => void;
+  deleteShopStyleSize: (id: string) => void;
+  createShopSizeChart: (chart: Omit<ShopSizeChart, "id" | "created_at">) => ShopSizeChart;
+  shopOrderItemsFor: (orderId: string) => ShopOrderItem[];
+  submitShopOrder: (lines: CartLine[]) => Promise<ShopOrder>;
+  updateShopOrderItems: (orderId: string, lines: CartLine[]) => void;
+  cancelShopOrder: (id: string) => void;
+  rejectShopOrder: (id: string) => void;
+  acceptShopOrder: (
+    orderId: string
+  ) => Promise<{ ok: true; order: ShopOrder } | { ok: false; error: string }>;
   notifyAll: (
     title: string,
     body: string,
-    target: { sessionId?: string; raceId?: string }
+    target: { sessionId?: string; raceId?: string; orderId?: string }
   ) => void;
   markNotificationRead: (id: string) => void;
   updateWorkoutProgram: (content: string) => void;
@@ -156,6 +206,11 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [comments, setComments] = useState<Comment[]>(MOCK_COMMENTS);
   const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
   const [teamDocuments, setTeamDocuments] = useState<TeamDocument[]>(MOCK_TEAM_DOCUMENTS);
+  const [shopStyles, setShopStyles] = useState<ShopStyle[]>(MOCK_SHOP_STYLES);
+  const [shopStyleSizes, setShopStyleSizes] = useState<ShopStyleSize[]>(MOCK_SHOP_STYLE_SIZES);
+  const [shopSizeCharts, setShopSizeCharts] = useState<ShopSizeChart[]>(MOCK_SHOP_SIZE_CHARTS);
+  const [shopOrders, setShopOrders] = useState<ShopOrder[]>(MOCK_SHOP_ORDERS);
+  const [shopOrderItems, setShopOrderItems] = useState<ShopOrderItem[]>(MOCK_SHOP_ORDER_ITEMS);
   const [workoutProgram, setWorkoutProgram] = useState<WorkoutProgram | null>(
     MOCK_WORKOUT_PROGRAM
   );
@@ -168,7 +223,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     (async () => {
       try {
-        const [p, s, a, r, rc, ce, l, cm, n, wp, td] = await Promise.all([
+        const [p, s, a, r, rc, ce, l, cm, n, wp, td, ss, ssz, ssc, so, soi] = await Promise.all([
           fetchProfiles(),
           fetchSessions(),
           fetchAttendance(),
@@ -180,6 +235,11 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           fetchNotifications(),
           fetchWorkoutProgram(),
           fetchTeamDocuments(),
+          fetchShopStyles(),
+          fetchShopStyleSizes(),
+          fetchShopSizeCharts(),
+          fetchShopOrders(),
+          fetchShopOrderItems(),
         ]);
         if (cancelled) return;
         if (p) setProfiles(p);
@@ -193,6 +253,11 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         if (n) setNotifications(n);
         if (wp) setWorkoutProgram(wp);
         if (td) setTeamDocuments(td);
+        if (ss) setShopStyles(ss);
+        if (ssz) setShopStyleSizes(ssz);
+        if (ssc) setShopSizeCharts(ssc);
+        if (so) setShopOrders(so);
+        if (soi) setShopOrderItems(soi);
       } catch (err) {
         console.error("Failed to load live Supabase data, staying on mock state:", err);
       } finally {
@@ -562,12 +627,19 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const notifyAll = useCallback(
-    (title: string, body: string, target: { sessionId?: string; raceId?: string }) => {
+    (
+      title: string,
+      body: string,
+      target: { sessionId?: string; raceId?: string; orderId?: string }
+    ) => {
+      const audience: NotificationAudience = target.orderId ? "coach" : "all";
       const notification: Omit<Notification, "id" | "created_at" | "read_by"> = {
         title,
         body,
         session_id: target.sessionId ?? null,
         race_id: target.raceId ?? null,
+        order_id: target.orderId ?? null,
+        audience,
         created_by: currentUserId,
       };
       const newNotification: Notification = {
@@ -621,6 +693,292 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     [currentUserId]
   );
 
+  const createShopStyle = useCallback(
+    (style: Omit<ShopStyle, "id" | "created_at" | "updated_at">) => {
+      const newStyle: ShopStyle = {
+        ...style,
+        id: `shop-style-${Date.now()}-${crypto.randomUUID()}`,
+        created_at: nowIso(),
+        updated_at: nowIso(),
+      };
+      setShopStyles((prev) => [...prev, newStyle]);
+      if (isSupabaseConfigured) {
+        apiCreateShopStyle(style).catch((err) =>
+          console.error("Failed to sync shop style to Supabase:", err)
+        );
+      }
+      return newStyle;
+    },
+    []
+  );
+
+  const updateShopStyle = useCallback((id: string, patch: Partial<ShopStyle>) => {
+    setShopStyles((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, ...patch, updated_at: nowIso() } : s))
+    );
+    if (isSupabaseConfigured) {
+      apiUpdateShopStyle(id, patch).catch((err) =>
+        console.error("Failed to sync shop style to Supabase:", err)
+      );
+    }
+  }, []);
+
+  const createShopStyleSize = useCallback(
+    (entry: Omit<ShopStyleSize, "id" | "created_at" | "updated_at">) => {
+      const newSize: ShopStyleSize = {
+        ...entry,
+        id: `shop-size-${Date.now()}-${crypto.randomUUID()}`,
+        created_at: nowIso(),
+        updated_at: nowIso(),
+      };
+      setShopStyleSizes((prev) => [...prev, newSize]);
+      if (isSupabaseConfigured) {
+        apiCreateShopStyleSize(entry).catch((err) =>
+          console.error("Failed to sync shop style size to Supabase:", err)
+        );
+      }
+      return newSize;
+    },
+    []
+  );
+
+  const updateShopStyleSize = useCallback((id: string, patch: Partial<ShopStyleSize>) => {
+    setShopStyleSizes((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, ...patch, updated_at: nowIso() } : s))
+    );
+    if (isSupabaseConfigured) {
+      apiUpdateShopStyleSize(id, patch).catch((err) =>
+        console.error("Failed to sync shop style size to Supabase:", err)
+      );
+    }
+  }, []);
+
+  const deleteShopStyleSize = useCallback((id: string) => {
+    setShopStyleSizes((prev) => prev.filter((s) => s.id !== id));
+    if (isSupabaseConfigured) {
+      apiDeleteShopStyleSize(id).catch((err) =>
+        console.error("Failed to sync shop style size deletion to Supabase:", err)
+      );
+    }
+  }, []);
+
+  const createShopSizeChart = useCallback((chart: Omit<ShopSizeChart, "id" | "created_at">) => {
+    const newChart: ShopSizeChart = {
+      ...chart,
+      id: `shop-size-chart-${Date.now()}-${crypto.randomUUID()}`,
+      created_at: nowIso(),
+    };
+    setShopSizeCharts((prev) => [...prev, newChart]);
+    if (isSupabaseConfigured) {
+      apiCreateShopSizeChart(chart).catch((err) =>
+        console.error("Failed to sync size chart to Supabase:", err)
+      );
+    }
+    return newChart;
+  }, []);
+
+  const shopOrderItemsFor = useCallback(
+    (orderId: string) => shopOrderItems.filter((i) => i.order_id === orderId),
+    [shopOrderItems]
+  );
+
+  // Deviation from this file's usual optimistic-then-fire-and-forget
+  // pattern: the coach notification can only be inserted once the order
+  // row is actually committed (the RLS insert policy on notifications
+  // requires the referenced order to already exist and belong to the
+  // caller), so this awaits the Supabase insert before notifying.
+  const submitShopOrder = useCallback(
+    async (lines: CartLine[]) => {
+      const newOrder: ShopOrder = {
+        id: `shop-order-${Date.now()}-${crypto.randomUUID()}`,
+        paddler_id: currentUserId,
+        status: "pending",
+        created_at: nowIso(),
+        updated_at: nowIso(),
+        decided_at: null,
+        decided_by: null,
+      };
+      const newItems: ShopOrderItem[] = lines.map((l) => ({
+        id: `shop-order-item-${Date.now()}-${crypto.randomUUID()}`,
+        order_id: newOrder.id,
+        style_id: l.styleId,
+        size: l.size,
+        quantity: l.quantity,
+        style_name_snapshot: l.styleName,
+        size_snapshot: l.size,
+        created_at: nowIso(),
+      }));
+      setShopOrders((prev) => [newOrder, ...prev]);
+      setShopOrderItems((prev) => [...prev, ...newItems]);
+
+      const notifyBody = `${currentUser?.full_name ?? "A paddler"} submitted an order (${
+        lines.length
+      } item${lines.length === 1 ? "" : "s"}).`;
+
+      if (isSupabaseConfigured) {
+        try {
+          const created = await apiCreateShopOrder(
+            { paddler_id: currentUserId, status: "pending" },
+            newItems.map(
+              ({ style_id, size, quantity, style_name_snapshot, size_snapshot }) => ({
+                style_id,
+                size,
+                quantity,
+                style_name_snapshot,
+                size_snapshot,
+              })
+            )
+          );
+          if (created) notifyAll("New shop order", notifyBody, { orderId: created.id });
+        } catch (err) {
+          console.error("Failed to sync shop order to Supabase:", err);
+        }
+      } else {
+        notifyAll("New shop order", notifyBody, { orderId: newOrder.id });
+      }
+      return newOrder;
+    },
+    [currentUserId, currentUser, notifyAll]
+  );
+
+  const updateShopOrderItems = useCallback((orderId: string, lines: CartLine[]) => {
+    const newItems: ShopOrderItem[] = lines.map((l) => ({
+      id: `shop-order-item-${Date.now()}-${crypto.randomUUID()}`,
+      order_id: orderId,
+      style_id: l.styleId,
+      size: l.size,
+      quantity: l.quantity,
+      style_name_snapshot: l.styleName,
+      size_snapshot: l.size,
+      created_at: nowIso(),
+    }));
+    setShopOrderItems((prev) => [...prev.filter((i) => i.order_id !== orderId), ...newItems]);
+    if (isSupabaseConfigured) {
+      apiReplaceShopOrderItems(
+        orderId,
+        newItems.map(({ style_id, size, quantity, style_name_snapshot, size_snapshot }) => ({
+          style_id,
+          size,
+          quantity,
+          style_name_snapshot,
+          size_snapshot,
+        }))
+      ).catch((err) => console.error("Failed to sync shop order item edits to Supabase:", err));
+    }
+  }, []);
+
+  const cancelShopOrder = useCallback(
+    (id: string) => {
+      setShopOrders((prev) =>
+        prev.map((o) =>
+          o.id === id
+            ? {
+                ...o,
+                status: "cancelled",
+                decided_by: currentUserId,
+                decided_at: nowIso(),
+                updated_at: nowIso(),
+              }
+            : o
+        )
+      );
+      if (isSupabaseConfigured) {
+        apiUpdateShopOrder(id, {
+          status: "cancelled",
+          decided_by: currentUserId,
+          decided_at: nowIso(),
+        }).catch((err) => console.error("Failed to sync order cancellation to Supabase:", err));
+      }
+    },
+    [currentUserId]
+  );
+
+  const rejectShopOrder = useCallback(
+    (id: string) => {
+      setShopOrders((prev) =>
+        prev.map((o) =>
+          o.id === id
+            ? {
+                ...o,
+                status: "rejected",
+                decided_by: currentUserId,
+                decided_at: nowIso(),
+                updated_at: nowIso(),
+              }
+            : o
+        )
+      );
+      if (isSupabaseConfigured) {
+        apiUpdateShopOrder(id, {
+          status: "rejected",
+          decided_by: currentUserId,
+          decided_at: nowIso(),
+        }).catch((err) => console.error("Failed to sync order rejection to Supabase:", err));
+      }
+    },
+    [currentUserId]
+  );
+
+  // Deviation from this file's usual optimistic pattern: accepting is a
+  // genuinely fallible operation (insufficient stock) the coach needs to
+  // see fail, so this is awaited and non-optimistic rather than
+  // fire-and-forget. The mock-mode branch replicates the accept_shop_order
+  // RPC's exact all-or-nothing stock check so behavior matches whether or
+  // not Supabase is configured.
+  const acceptShopOrder = useCallback(
+    async (
+      orderId: string
+    ): Promise<{ ok: true; order: ShopOrder } | { ok: false; error: string }> => {
+      if (isSupabaseConfigured) {
+        const { order, error } = await apiAcceptShopOrder(orderId);
+        if (error || !order) {
+          return { ok: false, error: error ?? "Failed to accept order" };
+        }
+        setShopOrders((prev) => prev.map((o) => (o.id === order.id ? order : o)));
+        const sizes = await fetchShopStyleSizes();
+        if (sizes) setShopStyleSizes(sizes);
+        return { ok: true, order };
+      }
+
+      const order = shopOrders.find((o) => o.id === orderId);
+      if (!order) return { ok: false, error: "Order not found" };
+      if (order.status !== "pending") {
+        return { ok: false, error: `Order is not pending (current status: ${order.status})` };
+      }
+      const items = shopOrderItems.filter((i) => i.order_id === orderId);
+      for (const item of items) {
+        if (!item.style_id) continue;
+        const sizeRow = shopStyleSizes.find(
+          (s) => s.style_id === item.style_id && s.size === item.size
+        );
+        if (!sizeRow || sizeRow.stock_count < item.quantity) {
+          return {
+            ok: false,
+            error: `Insufficient stock for ${item.style_name_snapshot} (size ${item.size})`,
+          };
+        }
+      }
+      setShopStyleSizes((prev) =>
+        prev.map((s) => {
+          const item = items.find((i) => i.style_id === s.style_id && i.size === s.size);
+          return item
+            ? { ...s, stock_count: s.stock_count - item.quantity, updated_at: nowIso() }
+            : s;
+        })
+      );
+      const updated: ShopOrder = {
+        ...order,
+        status: "accepted",
+        decided_by: currentUserId,
+        decided_at: nowIso(),
+        updated_at: nowIso(),
+      };
+      setShopOrders((prev) => prev.map((o) => (o.id === orderId ? updated : o)));
+      return { ok: true, order: updated };
+    },
+    [shopOrders, shopOrderItems, shopStyleSizes, currentUserId]
+  );
+
   const value: AppDataValue = {
     profiles,
     sessions,
@@ -632,6 +990,11 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     comments,
     notifications,
     teamDocuments,
+    shopStyles,
+    shopStyleSizes,
+    shopSizeCharts,
+    shopOrders,
+    shopOrderItems,
     workoutProgram,
     loading,
     usingLiveBackend: isSupabaseConfigured,
@@ -660,6 +1023,18 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     createTeamDocument,
     updateTeamDocument,
     deleteTeamDocument,
+    createShopStyle,
+    updateShopStyle,
+    createShopStyleSize,
+    updateShopStyleSize,
+    deleteShopStyleSize,
+    createShopSizeChart,
+    shopOrderItemsFor,
+    submitShopOrder,
+    updateShopOrderItems,
+    cancelShopOrder,
+    rejectShopOrder,
+    acceptShopOrder,
     notifyAll,
     markNotificationRead,
     updateWorkoutProgram,

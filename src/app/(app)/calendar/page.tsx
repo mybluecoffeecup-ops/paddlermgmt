@@ -73,14 +73,14 @@ export default function CalendarPage() {
       </div>
 
       {resolved && role === "coach" && (
-        <div className="flex flex-col gap-4">
-          <RaceManager />
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <CalendarEventManager />
+          <RaceManager />
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[18rem_1fr]">
-        <div className="xl:sticky xl:top-20 xl:col-start-1 xl:row-start-1">
+      <div className="grid grid-cols-1 gap-4 max-w-2xl xl:max-w-none xl:grid-cols-[18rem_1fr] xl:items-start">
+        <div className="flex flex-col gap-4 xl:sticky xl:top-20 xl:col-start-1">
           <CalendarMiniMonth
             year={year}
             month={month}
@@ -90,9 +90,10 @@ export default function CalendarPage() {
             onNavigateMonth={navigateMonth}
             onSelectDay={selectDay}
           />
+          <CalendarUpcomingList items={items} onSelectDay={selectDay} />
         </div>
 
-        <div className="xl:col-start-2 xl:row-start-1">
+        <div className="flex flex-col gap-4 xl:col-start-2">
           <CalendarMonthGrid
             year={year}
             month={month}
@@ -101,14 +102,7 @@ export default function CalendarPage() {
             todayDate={todayDate}
             onSelectDay={selectDay}
           />
-        </div>
-
-        <div className="xl:col-start-2 xl:row-start-2">
           <CalendarDayDetail selectedDate={selectedDate} items={items} />
-        </div>
-
-        <div className="xl:col-start-1 xl:row-start-2">
-          <CalendarUpcomingList items={items} onSelectDay={selectDay} />
         </div>
       </div>
     </div>

@@ -20,7 +20,7 @@ export function CalendarUpcomingList({
   const upcoming = upcomingItems(items, todayIso(), UPCOMING_LIMIT);
 
   return (
-    <div className="rounded-2xl border border-green-700/15 bg-green-500/[0.06] p-3 dark:border-green-400/20 dark:bg-green-400/10">
+    <div className="w-full max-w-sm rounded-2xl border border-green-700/15 bg-green-500/[0.06] p-3 dark:border-green-400/20 dark:bg-green-400/10 xl:max-w-none">
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}

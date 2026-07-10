@@ -50,7 +50,7 @@ export function CalendarMiniMonth({
   const eventDates = datesWithItems(items);
 
   return (
-    <div className="rounded-2xl border border-green-700/15 bg-green-500/[0.06] p-3 dark:border-green-400/20 dark:bg-green-400/10">
+    <div className="w-full max-w-sm rounded-2xl border border-green-700/15 bg-green-500/[0.06] p-3 dark:border-green-400/20 dark:bg-green-400/10 xl:max-w-none">
       <div className="mb-2 flex items-center justify-between">
         <p className="font-display text-sm font-bold uppercase tracking-wide text-slate-900 dark:text-white">
           {MONTH_NAMES[month - 1]} {year}
